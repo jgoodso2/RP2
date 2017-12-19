@@ -438,17 +438,18 @@ export class ResPlanListComponent implements OnInit {
         ;
         if (this.mainForm.dirty && this.mainForm.valid) {
 
-
-            let resourceplans = this.fb.array(this.resPlans.controls
-                .filter(item => item.dirty === true)).controls
+            debugger
+            let resourceplans = this.resPlans.controls
+                .filter(item => item.dirty === true)
                 .map(t => {
                     var _resPlan: IResPlan;
                     var _projects: [IProject];
-                    var projects = Object.assign([], _projects, this.fb.array(((t as FormGroup).controls['projects'] as FormArray).controls.filter(s => s.dirty == true)).value)
+                    //var projects = Object.assign([], _projects, this.fb.array(((t as FormGroup).controls['projects'] as FormArray).controls.filter(s => s.dirty == true)).value)
                     let resPlan = new ResPlan();
                     resPlan.resource = new Resource(t.value.resUid, t.value.resName);
 
-                    resPlan.projects = projects;
+                    resPlan.projects = ((t as FormGroup).controls['projects'] as FormArray).controls.filter(p=>p.dirty == true)
+                                        .map(v=>v.value as IProject)
                     return resPlan;
                 })
 
