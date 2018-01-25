@@ -555,13 +555,23 @@ debugger;
                     resPlan.resource = new Resource(t.value.resUid, t.value.resName);
 
                     resPlan.projects = projects
-                    if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+                    
                         resPlan.projects.forEach(p => {
                             p.intervals.forEach(i => {
-                                i.intervalValue = (+(i.intervalValue) / 100).toString()
+                                if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+                                i.intervalValue = (+(i.intervalValue.replace('%','')) / 100).toString()
+                                }
+                                else if (this._appSvc.queryParams.workunits == WorkUnits.hours)
+                                {
+                                    i.intervalValue = (+(i.intervalValue.replace('hrs',''))).toString()
+                                }
+                                else if (this._appSvc.queryParams.workunits == WorkUnits.days)
+                                {
+                                    i.intervalValue = (+(i.intervalValue.replace('d',''))).toString()
+                                }
                             })
                         })
-                    }
+                    
                     return resPlan;
                 })
 
