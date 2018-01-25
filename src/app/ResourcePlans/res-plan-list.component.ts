@@ -23,6 +23,7 @@ import { ResourcesModalCommunicatorService } from '../resourcePlans/resources-mo
 import { ResPlanHeaderRowComponent } from "../resourcePlans/res-plan-header-row/res-plan-header-row.component"
 import { AppStateService } from '../services/app-state.service' 
 import { MenuService } from '../../fw/services/menu.service';
+import { ExportExcelService } from '../services/export-excel.service';
 import { elementAt } from 'rxjs/operators/elementAt';
 
 
@@ -80,6 +81,7 @@ export class ResPlanListComponent implements OnInit {
         private _resourcePlanSvc: ResourcePlanService
         , private _resPlanUserStateSvc: ResourcePlanUserStateService
         , private menuService: MenuService
+        , private excelExportService: ExportExcelService
         , private _resModalSvc: ResourcesModalCommunicatorService
         , private _appSvc: AppStateService
         , private _route: ActivatedRoute, private dialog: MatDialog) { }
@@ -751,6 +753,9 @@ debugger;
         $.when(this.menuService.printMode())          
         .done(setTimeout(this.menuService.printerFunction,1000))
         // .done(setTimeout(this.menuService.normalizeView,500));
+    }
+    excelExport(): void {
+        this.excelExportService.excelObject.toCSV('testTable', 'RM2');
     }
  
     updateErrors(errors: Result[]) {

@@ -16,19 +16,19 @@
                 title="Remove resource from your workspace without deleting assignment">
                 Hide </button>
                 <input type="button" class="btn btn-primary margin-left" (click)="printFunction($event);" value="Print to PDF" />
+                <input type="button" class="btn btn-primary margin-left" (click)="excelExport('printContent', 'RM2');" value="Export to Excel" />
                 <input type="button" class="btn btn-primary margin-left" (click)="exitToPerView(this.mainForm.dirty);" value="Exit to PerView" />
                 <input type="button" (click)="toggleTimesheetDisplay(this)" class="btn btn-primary margin-left" 
                 [value]="getTimesheetButtonText()">
                 <!-- <input type="button" class="btn btn-primary margin-left" onclick="location.href='https://perviewqa.app.parallon.com/PWA';" value="Exit to PerView" /> -->
             </div>
         
-
         <form class="form-horizontal" novalidate [formGroup]="mainForm">
 
             <div formArrayName="resPlans" *ngIf="resPlans && resPlans.length">
                 <res-plan-header-row #header (onselectAllChanged)="toggleSelectAll($event)"></res-plan-header-row>
                 <div id="printContent" class="table-body">
-                    <table class="table">
+                    <table id="testTable" class="table">
                         <tbody *ngFor="let plan of resPlans.controls;index as i" >
 
                             <div [formGroupName]="i">

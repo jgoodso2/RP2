@@ -21,3 +21,8 @@
     width:100px;
     min-width: 100px;
 }
+.stick {
+    position:fixed;
+    top: 12%;
+    background: cadetblue;
+}

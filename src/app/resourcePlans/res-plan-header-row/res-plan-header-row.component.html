@@ -9,9 +9,11 @@
                 <td>
                     <div class="header-cell col1"></div>
                 </td>
-                <td  *ngFor="let interval of _intervals">
-                   <div class="header-cell col dateWindow" style="padding:19px;">
-                       <strong> {{interval.start | date :  "shortDate"}} -  {{interval.end | date :  "shortDate"}}</strong></div></td>
+                <td *ngFor="let interval of _intervals" >
+                   <div class="header-cell col" >
+                       <strong class="stick">{{interval.start | date :  "shortDate"}} - <br> {{interval.end | date :  "shortDate"}}</strong>
+                   </div>
+                </td>
             </tr>
 
         </thead>

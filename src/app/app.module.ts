@@ -60,6 +60,7 @@ import { IntervalMaskDirective } from './directives/interval-mask.directive';
 import { ProjectDateSpanDirective } from './directives/project-date-span.directive';
 import { ConfirmDialogComponent } from './common/confirm-dialog/confirm-dialog.component';
 import { CellWorkUnitsPipe } from './common/cell-work-units.pipe'
+import { ExportExcelService } from 'app/services/export-excel.service';
 
 //let jQuery : Object;// Add this function
 export function initConfig(configSvc: ConfigService){
@@ -116,6 +117,7 @@ export function initConfig(configSvc: ConfigService){
     , ResourcePlansResolverService
     ,ResourceService, SPListService
     ,AppStateService 
+    ,ExportExcelService
     , {
       provide: HTTP_INTERCEPTORS,
       useClass: CachingInterceptorService,

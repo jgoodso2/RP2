@@ -64,6 +64,8 @@ export class MenuService {
     console.log('currentView capture', this.currentView)
     return this.currentView;
   }
+
+  
   
 
 }//end of MenuService Class
