@@ -757,8 +757,10 @@ debugger;
     //side bar and printing the window after enough time has
     //elapsed to reflect a full-screen.
     printFunction(event: Event): void {
+        this.menuService.getCurrentView();
         $.when(this.menuService.printMode())          
-        .done(setTimeout(this.menuService.printerFunction,1000));
+        .done(setTimeout(this.menuService.printerFunction,1000))
+        // .done(setTimeout(this.menuService.normalizeView,500));
     }
  
     updateErrors(errors: Result[]) {
