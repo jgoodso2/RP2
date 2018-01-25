@@ -1,3 +1,4 @@
+
 .table-header
 {
     position: relative;
@@ -23,6 +24,6 @@
 }
 .stick {
     position:fixed;
-    top: 12%;
-    background: cadetblue;
+    top: 4%;
+     background: cadetblue;
 }

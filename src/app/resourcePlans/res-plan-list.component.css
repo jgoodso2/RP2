@@ -68,6 +68,14 @@ min-width: 220px;
 width:100px;
 min-width: 100px;
 }
+/* div[class="button-header"]::before {
+    content: "";
+    clear: both;    
+} */
+/* div[class="button-header"]::after {
+    content: "";
+    clear: both;    
+} */
 
 /* input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
