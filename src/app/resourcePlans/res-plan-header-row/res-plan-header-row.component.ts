@@ -2,6 +2,7 @@ import { Component, OnInit,Input,Output,EventEmitter, } from '@angular/core';
 import {IResPlan,Timescale,WorkUnits,IInterval} from '../../resourcePlans/res-plan.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment'
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'res-plan-header-row',
@@ -12,9 +13,9 @@ export class ResPlanHeaderRowComponent implements OnInit {
 visible: boolean = true;
  _resPlans: IResPlan[];
  _intervals: IInterval[];
+ 
   
-
-  constructor(private router: Router,private _route: ActivatedRoute) { }
+ constructor(private router: Router,private _route: ActivatedRoute) { }
   @Output() onselectAllChanged = new EventEmitter<boolean>();
   ngOnInit() {
   this._route.data.subscribe(values =>{
@@ -47,6 +48,16 @@ visible: boolean = true;
      }
 
    })
+  }
+
+   horizontalScroll (event) {
+  //  let dateRow =  document.getElementById('hscroll');
+  //  console.log(event.target, "the event target is ___", event.target.value);
+  //  let width = dateRow.style.width;
+  //  let scrollAdjust = dateRow.scrollLeft;
+  //  width = width + scrollAdjust;
+  //  console.log(width, "with scroll adjust");
+  //  dateRow.width
   }
 
 }

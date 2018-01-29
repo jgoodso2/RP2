@@ -25,5 +25,6 @@
 .stick {
     position:fixed;
     top: 4%;
-     background: cadetblue;
+    background:white;
+    z-index: 99;
 }

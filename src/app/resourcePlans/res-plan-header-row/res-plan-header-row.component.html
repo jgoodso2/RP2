@@ -10,7 +10,7 @@
                     <div class="header-cell col1"></div>
                 </td>
                 <td *ngFor="let interval of _intervals" >
-                   <div class="header-cell col" >
+                   <div id="hscroll" class="header-cell col" (scroll)="horizontalScroll($event)">
                        <strong class="stick">{{interval.start | date :  "shortDate"}} - <br> {{interval.end | date :  "shortDate"}}</strong>
                    </div>
                 </td>
