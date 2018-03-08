@@ -41,6 +41,7 @@ export class MenuService {
     // this.isVertical = cv;
     // console.log("normalizing now for true", this.isVertical)
     // return this.isVertical;
+    //test
   }
 
   printerFunction() {
