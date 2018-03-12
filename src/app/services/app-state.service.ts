@@ -40,7 +40,7 @@ export class AppStateService {
   exitToBI$ = this.exitToBISource.asObservable()
 
   public next12Months = new Next12Months()  //default daterange
-
+  public projectsView : boolean = false;
 
   public queryParams: IQueryParams = {
     fromDate: this.next12Months.startDate,

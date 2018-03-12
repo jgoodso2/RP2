@@ -65,7 +65,8 @@ export let initialMenuItems: Array<MenuItem> = [
                 route: '/home/customDates',
                 submenu: null,
                 params: {}
-            }
+            }, 
+            
         ],
     }
     ,
@@ -138,6 +139,13 @@ export let initialMenuItems: Array<MenuItem> = [
             }
             
         ]
+    }, 
+    {
+        text: 'pivot',
+        icon: 'glyphicon-calendar',
+        route: '/home/pivot',
+        submenu: null,
+        params: {}
     }
     
     

@@ -3,6 +3,12 @@ export interface IResPlan {
   projects?: IProject[];
 }
 
+export interface IProjectPlan
+{
+  project :IProject
+  resources? : IResource[]
+}
+
 export interface IResource {
   resUid: string;
   resName?: string;
@@ -13,12 +19,14 @@ export interface IResource {
     title: string;
     manager: string;
   };
+  intervals?: IInterval[];
+  timesheetData?: IInterval[];
 }
 
 export interface IProject {
   projUid: string;
   projName: string;
-  readOnly: boolean;
+  readOnly?: boolean;
   stalePublish?: boolean;
   readOnlyReason?: string;
   owner?: string,
@@ -35,8 +43,8 @@ export interface IInterval {
 
   intervalName: string;
   intervalValue: string;
-  start: Date
-  end: Date
+  start?: Date
+  end?: Date
 }
 
 export interface IQueryParams {

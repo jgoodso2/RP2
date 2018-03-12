@@ -3,7 +3,8 @@ import { ResPlanListComponent } from './resourcePlans/res-plan-list.component'
 import { ResPlanHomeComponent } from './resourcePlans/res-plan-home/res-plan-home.component'
 import { JumbotronComponent  } from './jumbotron/jumbotron.component'
 import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.component'
-import { ResPlanEditGuard   }  from './services/resPlanEditGuard.service'
+import { ResPlanEditGuard   }  from './services/resPlanEditGuard.service' 
+import { ProjPlanListComponent }  from './ResourcePlans/proj-plan-list/proj-plan-list.component'
 
 import { ResourcePlansResolverService } from './services/resource-plans-resolver.service'
 
@@ -22,6 +23,9 @@ export const appRoutes: Routes = [
         { path: 'perview', redirectTo: "https://perviewqa.app.parallon.com/pwa" ,pathMatch: 'full'},
         { path: '', redirectTo: 'resPlans', pathMatch: 'full' , canDeactivate: [ ResPlanEditGuard ]},
         { path: 'jumbo', component: JumbotronComponent },
+        { path: 'pivot', component: ProjPlanListComponent }
+
+
       ]
 }
 ]

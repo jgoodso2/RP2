@@ -1,0 +1,47 @@
+<form class="form-horizontal" novalidate [formGroup]="mainForm">
+  <div formArrayName="projPlans" *ngIf="projPlans && projPlans.length">
+    <table id="projPlans" class="table">
+      <tbody *ngFor="let projPlan of projPlans.controls;index as i">
+        <div [formGroupName]="i">
+          <tr>
+            <td class="body-cell col1" colspan="0">
+              <input class = "totalsRow" formControlName="projName" placeholder="Project" style="width:100%">
+            </td>
+            <div formArrayName="totals">
+              <td class="body-cell col" *ngFor="let total of projPlan.get('totals').controls;index as l">
+                <div [formGroupName]="l">
+                  <input formControlName="intervalValue" placeholder="intervalValue" style="width:100%" />
+
+
+
+                </div>
+              </td>
+
+            </div>
+          </tr>
+          <div formArrayName="resources">
+            <div *ngFor="let resource of projPlan.get('resources').controls;index as j">
+              <tr [formGroupName]="j">
+
+                <td class="body-cell col1">
+                  <input formControlName="resName" placeholder="resource" style="width:100%" />
+                  <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
+                    [finish]="proj.get('finishDate').value"  placeholder="project" style="width:100%" /> -->
+                </td>
+                <div formArrayName="intervals">
+                  <td class="body-cell col" *ngFor="let intrvl of resource.get('intervals').controls; index as k">
+                    <div [formGroupName]="k">
+                      <input type="text" onClick="this.select()" autofocus formControlName="intervalValue" style="width:100%" spellcheck="false" 
+                      />
+                    </div>
+                  </td>
+                </div>
+              </tr>
+
+            </div>
+          </div>
+        </div>
+      </tbody>
+    </table>
+  </div>
+</form>

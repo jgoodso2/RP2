@@ -1,0 +1,119 @@
+.margin-left{
+    margin-left: 10px !important;
+}
+
+body
+{
+height: 100%;
+width: 100%;
+}
+table
+{
+border-collapse: collapse;
+}
+.totalGreen {
+background-color: rgb(191, 230, 191);
+}
+.totalRed {
+background-color: rgb(243, 162, 162);
+font-style: italic
+}
+.totalsRow {
+    font-weight: bold
+}
+.dirtyCell
+{
+    background-color:rgba(231, 227, 227, 0.89) !important
+}
+.outer-container
+{
+background-color: #ccc;
+position: absolute;
+top:0;
+left: 0;
+right: 300px;
+bottom: 40px;
+}
+.inner-container
+{
+height: 100%;
+overflow: hidden;
+}
+
+.header-cell
+{
+text-align: left;
+height: 40px;
+}
+.body-cell 
+{
+text-align: left;
+}
+.col1
+{
+width:220px;
+min-width: 220px;
+}
+.col
+{
+width: 80px;
+min-width: 50px;
+}
+
+/* input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+input[type="number"] {
+    -moz-appearance: textfield;
+} */
+
+input[type="number"]:focus {
+    -moz-appearance: number-input;
+}
+
+.intervalCell
+{
+    text-align: center
+}
+
+.actualCell
+{
+  color:  blue
+}
+
+.zeno{
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+}
+
+.ownBox{
+    /* position: relative; */
+    flex: 0 0 auto;
+    background-color: inherit;
+    /* background-color:   cadetblue; */
+    order: 0;
+    position: absolute;
+    top: 6%;
+    overflow: visible;
+    /* overflow-x: hidden; */
+    /* overflow-y: visible */
+    /* margin-top:7%; */
+    margin-top: 1%;
+    z-index: 99;
+    
+}
+
+
+.allTab{
+    flex: 0 0 auto;
+    position: relative;
+    /* overflow-y: hidden; */
+    /* overflow-x: auto; */
+    /* overflow: auto; */
+    order: 1;
+}
+
+

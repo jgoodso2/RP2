@@ -55,6 +55,7 @@ import { ProjectDateSpanDirective } from './directives/project-date-span.directi
 import { ConfirmDialogComponent } from './common/confirm-dialog/confirm-dialog.component';
 import { CellWorkUnitsPipe } from './common/cell-work-units.pipe';
 import { ExportExcelService } from 'app/services/export-excel.service';
+import { ProjPlanListComponent } from './ResourcePlans/proj-plan-list/proj-plan-list.component';
 
 
 
@@ -89,6 +90,7 @@ export function initConfig(configSvc: ConfigService){
     ProjectDateSpanDirective,
     ConfirmDialogComponent,
     CellWorkUnitsPipe,
+    ProjPlanListComponent,
   ],
 
   imports: [
