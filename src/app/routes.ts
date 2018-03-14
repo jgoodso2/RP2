@@ -1,6 +1,6 @@
 import { Routes  } from '@angular/router'
-import { ResPlanListComponent } from './resourcePlans/res-plan-list.component'
-import { ResPlanHomeComponent } from './resourcePlans/res-plan-home/res-plan-home.component'
+import { ResPlanListComponent } from './ResourcePlans/res-plan-list.component'
+import { ResPlanHomeComponent } from './ResourcePlans/res-plan-home/res-plan-home.component'
 import { JumbotronComponent  } from './jumbotron/jumbotron.component'
 import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.component'
 import { ResPlanEditGuard   }  from './services/resPlanEditGuard.service' 

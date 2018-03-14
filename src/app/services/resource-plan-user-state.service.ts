@@ -11,7 +11,7 @@ import { Observable } from 'rxjs';
 import * as moment from 'moment'
 
 
-import { IResPlan, ResPlan, IProject, Project, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result } from '../resourcePlans/res-plan.model'
+import { IResPlan, ResPlan, IProject, Project, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result } from '../ResourcePlans/res-plan.model'
 declare var $: any;
 
 @Injectable()

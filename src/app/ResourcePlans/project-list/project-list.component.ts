@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn, FormA
 
 import { ResPlan, Project, Interval, ProjectActiveStatus } from '../res-plan.model';
 import { SimpleModalComponent } from '../../common/simple-modal.component';
-import { ModalCommunicator } from '../../resourcePlans/modal-communicator.service';
+import { ModalCommunicator } from '../../ResourcePlans/modal-communicator.service';
 import 'rxjs/add/operator/filter';
 
 import { ProjectService } from '../../services/project-service.service'

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs/Subject"
-import { IQueryParams, Timescale, WorkUnits } from '../resourcePlans/res-plan.model'
+import { IQueryParams, Timescale, WorkUnits } from '../ResourcePlans/res-plan.model'
 import { CurrentCalendarYear, CurrentFiscalYear, Next12Months } from '../common/utilities'
 import { Subscriber } from 'rxjs/Subscriber';
 

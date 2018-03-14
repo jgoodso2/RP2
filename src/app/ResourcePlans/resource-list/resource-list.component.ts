@@ -5,7 +5,7 @@ import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn, FormA
 
 import { Resource, IResource } from '../res-plan.model';
 import { SimpleModalComponent } from '../../common/simple-modal.component';
-import { ResourcesModalCommunicatorService } from '../../resourcePlans/resources-modal-communicator.service';
+import { ResourcesModalCommunicatorService } from '../../ResourcePlans/resources-modal-communicator.service';
 import 'rxjs/add/operator/filter';
 
 import { ResourceService } from '../../services/resource.service'

@@ -7,7 +7,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
-import { IResPlan, IProject, IInterval, ResPlan, Interval, Project } from '../resourcePlans/res-plan.model';
+import { IResPlan, IProject, IInterval, ResPlan, Interval, Project } from '../ResourcePlans/res-plan.model';
 import { ResourcePlanService } from '../services/resource-plan.service'
 import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
 

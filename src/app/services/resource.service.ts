@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { IResource, Resource,Config } from '../resourcePlans/res-plan.model'
+import { IResource, Resource,Config } from '../ResourcePlans/res-plan.model'
 //import { Http, Response, Headers, RequestOptions } from '@angular/http';
 import { HttpClient, HttpHeaders, HttpInterceptor } from '@angular/common/http'
 import {ConfigService} from "./config-service.service"

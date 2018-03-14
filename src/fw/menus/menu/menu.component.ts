@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MenuService } from '../../services/menu.service';
 import { ResourcePlanUserStateService } from '../../../app/services/resource-plan-user-state.service'
-import { ResPlan, Resource } from '../../../app/resourcePlans/res-plan.model'
+import { ResPlan, Resource } from '../../../app/ResourcePlans/res-plan.model'
 import { AppStateService } from '../../../app/services/app-state.service'
 
 @Component({

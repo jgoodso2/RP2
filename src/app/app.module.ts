@@ -11,17 +11,17 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
 
 import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.component'
 
-import {Config} from './resourcePlans/res-plan.model'
-import { ModalCommunicator } from  './resourcePlans/modal-communicator.service'
-import { ResourcesModalCommunicatorService } from  './resourcePlans/resources-modal-communicator.service'
+import {Config} from './ResourcePlans/res-plan.model'
+import { ModalCommunicator } from  './ResourcePlans/modal-communicator.service'
+import { ResourcesModalCommunicatorService } from  './ResourcePlans/resources-modal-communicator.service'
 import { AppStateService } from  './services/app-state.service'
-import {ResPlanDetailsComponent} from './resourcePlans/res-plan-detail.component';
+import {ResPlanDetailsComponent} from './ResourcePlans/res-plan-detail.component';
 import { CollapsibleWellComponent} from './common/collapsible-well.component'
 import { HeaderRowComponent} from './common/header-row.component'
 import { ReactiveFormsModule } from '@angular/forms'
-import { ResPlanListComponent} from './resourcePlans/res-plan-list.component'
+import { ResPlanListComponent} from './ResourcePlans/res-plan-list.component'
 import { SimpleModalComponent} from './common/simple-modal.component';
-import { ProjectListComponent } from './resourcePlans/project-list/project-list.component';
+import { ProjectListComponent } from './ResourcePlans/project-list/project-list.component';
 
 import { MatDatepickerModule,MatInputModule,MatNativeDateModule,MatTableModule,MatButtonModule,MatDialogModule} from '@angular/material';
 import { ProjectService} from './services/project-service.service'
@@ -38,18 +38,18 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http'
 import { ProjectListFilterPipe } from './common/project-list-filter.pipe'
 
 import { ResourcePlansResolverService } from './services/resource-plans-resolver.service';
-import { ResourceListComponent } from './resourcePlans/resource-list/resource-list.component'
+import { ResourceListComponent } from './ResourcePlans/resource-list/resource-list.component'
 import { SPListService } from './services/sp-list.service';
-import { ResPlanHomeComponent } from './resourcePlans/res-plan-home/res-plan-home.component';
-import { ResPlanHeaderRowComponent } from './resourcePlans/res-plan-header-row/res-plan-header-row.component';
+import { ResPlanHomeComponent } from './ResourcePlans/res-plan-home/res-plan-home.component';
+import { ResPlanHeaderRowComponent } from './ResourcePlans/res-plan-header-row/res-plan-header-row.component';
 import { ResPlanTimescaleComponent } from './res-plan-timescale/res-plan-timescale.component';
-import { ResPlanWorkunitsComponent } from './resourcePlans/res-plan-workunits/res-plan-workunits.component';
+import { ResPlanWorkunitsComponent } from './ResourcePlans/res-plan-workunits/res-plan-workunits.component';
 import { IntervalPipe } from './common/interval.pipe'
-import { MessageComponent} from './resourcePlans/messageComponent/message.component'
-import { ErrorComponent} from './resourcePlans/errorComponent/error.component'
+import { MessageComponent} from './ResourcePlans/messageComponent/message.component'
+import { ErrorComponent} from './ResourcePlans/errorComponent/error.component'
 import { FwModule} from '../fw/fw.module'
 import { JumbotronComponent} from './jumbotron/jumbotron.component';
-import { ResPlanListTesterComponent } from './resourcePlans/res-plan-list-tester/res-plan-list-tester.component';
+import { ResPlanListTesterComponent } from './ResourcePlans/res-plan-list-tester/res-plan-list-tester.component';
 import { IntervalMaskDirective } from './directives/interval-mask.directive';
 import { ProjectDateSpanDirective } from './directives/project-date-span.directive';
 import { ConfirmDialogComponent } from './common/confirm-dialog/confirm-dialog.component';

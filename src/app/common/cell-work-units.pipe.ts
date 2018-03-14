@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {WorkUnits} from "../resourcePlans/res-plan.model"
+import {WorkUnits} from "../ResourcePlans/res-plan.model"
 @Pipe({
   name: 'cellWorkUnits'
 })

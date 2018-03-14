@@ -13,7 +13,7 @@ import { Observable } from 'rxjs';
 import {
     IResPlan, ResPlan, IProject, Project, WorkUnits, Timescale
     , IInterval, Interval, IResource, Resource
-} from '../resourcePlans/res-plan.model'
+} from '../ResourcePlans/res-plan.model'
 
 declare var jquery:any;
 declare var $ :any;

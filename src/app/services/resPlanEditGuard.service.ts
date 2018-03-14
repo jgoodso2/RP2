@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanDeactivate } from '@angular/router';
-import { ResPlanListComponent } from '../resourcePlans/res-plan-list.component'
+import { ResPlanListComponent } from '../ResourcePlans/res-plan-list.component'
 
 @Injectable()
 export class ResPlanEditGuard implements CanDeactivate<ResPlanListComponent> {

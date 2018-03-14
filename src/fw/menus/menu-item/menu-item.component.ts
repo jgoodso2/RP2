@@ -2,7 +2,7 @@ import { Component, ElementRef, HostBinding, HostListener,
          Input, OnInit,OnDestroy ,Renderer,
          trigger, state, style, transition, animate } from '@angular/core';
 import { NavigationEnd, Router,ActivatedRoute,Params } from '@angular/router';
-import {Timescale,WorkUnits} from '../../../app/resourcePlans/res-plan.model'
+import {Timescale,WorkUnits} from '../../../app/ResourcePlans/res-plan.model'
 import { MenuItem, MenuService } from '../../services/menu.service';
 import {CurrentCalendarYear} from '../../../app/common/utilities'
 import { AppUtilService } from '../../../app/common/app-util.service'

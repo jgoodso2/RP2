@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { IResPlan, Timescale, WorkUnits, IInterval,Interval } from '../../resourcePlans/res-plan.model';
+import { IResPlan, Timescale, WorkUnits, IInterval,Interval } from '../../ResourcePlans/res-plan.model';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as moment from 'moment'
 import { AppUtilService } from '../../common/app-util.service'

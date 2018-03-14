@@ -16,13 +16,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs/Rx';
 import { ResPlan, Project, Interval } from './res-plan.model';
 import { SimpleModalComponent } from '../common/simple-modal.component'
-import { ModalCommunicator } from '../resourcePlans/modal-communicator.service';
+import { ModalCommunicator } from '../ResourcePlans/modal-communicator.service';
 import { ProjectService } from '../services/project-service.service'
 import { ResourcePlanService } from '../services/resource-plan.service'
 import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
-import { ResourcesModalCommunicatorService } from '../resourcePlans/resources-modal-communicator.service'
+import { ResourcesModalCommunicatorService } from '../ResourcePlans/resources-modal-communicator.service'
 import { AppUtilService } from '../common/app-util.service'
-import { ResPlanHeaderRowComponent } from "../resourcePlans/res-plan-header-row/res-plan-header-row.component"
+import { ResPlanHeaderRowComponent } from "../ResourcePlans/res-plan-header-row/res-plan-header-row.component"
 import { AppStateService } from '../services/app-state.service'
 import { MenuService } from '../../fw/services/menu.service';
 import { ExportExcelService } from '../services/export-excel.service';

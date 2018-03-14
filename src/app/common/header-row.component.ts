@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IResPlan }  from '../resourcePlans/res-plan.model';
+import { IResPlan }  from '../ResourcePlans/res-plan.model';
 
 @Component({
   selector: 'header-row',

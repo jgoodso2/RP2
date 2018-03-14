@@ -17,8 +17,11 @@ export class ProjPlanListComponent implements OnInit {
   ///
   mainForm: FormGroup;
   _intervalCount :number=0;
-  get projPlans(): FormArray {  //this getter should return all instances.
-    return <FormArray>this.mainForm.get('projPlans');
+
+  
+
+  get chargeBacks(): FormArray {  //this getter should return all instances.
+    return <FormArray>this.mainForm.get('chargeBacks');
   }
 
 
@@ -30,7 +33,7 @@ export class ProjPlanListComponent implements OnInit {
     let obs1 = Observable.from(this.projPlanData)
     this.dataSub = obs1.subscribe((x) => console.log(JSON.stringify(x)))
     this.mainForm = this.fb.group({
-      projPlans: this.fb.array([])
+      chargeBacks: this.fb.array([]),
     })
     this.setIntervalLength(this.projPlanData.map(t => t.resources).reduce((a, b) => a.concat(b)))
     this.buildProjPlans(this.projPlanData)
@@ -39,11 +42,33 @@ export class ProjPlanListComponent implements OnInit {
 
   buildProjPlans(projPlans: IProjectPlan[]) {
     debugger;
-    for (var i = 0; i < projPlans.length; i++) {
-      var projPlan = this.buildProjPlan(projPlans[i]);
-      this.projPlans.push(projPlan);
-      
-    }
+    //group by charge back
+     let groupedChargeBack = this.groupBy(projPlans,'project[projectChargeBackCategory]')
+     debugger;
+     for(var key in groupedChargeBack){
+    let chargeBackGroup = this.buildChargeBack(key,groupedChargeBack[key]);
+    this.chargeBacks.push(chargeBackGroup)
+     }
+  }
+
+  groupBy(xs, key) {
+    return xs.reduce(function(rv, x) {
+      (rv[x[key]] = rv[x[key]] || []).push(x);
+      return rv;
+    }, {});
+  };
+
+  buildChargeBack(chargeBack:string,projPlans:IProjectPlan[]) : FormGroup
+  {
+      var chargeBackGroup = this.fb.group({
+        chargeBack:chargeBack,
+        projPlans : this.fb.array([])
+      })
+          for (var i = 0; i < projPlans.length; i++) {
+          var projPlan = this.buildProjPlan(projPlans[i]);
+          (chargeBackGroup.get('projPlans') as FormArray).push(projPlan);
+        }
+   return chargeBackGroup;
   }
 
     buildProjPlan(projPlan: IProjectPlan): FormGroup {
@@ -60,10 +85,10 @@ export class ProjPlanListComponent implements OnInit {
         (projPlanGroup.get('resources') as FormArray).push(resource)
       }
 
-      //this.calculateTotals(resPlanGroup);
-      // this.resPlanGroupChangesSub = resPlanGroup.valueChanges.subscribe(value => {
-      //     this.calculateTotals(resPlanGroup)
-      // }, (error) => console.log(error));
+      this.calculateTotals(projPlanGroup);
+       projPlanGroup.valueChanges.subscribe(value => {
+          this.calculateTotals(projPlanGroup)
+      }, (error) => console.log(error));
       debugger;
       return projPlanGroup;
     }
@@ -180,6 +205,7 @@ debugger;
       project: {
         projUid: '1',
         projName: 'Test Project 1',
+        projectChargeBackCategory : 'Category 1'
       },
       resources: [
         {
@@ -422,6 +448,7 @@ debugger;
       project: {
         projUid: '2',
         projName: 'Test Project 2',
+        projectChargeBackCategory : 'Category 2'
       },
       resources: [
         {

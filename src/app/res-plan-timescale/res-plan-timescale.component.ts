@@ -1,5 +1,5 @@
 import { Component, OnInit,EventEmitter,Output } from '@angular/core';
-import {IResPlan,Timescale,WorkUnits} from '../resourcePlans/res-plan.model';
+import {IResPlan,Timescale,WorkUnits} from '../ResourcePlans/res-plan.model';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {ActivatedRoute} from '@angular/router'
 declare var $:any;

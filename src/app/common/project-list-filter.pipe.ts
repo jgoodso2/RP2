@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {IProject,IResPlan} from "../resourcePlans/res-plan.model"
+import {IProject,IResPlan} from "../ResourcePlans/res-plan.model"
 import { FormGroup,FormControl, FormBuilder, Validators, AbstractControl, ValidatorFn, FormArray, FormGroupName } from '@angular/forms';
 @Pipe({
   name: 'projectListFilter'

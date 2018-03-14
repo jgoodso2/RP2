@@ -9,8 +9,8 @@ import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 import 'rxjs/add/operator/mergeMap';
 
-import { IResPlan,IProject,IInterval,ResPlan,Interval,Project } from '../resourcePlans/res-plan.model';
-import { WorkUnits,Timescale } from '../resourcePlans/res-plan.model';
+import { IResPlan,IProject,IInterval,ResPlan,Interval,Project } from '../ResourcePlans/res-plan.model';
+import { WorkUnits,Timescale } from '../ResourcePlans/res-plan.model';
 
 @Injectable()
 export class ResourcePlanService {

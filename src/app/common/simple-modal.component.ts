@@ -1,5 +1,5 @@
 import { Component, Input, ViewChild, ElementRef, OnInit} from '@angular/core';
-import { ModalCommunicator} from '../resourcePlans/modal-communicator.service';
+import { ModalCommunicator} from '../ResourcePlans/modal-communicator.service';
 import { Subject }    from 'rxjs/Subject';
  import { Observable} from  'rxjs'
 
