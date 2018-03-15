@@ -43,7 +43,7 @@ export class ProjPlanListComponent implements OnInit {
   buildProjPlans(projPlans: IProjectPlan[]) {
     debugger;
     //group by charge back
-     let groupedChargeBack = this.groupBy(projPlans,'project[projectChargeBackCategory]')
+     let groupedChargeBack = this.groupBy(projPlans,'project','projectChargeBackCategory')
      debugger;
      for(var key in groupedChargeBack){
     let chargeBackGroup = this.buildChargeBack(key,groupedChargeBack[key]);
@@ -51,9 +51,13 @@ export class ProjPlanListComponent implements OnInit {
      }
   }
 
-  groupBy(xs, key) {
+  //a group by function to group by second level of hierarcial property on object
+  //key is just used to navigate to sub property
+  //subKey is the one used for grouping
+  groupBy(xs, key,subKey) {
     return xs.reduce(function(rv, x) {
-      (rv[x[key]] = rv[x[key]] || []).push(x);
+      debugger;
+      (rv[x[key][subKey]] = rv[x[key][subKey]] || []).push(x);
       return rv;
     }, {});
   };
