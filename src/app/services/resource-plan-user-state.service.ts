@@ -506,35 +506,25 @@ export class ResourcePlanUserStateService {
 
     addProject(resMgrUid: string, project: IProject, resource: IResource, fromDate: string, toDate: string, timeScale: Timescale, workScale: WorkUnits): Observable<Result> {
         var success;
-        //TODO
-        let adapterPath = `${this.config.adapterUrl}`
-        let body = {
-            method: 'PwaAddResourcePlanCommand',
-            'puid': project.projUid,
-            'resuid': resource.resUid,
-            'resname': resource.resName,
-            'projname': project.projName,
-            'user': '',
-            'fromDate': fromDate,
-            'toDate': toDate,
-            'timeScale': this.getTimeScaleString(timeScale),
-            'workScale': WorkUnits[workScale]
-        }
-        let headers = new Headers();
-        headers.append('accept', 'application/json;odata=verbose')
-        headers.append('content-type', 'application/x-www-form-urlencoded')
+        let headers = new HttpHeaders();
+        headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
+
+
+        // let body = new URLSearchParams();
+
+        const body = `method=PwaAddResourcePlanCommand&puid=${project.projUid}&resuid=${resource.resUid}&resName=${resource.resName}&projname=${project.projName}&fromDate=${this.getDateFormatString(new Date(fromDate))}&toDate=${this.getDateFormatString(new Date(toDate))}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
-            headers
-        }
-        return Observable.fromPromise($.ajax({
-            url: adapterPath,
-            type: 'POST',
-            dataType: "json",
-            data: body,
-            xhrFields: {
-                withCredentials: true
-            }
-        })).map(r => {
+            headers,
+            withCredentials: true
+        };
+
+        let adapterPath = `${this.config.adapterUrl}`
+        
+        console.log("====================================Hitting Adapter Get Res Plan for project = " + project.projName)
+        return this.http.post(
+            adapterPath, body, options
+
+        ).map(r => {
             return r as Result
         })
         // return this.http.post(adapterPath,body,options).flatMap(r=>
@@ -583,26 +573,26 @@ export class ResourcePlanUserStateService {
         resPlan.forEach(r => {
             r.projects = r.projects.filter(p => p.readOnly == false)
         })
-        let pwaPath = `${this.config.projectServerUrl}/`
-        let adapterPath = `${this.config.adapterUrl}`;
-        let body = {
-            method: 'PwaDeleteResourcePlanCommand',
-            'resourceplan': JSON.stringify(resPlan),
-            'fromDate': this.getDateFormatString(fromDate),
-            'toDate': this.getDateFormatString(toDate),
-            'timeScale': this.getTimeScaleString(timeScale),
-            'workScale': WorkUnits[workScale]
-        }
+        let headers = new HttpHeaders();
+        //let start: Date = new LastYear().startDate;
+        //let end: Date = moment(new LastYear().startDate).add(3,'month').toDate()
+        let start: Date = moment(new LastYear().startDate).toDate();
+        let end: Date = new Date();
+        headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
 
-        return Observable.fromPromise($.ajax({
-            url: adapterPath,
-            type: 'POST',
-            dataType: "json",
-            data: body,
-            xhrFields: {
-                withCredentials: true
-            }
-        })).map((r) => {
+        console.log('--------------------')
+        console.log('-----   START  -------' + start)
+        console.log('--------------------')
+
+        const body = `method=PwaDeleteResourcePlanCommand&resourceplan=${JSON.stringify(resPlan)}&fromDate=${this.getDateFormatString(fromDate)}&toDate=${this.getDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`;
+        let adapterPath = `${this.config.adapterUrl}`
+        let options = {
+            headers
+        };
+        return this.http.post(
+            adapterPath, body, options
+
+        ).map((r) => {
             return r as Result[];
         })
 

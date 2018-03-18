@@ -13,10 +13,9 @@ export class CachingInterceptorService implements HttpInterceptor {
     req = req.clone({
       withCredentials: true
     });
-///why are we caching timesheet??
+
     let requestsToCache = ["PwaGetProjectsForEditCommand","PwaGetResourcesCommand","PwaGetResourcePlansCommand","PwaGetTimsheetsCommand"];
     // requests that won't be deleted from cache
-    let staticRequests = ["PwaGetProjectsForEditCommand","PwaGetResourcesCommand","PwaGetResourcePlansCommand"];
     let isRequestToCache : boolean = false;
     // Before doing anything, it's important to only cache GET requests.
     // Skip this interceptor if the request method isn't GET.
@@ -31,8 +30,14 @@ export class CachingInterceptorService implements HttpInterceptor {
 
     //If Request body has parameter method = PwaupdateResourcePlanCommand
     //Save called and hence intercept the call to invalidate the cache for all the projects that get saved
-    if (req && req.body && (typeof req.body == typeof "") && (req.body.indexOf('method=PwaupdateResourcePlanCommand') > -1)
+    if ((req && req.body && (typeof req.body == typeof "")) && 
+    ((req.body.indexOf('method=PwaupdateResourcePlanCommand') > -1)
+    ||  (req.body.indexOf('method=PwaAddResourcePlanCommand') > -1)
+    || (req.body.indexOf('method=PwaDeleteResourcePlanCommand') > -1)
+  
+  )
     ) {
+      debugger;
       var projectsToInvalidateCache = this.getCacheDataToRemove(req);
       //this.cache = this.cache.map(c=>c.indexOf(`puid=${}`))
       projectsToInvalidateCache.forEach(project => {
@@ -49,6 +54,7 @@ export class CachingInterceptorService implements HttpInterceptor {
     requestsToCache.find(r=>req.body.indexOf('method=' + r) > -1)
 
     ) {
+      debugger;
       isRequestToCache = true;
       // First, check the cache to see if this request exists.
       const cachedResponse = this.cache[req.urlWithParams + req.body] || null;
@@ -81,14 +87,30 @@ export class CachingInterceptorService implements HttpInterceptor {
     });
   }
   getCacheDataToRemove(req) : Array<string>{
+    var allProjects:any;
  //invalidate resource plan command cache
  var t = req.body.toString();
  //strip off every thing from beginning of array
- t = t.replace('method=PwaupdateResourcePlanCommand&resourceplan=', '')
- //strip off every thing from end of array
- t = t.replace(t.slice(t.indexOf('&fromDate')), '');
+ //if update called
+ if(t.indexOf('method=PwaupdateResourcePlanCommand') > -1 || t.indexOf('method=PwaDeleteResourcePlanCommand') > -1){
+  allProjects = JSON.parse(this.parseObjectFromUrlEncodedBody(req.body).resourceplan)
+  .map(i => i.projects.map(p => p.projUid));
+ }
+ else if(t.indexOf('method=PwaAddResourcePlanCommand') > -1)
+ {
+   debugger;
+  var puids = this.parseObjectFromUrlEncodedBody(req.body).puid
+  allProjects = puids.split(',');
+ }
+ else{
 
- var allProjects = JSON.parse(t).map(i => i.projects.map(p => p.projUid))
+ }
+//  t = t.replace('method=PwaupdateResourcePlanCommand&resourceplan=', '')
+//  .replace('method=PwaAddResourcePlanCommand&resourceplan=', '')
+//  //strip off every thing from end of array
+//  t = t.replace(t.slice(t.indexOf('&fromDate')), '');
+
+ 
  var projectsToInvalidateCache = [].concat.apply([], allProjects);
  return projectsToInvalidateCache;
  
@@ -100,5 +122,9 @@ export class CachingInterceptorService implements HttpInterceptor {
         delete this.cache[key]
       }
     }
+  }
+
+  parseObjectFromUrlEncodedBody(body:string) : any{
+    return JSON.parse('{"' + body.replace(/"/g, '\\"').replace(/&/g, '","').replace(/=/g,'":"') + '"}')
   }
 }

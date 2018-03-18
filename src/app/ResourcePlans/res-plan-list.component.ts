@@ -863,35 +863,38 @@ export class ResPlanListComponent implements OnInit {
     //side bar and printing the window after enough time has
     //elapsed to reflect a full-screen.
     printFunction(): void {
-        console.log('this is printFunction inside res-plan-list-component')
-        let deferredAction = $.Deferred();
+        console.log('this is printFunction inside res-plan-list-component');
 
-
+        this.menuService.getCurrentView();
         let resetView = this.menuService.getCurrentView();
+        // let resetView = this.menuService.getCurrentView();
         if (this._appSvc.mainFormDirty === true) {
 
             let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
             this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
                 this.confirmDialogResult = result;
                 if (result === "yes") {
-
-                    
+                    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                     $.when(this.menuService.printMode())
-                        .done(setTimeout(this.menuService.printerFunction, 1500))
-                    // .done(setTimeout(this.menuService.normalizeView,500));
+                    .then(() => wait(1000))
+                    .then(() => this.menuService.printerFunction())
+                    .then(() => wait(25))
+                    .then(() => this.menuService.normalizeView())
+                    .catch('failed');      
+                    
                 }
             });
 
         }
         else {
-            debugger;
+            const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
             $.when(this.menuService.printMode())
-                .done(setTimeout(this.menuService.printerFunction, 1000))
-            
+            .then(() => wait(100))
+            .then(() => this.menuService.printerFunction())
+            .then(() => wait(25))
+            .then(() => this.menuService.normalizeView())
+            .catch('failed');    
         }
-        console.log(resetView, "this is the reset View setting")
-        this.menuService.normalizeView(resetView);
-       
     }
 
     excelExportFunction() {

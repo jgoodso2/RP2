@@ -25,7 +25,7 @@ export class MenuService {
     this.isVertical = !this.isVertical;
   }
 
-  printMode(){//normalize: Boolean){
+  printMode(): any{//normalize: Boolean){
     this.isVertical = false;
     // this.isVertical == normalize;
   }
@@ -34,7 +34,7 @@ export class MenuService {
   //   if (this.isVertical = false)
   // }
 
-  normalizeView(viewState: boolean) :void {
+  normalizeView(viewState: boolean = this.currentView) :void {
      this.isVertical = viewState;
     // console.log('normalizing, what is currentView?', this.currentView)
     // console.log('normalizing, what is isVertical?', this.isVertical)
@@ -57,8 +57,8 @@ export class MenuService {
     )
     window.print();
     window.close();
-    console.log('currentView is: ',this.currentView)
-    this.normalizeView(this.currentView);
+    // console.log('currentView is: ',this.currentView)
+    // this.normalizeView(this.currentView);
   }
 
   getCurrentView(): boolean {
