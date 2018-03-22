@@ -1,212 +1,59 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IProjectPlan, IResource,IInterval,IProject,WorkUnits} from '../res-plan.model'
-import { Observable, Subscription, Subject } from 'rxjs'
-import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn, FormArray, FormGroupName, } from '@angular/forms';
-import {AppStateService} from '../../services/app-state.service'
-import {IntervalPipe} from '../../common/interval.pipe'
-@Component({
-  selector: 'app-proj-plan-list',
-  templateUrl: './proj-plan-list.component.html',
-  styleUrls: ['./proj-plan-list.component.scss']
-})
-export class ProjPlanListComponent implements OnInit {
+import { Injectable } from '@angular/core';
 
-  //dataSub : Subject<any>  = Observable.from(this.projPlanData)
-  tempData: IProjectPlan[]
-  dataSub: Subscription
-  ///
-  mainForm: FormGroup;
-  _intervalCount :number=0;
+import { Resolve, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
 
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/observable/of';
+
+import { IProjectPlan, IProject, IInterval, ResPlan, Interval, Project, Timescale, WorkUnits, PlanMode } from '../ResourcePlans/res-plan.model';
+import { ResourcePlanService } from '../services/resource-plan.service'
+import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
+import { CurrentCalendarYear}  from '../common/utilities'
+import { AppStateService } from './app-state.service'
+
+@Injectable()
+export class ProjectPlanResolverService implements Resolve<IProjectPlan[]> {
+  boo: any[]
+
+  constructor(private _resPlanSvc: ResourcePlanService
+    , private _resPlanUserStateSvc: ResourcePlanUserStateService
+    , private router: Router
+    , private _appState: AppStateService
   
+  ) { }
 
-  get chargeBacks(): FormArray {  //this getter should return all instances.
-    return <FormArray>this.mainForm.get('chargeBacks');
-  }
-
-
-  constructor(private fb: FormBuilder,private _appSvc:AppStateService , private _route: ActivatedRoute,) { }
+  resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IProjectPlan[]> {
+   console.log("====HEY...resolver fired with route = " + JSON.stringify(route.params)) 
 
 
-  ngOnInit() {
-
-    let obs1 = Observable.from(this.projPlanData)
-    this.dataSub = obs1.subscribe((x) => console.log(JSON.stringify(x)))
-    this.mainForm = this.fb.group({
-      chargeBacks: this.fb.array([]),
-    })
-    this._route.data.subscribe(values => {
-      this.projPlanData = values.projPlans;
-    this.setIntervalLength(this.projPlanData.map(t => t.resources).reduce((a, b) => a.concat(b)))
-    this.buildProjPlans(this.projPlanData)
-    });
+    //set up the default parameters needed by res-plan-list component
+    //let currentYear = new CurrentCalendarYear()
+    //if find on route, use it
+    let fromDate = route.params["fromDate"] && new Date(route.params["fromDate"]) || this._appState.queryParams.fromDate 
+    let toDate = route.params["toDate"] && new Date(route.params["toDate"]) || this._appState.queryParams.toDate;
+    let timescale = route.params["timescale"] || this._appState.queryParams.timescale;
+    let workunits = route.params["workunits"] || this._appState.queryParams.workunits;
+    let planMode = PlanMode.ProjectPlan
     
-  }
-
-  buildProjPlans(projPlans: IProjectPlan[]) {
-    debugger;
-    //group by charge back
-     let groupedChargeBack = this.groupBy(projPlans,'project','projectChargeBackCategory')
-     debugger;
-     for(var key in groupedChargeBack){
-    let chargeBackGroup = this.buildChargeBack(key,groupedChargeBack[key]);
-    this.chargeBacks.push(chargeBackGroup)
-     }
-  }
-
-  //a group by function to group by second level of hierarcial property on object
-  //key is just used to navigate to sub property
-  //subKey is the one used for grouping
-  groupBy(xs, key,subKey) {
-    return xs.reduce(function(rv, x) {
-      debugger;
-      (rv[x[key][subKey]] = rv[x[key][subKey]] || []).push(x);
-      return rv;
-    }, {});
-  };
-
-  buildChargeBack(chargeBack:string,projPlans:IProjectPlan[]) : FormGroup
-  {
-      var chargeBackGroup = this.fb.group({
-        chargeBack:chargeBack,
-        projPlans : this.fb.array([])
-      })
-          for (var i = 0; i < projPlans.length; i++) {
-          var projPlan = this.buildProjPlan(projPlans[i]);
-          (chargeBackGroup.get('projPlans') as FormArray).push(projPlan);
-        }
-   return chargeBackGroup;
-  }
-
-    buildProjPlan(projPlan: IProjectPlan): FormGroup {
-       var _totals = this.fb.array([]);
-      var projPlanGroup = this.fb.group({
-        projUid: projPlan.project.projUid.toLowerCase(),
-        projName: projPlan.project.projName,
-        totals: this.initTotals(_totals, projPlan.resources),
-        resources: this.fb.array([]),
-        // selected: this.fb.control(false)
-      });
-      for (var i = 0; i < projPlan.resources.length; i++) {
-        var resource = this.buildResource(projPlan.resources[i]);
-        (projPlanGroup.get('resources') as FormArray).push(resource)
-      }
-
-      this.calculateTotals(projPlanGroup);
-       projPlanGroup.valueChanges.subscribe(value => {
-          this.calculateTotals(projPlanGroup)
-      }, (error) => console.log(error));
-      debugger;
-      return projPlanGroup;
+    let showTimesheetData:boolean;
+    if(route.params["showTimesheetData"])
+    {
+      showTimesheetData =  route.params["showTimesheetData"] == "true";
     }
-    buildResource(resource: IResource) : FormGroup {
-      var resourceGroup = this.fb.group(
-        {
-          resUID: resource.resUid,
-          resName: [resource.resName],
-
-          intervals: this.fb.array([]),
-          //timesheetData: this.fb.array([]),
-          //selected: this.fb.control(false) 
-        });
-
-      for (var i = 0; i < resource.intervals.length; i++) {
-        var interval = this.buildInterval(resource.intervals[i]);
-        (resourceGroup.get('intervals') as FormArray).push(interval);
-      }
-
-      // if (_project.timesheetData) {
-      //     for (var i = 0; i < _project.timesheetData.length; i++) {
-      //         var interval = this.buildtimesheetInterval(_project.timesheetData[i]);
-      //         (project.get('timesheetData') as FormArray).push(interval);
-      //     }
-      // }
-
-      //_project.readOnly && project.disable({emitEvent:false})
-      return resourceGroup;
+    else{
+      showTimesheetData = this._appState.queryParams.showTimesheetData
     }
-
-    buildInterval(interval: IInterval): FormGroup {
-  
-      return this.fb.group({
-        intervalName: interval.intervalName,
-        //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
-        intervalValue: interval.intervalValue,
-        //Validators.pattern(this.getIntervalValidationPattern())],
-        intervalStart: interval.start,
-        intervalEnd: interval.end
-
-      });
-    }
-
-    initTotals(totals: FormArray, _projects: IResource[]): FormArray {
-      if (totals.controls.length < 1) {
-debugger;
-          var intervalLen = this.getIntervalLength();
-          for (var i = 0; i < intervalLen; i++) {
-
-              var total = this.fb.group({
-                  intervalName: '',
-                  intervalValue: new IntervalPipe().transform('0', this._appSvc.queryParams.workunits)
-              });
-              totals.push(total);
-          }
-      }
-      return totals;
+ 
+    this._appState.queryParams.fromDate = fromDate
+    this._appState.queryParams.toDate = toDate
+    this._appState.queryParams.timescale = timescale
+    this._appState.queryParams.workunits = workunits 
+    this._appState.queryParams.showTimesheetData = showTimesheetData
+    this._appState.queryParams.planMode = planMode
+    return  Observable.of(this.projPlanData)
   }
-
-    calculateTotals(fg: FormGroup): void {
-      
-              var value = fg.value;
-      
-              if (value.readOnly == true)
-                  return
-              for (var i = 0; i < value["totals"].length; i++) {
-                  var sum = 0;
-                  for (var j = 0; j < value["resources"].length; j++) {
-                      if (value["resources"][j]["intervals"].length < 1)
-                          continue;
-                      var val = parseInt(value["resources"][j]["intervals"][i]["intervalValue"]);
-      
-                      if (!val) {
-                          val = 0;
-                      }
-      
-                      sum += val;
-      
-                  }
-                  if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
-                      sum = sum / 100;
-                  }
-                  value["totals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString()
-                                                           , this._appSvc.queryParams.workunits)
-      
-              }
-              fg.setValue(value, { emitEvent: false });
-              //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
-      
-          }
-          getIntervalLength() {
-            //toDo... thinking about putting interval count in data service
-            return this._intervalCount;
-        }
-        setIntervalLength(resources: IResource[]) {
-         debugger;
-            if (this._intervalCount < 1) {
-                for (var j = 0; j < resources.length; j++) {
-                    this._intervalCount = resources[j].intervals.length;
-                    return;
-                }
-            }
-    
-        }
-
-
-
-  
-
-
 
   projPlanData: IProjectPlan[] = [
     {
@@ -696,5 +543,4 @@ debugger;
       ]
     }
   ];
-
 }

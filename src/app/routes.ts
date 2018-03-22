@@ -7,6 +7,7 @@ import { ResPlanEditGuard   }  from './services/resPlanEditGuard.service'
 import { ProjPlanListComponent }  from './ResourcePlans/proj-plan-list/proj-plan-list.component'
 
 import { ResourcePlansResolverService } from './services/resource-plans-resolver.service'
+import { ProjectPlanResolverService } from './services/project-plan-resolver.service'
 
 export const appRoutes: Routes = [
 
@@ -23,7 +24,9 @@ export const appRoutes: Routes = [
         { path: 'perview', redirectTo: "https://perviewqa.app.parallon.com/pwa" ,pathMatch: 'full'},
         { path: '', redirectTo: 'resPlans', pathMatch: 'full' , canDeactivate: [ ResPlanEditGuard ]},
         { path: 'jumbo', component: JumbotronComponent },
-        { path: 'pivot', component: ProjPlanListComponent }
+        { path: 'pivot', component: ProjPlanListComponent,
+          resolve: {projPlans: ProjectPlanResolverService }
+       }
 
 
       ]

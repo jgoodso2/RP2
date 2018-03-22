@@ -7,7 +7,7 @@ import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/observable/of';
 
-import { IResPlan, IProject, IInterval, ResPlan, Interval, Project, Timescale, WorkUnits } from '../ResourcePlans/res-plan.model';
+import { IResPlan, IProject, IInterval, ResPlan, Interval, Project, Timescale, WorkUnits,PlanMode } from '../ResourcePlans/res-plan.model';
 import { ResourcePlanService } from '../services/resource-plan.service'
 import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
 import { CurrentCalendarYear}  from '../common/utilities'
@@ -37,6 +37,7 @@ export class ResourcePlansResolverService implements Resolve<IResPlan[]> {
     let toDate = route.params["toDate"] && new Date(route.params["toDate"]) || this._appState.queryParams.toDate;
     let timescale = route.params["timescale"] || this._appState.queryParams.timescale;
     let workunits = route.params["workunits"] || this._appState.queryParams.workunits;
+    let planMode = PlanMode.ResourcePlan;
     
     let showTimesheetData:boolean;
     if(route.params["showTimesheetData"])
@@ -52,7 +53,7 @@ export class ResourcePlansResolverService implements Resolve<IResPlan[]> {
     this._appState.queryParams.timescale = timescale
     this._appState.queryParams.workunits = workunits 
     this._appState.queryParams.showTimesheetData = showTimesheetData
-
+    this._appState.queryParams.planMode = planMode
     return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr=>{
     return this._resPlanUserStateSvc.getResPlans(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
       .map(resPlans => {

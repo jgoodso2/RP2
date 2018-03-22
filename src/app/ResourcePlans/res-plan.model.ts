@@ -53,7 +53,7 @@ export interface IQueryParams {
   timescale: Timescale
   workunits: WorkUnits
   showTimesheetData: boolean
-
+  planMode : PlanMode
 }
 
 
@@ -92,6 +92,10 @@ export class Resource implements IResource {
   constructor(public resUid = '0', public resName = '', public rbs = '', public timesheetMgr = '') { }
 }
 
+export enum PlanMode{
+  ResourcePlan=1,
+  ProjectPlan=2
+}
 
 export enum ProjectActiveStatus {
   inProgress = 1,

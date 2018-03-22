@@ -2,10 +2,11 @@ import { Component, ElementRef, HostBinding, HostListener,
          Input, OnInit,OnDestroy ,Renderer,
          trigger, state, style, transition, animate } from '@angular/core';
 import { NavigationEnd, Router,ActivatedRoute,Params } from '@angular/router';
-import {Timescale,WorkUnits} from '../../../app/ResourcePlans/res-plan.model'
+import {Timescale,WorkUnits,PlanMode} from '../../../app/ResourcePlans/res-plan.model'
 import { MenuItem, MenuService } from '../../services/menu.service';
 import {CurrentCalendarYear} from '../../../app/common/utilities'
 import { AppUtilService } from '../../../app/common/app-util.service'
+import { AppStateService } from '../../../app/services/app-state.service'
 import { Subscription } from 'rxjs/Subscription';
 @Component({
   selector: 'fw-menu-item',
@@ -40,7 +41,8 @@ export class MenuItemComponent implements OnInit {
               public menuService: MenuService,
               public el: ElementRef,
               public renderer: Renderer,
-              private _appUtilSvc:AppUtilService
+              private _appUtilSvc:AppUtilService,
+              private _appStateSvc:AppStateService
             ) {
   }
 
@@ -75,7 +77,7 @@ export class MenuItemComponent implements OnInit {
           this.mouseInPopup = !this.mouseInPopup;
       }
     }
-    else if (this.item.route) {
+    else {
       // force horizontal menus to close by sending a mouseleave event
       let newEvent = new MouseEvent('mouseleave', {bubbles: true});
       this.renderer.invokeElementMethod(
@@ -103,8 +105,28 @@ export class MenuItemComponent implements OnInit {
         //   {
         //     this.item.params["toDate"] = this.activatedRoute.snapshot.queryParams["toDate"] || currentYear.endDate
         //   }
-
-      this.router.navigate([this.item.route, this.item.params],{ preserveQueryParams:true} );
+    debugger;
+    let route ='';
+    if(this.item.route == '/home/pivot')
+    {
+        if(this._appStateSvc.queryParams.planMode  == PlanMode.ResourcePlan)
+        {
+            this._appStateSvc.queryParams.planMode = PlanMode.ProjectPlan
+        }
+        else if(this._appStateSvc.queryParams.planMode  == PlanMode.ProjectPlan)
+        {
+            this._appStateSvc.queryParams.planMode = PlanMode.ResourcePlan
+        }
+        route = this._appStateSvc.queryParams.planMode == PlanMode.ResourcePlan ? '/home/resPlans' : '/home/pivot';
+    }
+     else if(this.item.route == '')
+      {
+           route = this._appStateSvc.queryParams.planMode == PlanMode.ResourcePlan ? '/home/resPlans' : '/home/pivot';
+      }
+      else{
+        route = this.item.route
+      }
+      this.router.navigate([route, this.item.params],{ preserveQueryParams:true} );
         
     }
   }

@@ -56,6 +56,7 @@ import { ConfirmDialogComponent } from './common/confirm-dialog/confirm-dialog.c
 import { CellWorkUnitsPipe } from './common/cell-work-units.pipe';
 import { ExportExcelService } from 'app/services/export-excel.service';
 import { ProjPlanListComponent } from './ResourcePlans/proj-plan-list/proj-plan-list.component';
+import { ProjectPlanResolverService } from './services/project-plan-resolver.service';
 
 
 
@@ -113,6 +114,7 @@ export function initConfig(configSvc: ConfigService){
     , ResourcePlanUserStateService
     ,AppUtilService
     , ResourcePlansResolverService
+    ,ProjectPlanResolverService
     ,ResourceService, SPListService
     ,AppStateService 
     , ResPlanEditGuard 

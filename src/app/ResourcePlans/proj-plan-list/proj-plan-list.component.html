@@ -1,115 +1,122 @@
-<form class="form-horizontal" novalidate [formGroup]="mainForm">
-    <div formArrayName="chargeBacks" *ngIf="chargeBacks && chargeBacks.length > 0">
-        <div *ngFor="let chargebackGroup of chargeBacks.controls;index as c">
-        <div [formGroupName]="c">
-        <collapsible-well >
-           
-            <div  well-title>
-                <input type="label" readonly style=" background:rgba(0,0,0,0);border:none;font-weight:bold " formControlName="chargeBack">
-            </div>
-            <div well-body>
-                <div formArrayName="projPlans">
-                    <div id="printContent" class="table-body">
-                        <table id="testing" class="table">
-                            <tbody *ngFor="let plan of chargebackGroup.get('projPlans').controls;index as i">
+<div class="zeno">
+    <div class="ownBox">
+        <res-plan-header-row #header></res-plan-header-row>
+    </div>
+    <div class="allTab">
+        <form class="form-horizontal" novalidate [formGroup]="mainForm">
+            <div formArrayName="chargeBacks" *ngIf="chargeBacks && chargeBacks.length > 0">
+                <div *ngFor="let chargebackGroup of chargeBacks.controls;index as c">
+                    <div [formGroupName]="c">
+                        <collapsible-well >
 
-                                <div [formGroupName]="i">
-                                    <collapsible-well>
-                                        <div well-title>
-                                            <tr>
-                                                <td class="body-cell" style="padding-left:5px">
-                                                    <!-- <input type="checkbox" /> -->
-                                                </td>
+                        <div well-title>
+                            <input type="label" readonly style=" background:rgba(0,0,0,0);border:none;font-weight:bold " formControlName="chargeBack">
+                        </div>
+                        <div well-body>
+                            <div formArrayName="projPlans">
+                                <div id="printContent" class="table-body">
+                                    <table id="testing" class="table">
+                                        <tbody *ngFor="let plan of chargebackGroup.get('projPlans').controls;index as i">
 
-
-
-                                                <td class="body-cell col1">
-                                                    <input class="totalsRow" formControlName="projName" placeholder="Project" style="width:100%">
-                                                </td>
-                                                <div formArrayName="totals">
-                                                    <td class="body-cell col" *ngFor="let total of plan.get('totals').controls;index as l">
-                                                        <div [formGroupName]="l">
-                                                            <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
-                                                            />
-
-
-
-                                                        </div>
-                                                    </td>
-
-                                                </div>
-
-                                            </tr>
-                                        </div>
-                                        <div well-body>
-                                            <div formArrayName="resources">
-                                                <div *ngFor="let proj of plan.get('resources').controls;index as j">
-                                                    <tr [formGroupName]="j">
+                                            <div [formGroupName]="i">
+                                                <collapsible-well>
+                                                <div well-title>
+                                                    <tr>
                                                         <td class="body-cell" style="padding-left:5px">
-                                                            <!-- <input type="checkbox" formControlName="selected" (click)="DeselectGroupOnUncheck(plan,proj,$event.target.checked)" /> -->
+                                                            <!-- <input type="checkbox" /> -->
                                                         </td>
-
 
 
 
                                                         <td class="body-cell col1">
-                                                            <input formControlName="resName" placeholder="resource" style="width:100%" />
-                                                            <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
+                                                            <input class="totalsRow" formControlName="projName" placeholder="Project" style="width:100%">
+                                                        </td>
+                                                        <div formArrayName="totals">
+                                                            <td class="body-cell col" *ngFor="let total of plan.get('totals').controls;index as l">
+                                                                <div [formGroupName]="l">
+                                                                    <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
+                                                                    />
+
+
+
+                                                                </div>
+                                                            </td>
+
+                                                        </div>
+
+                                                    </tr>
+                                                </div>
+                                                <div well-body>
+                                                    <div formArrayName="resources">
+                                                        <div *ngFor="let proj of plan.get('resources').controls;index as j">
+                                                            <tr [formGroupName]="j">
+                                                                <td class="body-cell" style="padding-left:5px">
+                                                                    <!-- <input type="checkbox" formControlName="selected" (click)="DeselectGroupOnUncheck(plan,proj,$event.target.checked)" /> -->
+                                                                </td>
+
+
+
+
+                                                                <td class="body-cell col1">
+                                                                    <input formControlName="resName" placeholder="resource" style="width:100%" />
+                                                                    <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
                                                                 [finish]="proj.get('finishDate').value"  placeholder="project" style="width:100%" /> -->
 
-                                                        </td>
-                                                        <div formArrayName="intervals">
-                                                            <td class="body-cell col" *ngFor="let intrvl of proj.get('intervals').controls; index as k">
-                                                                <div [formGroupName]="k">
-                                                                    <input style="width:100%" class='' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text" onClick="this.select()"
-                                                                        autofocus formControlName="intervalValue">
+                                                                </td>
+                                                                <div formArrayName="intervals">
+                                                                    <td class="body-cell col" *ngFor="let intrvl of proj.get('intervals').controls; index as k">
+                                                                        <div [formGroupName]="k">
+                                                                            <input style="width:100%" class='' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text" onClick="this.select()"
+                                                                                autofocus formControlName="intervalValue">
+                                                                        </div>
+                                                                        <span *ngIf="intrvl.get('intervalValue').touched && intrvl.get('intervalValue').dirty && intrvl.get('intervalValue').errors">
+                                                                            <error [error]="getIntervalValidationMessage()"></error>
+                                                                        </span>
+                                                                    </td>
                                                                 </div>
-                                                                <span *ngIf="intrvl.get('intervalValue').touched && intrvl.get('intervalValue').dirty && intrvl.get('intervalValue').errors">
-                                                                    <error [error]="getIntervalValidationMessage()"></error>
-                                                                </span>
-                                                            </td>
+                                                            </tr>
+
                                                         </div>
-                                                    </tr>
+                                                        <!-- i = index of resplan formgroup -->
+
+                                                    </div>
+
+                                                    <!-- <button btn btn-primary" type="button" (click) = "addProject(plan)" > Add Project  </button> -->
+                                                    <button class="btn btn-primary" type="button"> Add Project </button>
+
+
+
 
                                                 </div>
-                                                <!-- i = index of resplan formgroup -->
-
+                                                </collapsible-well>
                                             </div>
 
-                                            <!-- <button btn btn-primary" type="button" (click) = "addProject(plan)" > Add Project  </button> -->
-                                            <button class="btn btn-primary" type="button"> Add Project </button>
 
+                                        </tbody>
+                                    </table>
 
-
-
-                                        </div>
-                                    </collapsible-well>
                                 </div>
+                            </div>
 
-
-                            </tbody>
-                        </table>
-
+                        </div>
+                        </collapsible-well>
                     </div>
                 </div>
-
             </div>
-        </collapsible-well>
-    </div>
-    </div>
-    </div>
-        <simple-modal #modalresources closeOnBodyClick="true" elementId="1" title="Add resources" primaryBtnText="Add Selected resources">
-            <div class="list-group">
-                <project-list [projData]='projData'></project-list>
-            </div>
-        </simple-modal>
-        <simple-modal #modalResources closeOnBodyClick="true" elementId="2" title="Select Resource" primaryBtnText="Add Selected Resources">
-            <div class="list-group">
-                <resource-list></resource-list>
-            </div>
-        </simple-modal>
-        <!-- <confirm-dialog>
+            <simple-modal #modalresources closeOnBodyClick="true" elementId="1" title="Add resources" primaryBtnText="Add Selected resources">
+                <div class="list-group">
+                    <project-list [projData]='projData'></project-list>
+                </div>
+            </simple-modal>
+            <simple-modal #modalResources closeOnBodyClick="true" elementId="2" title="Select Resource" primaryBtnText="Add Selected Resources">
+                <div class="list-group">
+                    <resource-list></resource-list>
+                </div>
+            </simple-modal>
+            <!-- <confirm-dialog>
     
                 </confirm-dialog> -->
-    
-</form>
+
+        </form>
+    </div>
+</div>

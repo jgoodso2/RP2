@@ -1,6 +1,6 @@
 import { MenuItem } from '../fw/services/menu.service';
-// import { AppStateService } from './services/app-state.service'
-
+import { AppStateService } from './services/app-state.service'
+import {ReflectiveInjector} from '@angular/core';
 // export let foo: AppStateService
 import { CurrentCalendarYear, CurrentFiscalYear, Next12Months, NextYear , LastYear } from './common/utilities'
 
@@ -9,11 +9,12 @@ export let _CurrentFiscalYer = new CurrentFiscalYear()
 export let _next12Months = new Next12Months()
 export let _nextYear = new NextYear()
 export let _lastYear = new LastYear()
-
+let injector = ReflectiveInjector.resolveAndCreate([AppStateService]); 
+let _appStateSvc = injector.get(AppStateService);
 
 export let initialMenuItems: Array<MenuItem> = [
-  
     {
+        
         text: 'Date Range',
         icon: '	glyphicon-calendar',
         route: null,
@@ -21,7 +22,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'This Year',
                 icon: 'glyphicon-calendar',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     fromDate: _currentCalYear.startDate,
                     toDate: _currentCalYear.endDate
@@ -31,7 +32,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Next 12 Months',
                 icon: 'glyphicon-calendar',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     fromDate: _next12Months.startDate,
                     toDate: _next12Months.endDate
@@ -41,7 +42,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Next Year',
                 icon: 'glyphicon-calendar',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     fromDate: _nextYear.startDate,
                     toDate: _nextYear.endDate
@@ -51,7 +52,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Last Year',
                 icon: 'glyphicon-calendar',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     fromDate: _lastYear.startDate,
                     toDate: _lastYear.endDate
@@ -78,7 +79,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Percentage',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     workunits: '3'
                 },
@@ -87,7 +88,7 @@ export let initialMenuItems: Array<MenuItem> = [
             , {
                 text: 'Days',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     workunits: '2'
                 },
@@ -96,7 +97,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Hours',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     workunits: '1'
                 },
@@ -113,7 +114,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Months',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     timescale: '5'
                 },
@@ -122,7 +123,7 @@ export let initialMenuItems: Array<MenuItem> = [
             , {
                 text: 'Years',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     timescale: '7'
                 },
@@ -131,7 +132,7 @@ export let initialMenuItems: Array<MenuItem> = [
             {
                 text: 'Weeks',
                 icon: '',
-                route: '/home/resPlans',
+                route: '',
                 params: {
                     timescale: '4'
                 },
@@ -145,7 +146,9 @@ export let initialMenuItems: Array<MenuItem> = [
         icon: 'glyphicon-calendar',
         route: '/home/pivot',
         submenu: null,
-        params: {}
+        params: {
+            planMode : '2'
+        }
     }
     
     

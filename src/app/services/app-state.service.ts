@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from "rxjs/Subject"
-import { IQueryParams, Timescale, WorkUnits } from '../ResourcePlans/res-plan.model'
+import { IQueryParams, Timescale, WorkUnits,PlanMode} from '../ResourcePlans/res-plan.model'
 import { CurrentCalendarYear, CurrentFiscalYear, Next12Months } from '../common/utilities'
 import { Subscriber } from 'rxjs/Subscriber';
 
@@ -47,7 +47,8 @@ export class AppStateService {
     toDate: this.next12Months.endDate,
     timescale: Timescale.calendarMonths,
     workunits: WorkUnits.FTE,
-    showTimesheetData: false
+    showTimesheetData: false,
+    planMode : PlanMode.ResourcePlan
   }
 
 

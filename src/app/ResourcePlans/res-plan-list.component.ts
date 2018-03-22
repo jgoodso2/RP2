@@ -587,7 +587,7 @@ export class ResPlanListComponent implements OnInit {
                             Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
                             , showTimesheetData).subscribe(resPlans => {
                                 this.buildSelectedProjects(resPlans[0].projects)//.filter(r=>r.projUid.toUpperCase))
-                                this.header && this.header.setIntervals(resPlans);
+                                this.header && this.header.setIntervalsFromresPlans(resPlans);
                                 this.initTotals(this.currentFormGroup.get('totals') as FormArray, resPlans[0].projects)
                                 this.calculateTotals(this.currentFormGroup);
 
