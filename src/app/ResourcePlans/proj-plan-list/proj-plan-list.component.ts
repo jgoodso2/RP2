@@ -1,24 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit ,ViewChild} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IProjectPlan, IResource,IInterval,IProject,WorkUnits} from '../res-plan.model'
+import { IProjectPlan, IResource,IInterval,IProject,WorkUnits, Lookup} from '../res-plan.model'
+import { SimpleModalComponent } from '../../common/simple-modal.component'
 import { Observable, Subscription, Subject } from 'rxjs'
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn, FormArray, FormGroupName, } from '@angular/forms';
 import {AppStateService} from '../../services/app-state.service'
 import {IntervalPipe} from '../../common/interval.pipe'
+import {ChargebackModalCommunicatorService} from '../chargeback-modal-communicator.service'
 @Component({
   selector: 'app-proj-plan-list',
   templateUrl: './proj-plan-list.component.html',
   styleUrls: ['./proj-plan-list.component.scss']
 })
 export class ProjPlanListComponent implements OnInit {
-
+  @ViewChild('modalChargebacks') private modalChargebacks: SimpleModalComponent;
   //dataSub : Subject<any>  = Observable.from(this.projPlanData)
-  tempData: IProjectPlan[]
   dataSub: Subscription
   ///
   mainForm: FormGroup;
   _intervalCount :number=0;
-
+  projPlanData : IProjectPlan[];
   
 
   get chargeBacks(): FormArray {  //this getter should return all instances.
@@ -26,16 +27,19 @@ export class ProjPlanListComponent implements OnInit {
   }
 
 
-  constructor(private fb: FormBuilder,private _appSvc:AppStateService , private _route: ActivatedRoute,) { }
+  constructor(private fb: FormBuilder,private _appSvc:AppStateService , private _route: ActivatedRoute,
+  private _chargebackSvc:ChargebackModalCommunicatorService) { }
 
 
   ngOnInit() {
 
-    let obs1 = Observable.from(this.projPlanData)
-    this.dataSub = obs1.subscribe((x) => console.log(JSON.stringify(x)))
+    
+    
     this.mainForm = this.fb.group({
       chargeBacks: this.fb.array([]),
     })
+
+    this._appSvc.addChargebacks$.subscribe(() => this.addChargebacks())
     this._route.data.subscribe(values => {
       this.projPlanData = values.projPlans;
     this.setIntervalLength(this.projPlanData.map(t => t.resources).reduce((a, b) => a.concat(b)))
@@ -201,500 +205,17 @@ debugger;
             }
     
         }
-
-
-
-  
-
-
-
-  projPlanData: IProjectPlan[] = [
-    {
-      project: {
-        projUid: '1',
-        projName: 'Test Project 1',
-        projectChargeBackCategory : 'Category 1'
-      },
-      resources: [
-        {
-          resUid: '0',
-          resName: 'John Goodson',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '40h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '24h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-        {
-          resUid: '1',
-          resName: 'Nishant',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '20h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '20h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-        {
-          resUid: '2',
-          resName: 'Christina Wheeler',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '40h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '24h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-      ]
-    },
-    {
-      project: {
-        projUid: '2',
-        projName: 'Test Project 2',
-        projectChargeBackCategory : 'Category 2'
-      },
-      resources: [
-        {
-          resUid: '1',
-          resName: 'Nishant Jahagirdar',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '40h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '24h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-        {
-          resUid: '1',
-          resName: 'Nishant',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '20h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '20h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-        {
-          resUid: '2',
-          resName: 'Christina Wheeler',
-          intervals: [
-            {
-              intervalName: 'interval0',
-              intervalValue: '40h',
-              start: new Date('1/1/2018'),
-              end: new Date('1/31/2018')
-            },
-            {
-              intervalName: 'interval1',
-              intervalValue: '32h',
-              start: new Date('2/1/2018'),
-              end: new Date('2/28/2018')
-            },
-            {
-              intervalName: 'interval2',
-              intervalValue: '24h',
-              start: new Date('3/1/2018'),
-              end: new Date('3/31/2018')
-            },
-            {
-              intervalName: 'interval3',
-              intervalValue: '124h',
-              start: new Date('4/1/2018'),
-              end: new Date('4/30/2018')
-            },
-            {
-              intervalName: 'interval4',
-              intervalValue: '40h',
-              start: new Date('5/1/2018'),
-              end: new Date('5/31/2018')
-            },
-            {
-              intervalName: 'interval5',
-              intervalValue: '40h',
-              start: new Date('6/1/2018'),
-              end: new Date('6/30/2018')
-            },
-            {
-              intervalName: 'interval6',
-              intervalValue: '40h',
-              start: new Date('7/1/2018'),
-              end: new Date('7/30/2018')
-            },
-            {
-              intervalName: 'interval7',
-              intervalValue: '40h',
-              start: new Date('8/1/2018'),
-              end: new Date('8/30/2018')
-            },
-            {
-              intervalName: 'interval8',
-              intervalValue: '40h',
-              start: new Date('9/1/2018'),
-              end: new Date('9/30/2018')
-            },
-            {
-              intervalName: 'interval9',
-              intervalValue: '40h',
-              start: new Date('10/1/2018'),
-              end: new Date('10/31/2018')
-            },
-            {
-              intervalName: 'interval10',
-              intervalValue: '40h',
-              start: new Date('11/1/2018'),
-              end: new Date('11/31/2018')
-            },
-            {
-              intervalName: 'interval11',
-              intervalValue: '40h',
-              start: new Date('12/1/2018'),
-              end: new Date('12/31/2018')
-            },
-          ]
-        },
-      ]
-    }
-  ];
-
+        addChargebacks() {
+          console.log("add resources fired");
+          let chargebacksSelected: Lookup[] = this.chargeBacks.value.map(c => { 
+            var lookup = new Lookup();
+            lookup.name = c.chargeBack;
+            lookup.value = c.value;
+            return lookup
+          })
+          //console.log('resources selected=' + JSON.stringify(resourcesSelected))
+           debugger;
+          this._chargebackSvc.chargebacksSelected(chargebacksSelected)
+          this.modalChargebacks.showModal('');
+      }
 }

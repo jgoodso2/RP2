@@ -92,6 +92,11 @@ export class Resource implements IResource {
   constructor(public resUid = '0', public resName = '', public rbs = '', public timesheetMgr = '') { }
 }
 
+export class Lookup{
+  name:string;
+  value:string;
+}
+
 export enum PlanMode{
   ResourcePlan=1,
   ProjectPlan=2
@@ -128,6 +133,7 @@ export class Config {
   adapterUrl: string;
   projectPickerViewGuid: string;
   resourcePickerViewGuid: string;
+  chargebackCustomFieldGuid : string;
 }
 
 export class Result {

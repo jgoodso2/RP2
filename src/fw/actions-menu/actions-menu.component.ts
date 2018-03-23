@@ -1,6 +1,7 @@
 import { Component, OnInit,ViewChild , OnDestroy } from '@angular/core';
 import { AppStateService} from '../../app/services/app-state.service'
 import { MatMenu} from '@angular/material'
+import { PlanMode } from 'app/ResourcePlans/res-plan.model';
 
 @Component({
   selector: 'actions-menu',
@@ -18,7 +19,6 @@ export class ActionsMenuComponent implements OnInit {
     this._appStateSvc.formDirtyState$.subscribe(value=>this.disableSave = !value)
      this._appStateSvc.deleteState$.subscribe(value=>{this.disableDelete = !value})
      this._appStateSvc.hideState$.subscribe(value=>{this.disableHide= !value})
-     
   }
 
   ngOnDestroy() {
@@ -33,7 +33,14 @@ export class ActionsMenuComponent implements OnInit {
 
   addResources()
   {
+    debugger;
     this._appStateSvc.addResourcesClick();
+  }
+
+  addChargebacks()
+  {
+    debugger;
+    this._appStateSvc.addChargebacksClick();
   }
 
   delete()
@@ -95,4 +102,16 @@ export class ActionsMenuComponent implements OnInit {
   
   }
 
+  getaddResourceOrChargebackText() : string
+  {
+    if(this._appStateSvc.queryParams.planMode == PlanMode.ResourcePlan)
+    {
+      return "Add Resources"
+    }
+    else
+    {
+      return "Add Chargeback"
+    }
+  
+  }
 }

@@ -15,6 +15,7 @@ export class AppStateService {
   private hideState = new Subject<boolean>();
   private saveSource = new Subject<void>();
   public addResourcesSource = new Subject<void>();
+  public addChargebacksSource = new Subject<void>();
   private deleteSource = new Subject<void>();
   private hideSource = new Subject<void>();
   private showActualsSource = new Subject<boolean>();
@@ -31,6 +32,7 @@ export class AppStateService {
   hideState$ = this.hideState.asObservable();
   save$ = this.saveSource.asObservable();
   addResources$ = this.addResourcesSource.asObservable();
+  addChargebacks$ = this.addChargebacksSource.asObservable();
   delete$ = this.deleteSource.asObservable();
   hide$ = this.hideSource.asObservable();
   showActuals$ = this.showActualsSource.asObservable();
@@ -60,6 +62,10 @@ export class AppStateService {
   }
   addResourcesClick() {
     this.addResourcesSource.next();
+  }
+  addChargebacksClick()
+  {
+    this.addChargebacksSource.next();
   }
   setFormDirty(value: boolean) {
     this.formDirtyState.next(value);

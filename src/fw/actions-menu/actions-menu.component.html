@@ -1,4 +1,4 @@
-<button mat-button  (click)="addResources()">Add Resources</button>
+<button mat-button  (click)="_appStateSvc.queryParams.planMode == 1 ? addResources() :addChargebacks() ">{{getaddResourceOrChargebackText()}}</button>
 <button mat-button [disabled]="!this._appStateSvc.mainFormDirty" (click)="submit()">Save</button>
 <button mat-button [matMenuTriggerFor]="delHide">Actions</button>
 <button mat-button [matMenuTriggerFor]="export">Export</button>

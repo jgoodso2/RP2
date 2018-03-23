@@ -14,6 +14,7 @@ import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.compon
 import {Config} from './ResourcePlans/res-plan.model'
 import { ModalCommunicator } from  './ResourcePlans/modal-communicator.service'
 import { ResourcesModalCommunicatorService } from  './ResourcePlans/resources-modal-communicator.service'
+import { ChargebackModalCommunicatorService } from  './ResourcePlans/chargeback-modal-communicator.service'
 import { AppStateService } from  './services/app-state.service'
 import {ResPlanDetailsComponent} from './ResourcePlans/res-plan-detail.component';
 import { CollapsibleWellComponent} from './common/collapsible-well.component'
@@ -25,6 +26,7 @@ import { ProjectListComponent } from './ResourcePlans/project-list/project-list.
 
 import { MatDatepickerModule,MatInputModule,MatNativeDateModule,MatTableModule,MatButtonModule,MatDialogModule} from '@angular/material';
 import { ProjectService} from './services/project-service.service'
+import {ChargebackServiceService} from './services/chargeback-service.service'
 import { ResourcePlanService } from './services/resource-plan.service'
 import { ResourcePlanUserStateService } from './services/resource-plan-user-state.service';
 import { ResourceService } from './services/resource.service'
@@ -57,6 +59,7 @@ import { CellWorkUnitsPipe } from './common/cell-work-units.pipe';
 import { ExportExcelService } from 'app/services/export-excel.service';
 import { ProjPlanListComponent } from './ResourcePlans/proj-plan-list/proj-plan-list.component';
 import { ProjectPlanResolverService } from './services/project-plan-resolver.service';
+import { ChargebackListComponent } from './ResourcePlans/chargeback-list/chargeback-list.component';
 
 
 
@@ -92,6 +95,7 @@ export function initConfig(configSvc: ConfigService){
     ConfirmDialogComponent,
     CellWorkUnitsPipe,
     ProjPlanListComponent,
+    ChargebackListComponent,
   ],
 
   imports: [
@@ -109,7 +113,12 @@ export function initConfig(configSvc: ConfigService){
          MatDialogModule
   ],
   entryComponents: [ConfirmDialogComponent],
-  providers: [  ModalCommunicator, ResourcesModalCommunicatorService,ProjectService, 
+  providers: [  
+    ModalCommunicator, 
+    ResourcesModalCommunicatorService,
+    ChargebackModalCommunicatorService,
+    ChargebackServiceService,
+    ProjectService, 
     ResourcePlanService
     , ResourcePlanUserStateService
     ,AppUtilService
