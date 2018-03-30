@@ -539,6 +539,7 @@ export class ResPlanListComponent implements OnInit {
             console.log('selected resources=' + JSON.stringify(this._resModalSvc.selectedResources))
             this.getResPlansFromResSub = this._resPlanUserStateSvc.getResPlansFromResources(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData)
                 .subscribe(plans => {
+                    debugger;
                     this.addResToMgrSub = this._resPlanUserStateSvc.AddResourceToManager(resMgr, plans).subscribe(r => {
                         if (r.success == true) {
                             console.log('added resplans=' + JSON.stringify(plans))

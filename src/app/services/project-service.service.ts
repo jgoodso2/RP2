@@ -16,7 +16,7 @@ export class ProjectService {
     private url: string = 'api/dataservice/';
     public projects: IProject[];
     config: Config;
-    constructor(private http: HttpClient, private _configSvc: ConfigService) {
+    constructor(public http: HttpClient, private _configSvc: ConfigService) {
         //let observer = this.getProjects().subscribe(values => this.projects = values);
         this.config = this._configSvc.config;
     }

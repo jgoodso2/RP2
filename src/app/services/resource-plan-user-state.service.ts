@@ -65,8 +65,7 @@ export class ResourcePlanUserStateService {
         };
         return this.http.get(url, options)
             .map((data: Response) => {
-                ;
-                if (data["d"].results.length > 0)
+                if (data["d"].results&& data["d"].results.length > 0 && data["d"]["ResourceUID"])
                     return JSON.parse(data["d"].results
                         .map(r => r["ResourceUID"])) as IResource[] //dev
                 //.map(r=>r["ResourceUID"])) as IResource[] //qa
@@ -181,7 +180,7 @@ export class ResourcePlanUserStateService {
 
     }
     public AddResourceToManager(resMgrUid: string, resourcePlans: IResPlan[]): Observable<Result> {
-        let existingResources: IResource[];
+        let existingResources: IResource[]=[];
 
         let headers = new HttpHeaders();
         headers = headers.set('accept', 'application/json;odata=verbose')
@@ -196,8 +195,9 @@ export class ResourcePlanUserStateService {
                 let resources = [];
                 resources = resources.concat(resourcePlans.map(r => r.resource));
                 if (data["d"].results.length > 0) {
+                    if(data["d"].results[0]["ResourceUID"]){
                     existingResources = JSON.parse(data["d"].results[0]["ResourceUID"]).map(resource => { return new Resource(resource.resUid, resource.resName) }) //dev
-                    //existingResources = JSON.parse(data.json().d.results[0]["ResourceUID"]).map(resource => { return new Resource(resource.resUid, resource.resName) }) //qa
+                    }
                     existingResources = existingResources
                         .filter(e => resources.map(r => r.resUid.toUpperCase()).indexOf(e.resUid.toUpperCase()) < 0)
                 }
@@ -535,7 +535,6 @@ export class ResourcePlanUserStateService {
 
 
     getTimeScaleString(value: Timescale): string {
-        ;
         switch (value.toString()) {
             case Timescale.calendarMonths.toString(): return "Calendar Months";
             case Timescale.financialMonths.toString(): return "Financial Months";

@@ -12,6 +12,7 @@ import { ResourcePlanService } from '../services/resource-plan.service'
 import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
 import { CurrentCalendarYear}  from '../common/utilities'
 import { AppStateService } from './app-state.service'
+import {ProjectPlanService} from '../services/project-plan.service'
 
 @Injectable()
 export class ProjectPlanResolverService implements Resolve<IProjectPlan[]> {
@@ -21,7 +22,7 @@ export class ProjectPlanResolverService implements Resolve<IProjectPlan[]> {
     , private _resPlanUserStateSvc: ResourcePlanUserStateService
     , private router: Router
     , private _appState: AppStateService
-  
+    , private _projPlanSvc:ProjectPlanService
   ) { }
 
   resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<IProjectPlan[]> {
@@ -52,7 +53,15 @@ export class ProjectPlanResolverService implements Resolve<IProjectPlan[]> {
     this._appState.queryParams.workunits = workunits 
     this._appState.queryParams.showTimesheetData = showTimesheetData
     this._appState.queryParams.planMode = planMode
-    return  Observable.of(this.projPlanData)
+    return this._projPlanSvc.getCurrentUserId().flatMap(resMgr=>{
+      return this._projPlanSvc.getProjectPlans(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
+        .map(projPlans => {
+          if (projPlans) {
+            console.log('Projplans from resolver: ')
+            return projPlans
+          }
+        })
+      })
   }
 
   projPlanData: IProjectPlan[] = [

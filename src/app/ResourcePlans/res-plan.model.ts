@@ -64,6 +64,13 @@ export class ResPlan implements IResPlan {
     public projects: IProject[] = []) { }
 }
 
+export class ProjectPlan implements IProjectPlan {
+
+  constructor(public project: IProject = new Project('0', ''),
+
+    public resources: IResource[] = []) { }
+}
+
 
 export class Project implements IProject {
 

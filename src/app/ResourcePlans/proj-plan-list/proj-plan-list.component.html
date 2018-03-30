@@ -16,9 +16,10 @@
                             <div formArrayName="projPlans">
                                 <div id="printContent" class="table-body">
                                     <table id="testing" class="table">
+                                        
                                         <tbody *ngFor="let plan of chargebackGroup.get('projPlans').controls;index as i">
 
-                                            <div [formGroupName]="i">
+                                            <div [formGroupName]="i" >
                                                 <collapsible-well>
                                                 <div well-title>
                                                     <tr>
@@ -105,7 +106,7 @@
             </div>
             <simple-modal #modalresources closeOnBodyClick="true" elementId="1" title="Add resources" primaryBtnText="Add Selected resources">
                 <div class="list-group">
-                    <project-list [projData]='projData'></project-list>
+                    <project-list></project-list>
                 </div>
             </simple-modal>
             <simple-modal #modalChargebacks closeOnBodyClick="true" elementId="2" title="Select Chargebacks" primaryBtnText="Add Selected Chargebacks">

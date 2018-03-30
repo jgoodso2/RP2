@@ -26,6 +26,7 @@ import { ProjectListComponent } from './ResourcePlans/project-list/project-list.
 
 import { MatDatepickerModule,MatInputModule,MatNativeDateModule,MatTableModule,MatButtonModule,MatDialogModule} from '@angular/material';
 import { ProjectService} from './services/project-service.service'
+import { ProjectPlanService} from './services/project-plan.service'
 import {ChargebackServiceService} from './services/chargeback-service.service'
 import { ResourcePlanService } from './services/resource-plan.service'
 import { ResourcePlanUserStateService } from './services/resource-plan-user-state.service';
@@ -120,6 +121,7 @@ export function initConfig(configSvc: ConfigService){
     ChargebackServiceService,
     ProjectService, 
     ResourcePlanService
+    ,ProjectPlanService
     , ResourcePlanUserStateService
     ,AppUtilService
     , ResourcePlansResolverService
