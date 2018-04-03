@@ -2,7 +2,7 @@
     "projectServerUrl" : "http://foo.wingtip.com/PWA",
      "ResPlanUserStateUrl" : "http://foo.wingtip.com/PWA/_api/web/lists/GetByTitle('ResourcePlanUserState')",
      "adapterUrl":"http://foo.wingtip.com/PWA/_layouts/15/PwaPSIWrapper2/PwaAdapter.aspx",
-      "projectPickerViewGuid" : "eca55eb3-f0c6-e711-8113-0050568f3b8a",
+      "projectPickerViewGuid" : "63d3499e-df27-401c-af58-ebb9607beae8",
       "resourcePickerViewGuid" : "1b94c987-6731-4157-8586-4c3f7c0c8d58",
       "chargebackCustomFieldGuid" : "4836fff0-f0b4-e711-80ce-00155dcd8a01"
 }

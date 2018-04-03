@@ -54,8 +54,9 @@ export class ProjectPlanResolverService implements Resolve<IProjectPlan[]> {
     this._appState.queryParams.showTimesheetData = showTimesheetData
     this._appState.queryParams.planMode = planMode
     return this._projPlanSvc.getCurrentUserId().flatMap(resMgr=>{
-      return this._projPlanSvc.getProjectPlans(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
+      return  this._projPlanSvc.getProjectPlans(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
         .map(projPlans => {
+          debugger;
           if (projPlans) {
             console.log('Projplans from resolver: ')
             return projPlans

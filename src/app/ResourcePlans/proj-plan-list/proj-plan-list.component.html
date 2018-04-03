@@ -10,7 +10,29 @@
                         <collapsible-well >
 
                         <div well-title>
+                            <tr>
+                                <td class="body-cell" style="padding-left:5px">
+                                        <!-- <input type="checkbox" /> -->
+                                    </td>
+
+
+
+                                    <td class="body-cell col1">
                             <input type="label" readonly style=" background:rgba(0,0,0,0);border:none;font-weight:bold " formControlName="chargeBack">
+                        </td>
+                            <div formArrayName="totals">
+                                    <td class="body-cell col" *ngFor="let total of chargebackGroup.get('totals').controls;index as l">
+                                        <div [formGroupName]="l">
+                                            <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
+                                            />
+
+
+
+                                        </div>
+                                    </td>
+
+                                </div>
+                            </tr>
                         </div>
                         <div well-body>
                             <div formArrayName="projPlans">

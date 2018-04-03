@@ -65,7 +65,7 @@ export class ResourcePlanUserStateService {
         };
         return this.http.get(url, options)
             .map((data: Response) => {
-                if (data["d"].results&& data["d"].results.length > 0 && data["d"]["ResourceUID"])
+                if (data["d"].results&& data["d"].results.length > 0 && data["d"].results[0]["ResourceUID"])
                     return JSON.parse(data["d"].results
                         .map(r => r["ResourceUID"])) as IResource[] //dev
                 //.map(r=>r["ResourceUID"])) as IResource[] //qa

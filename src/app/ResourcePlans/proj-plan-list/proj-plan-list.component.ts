@@ -85,9 +85,11 @@ export class ProjPlanListComponent implements OnInit {
   };
 
   buildChargeBack(chargeBack: string, projPlans: IProjectPlan[]): FormGroup {
+    var _totals = this.fb.array([]);
     var chargeBackGroup = this.fb.group({
       chargeBack: chargeBack,
-      projPlans: this.fb.array([])
+      projPlans: this.fb.array([]),
+      totals: this.initTotals(_totals),
     })
     for (var i = 0; i < projPlans .length; i++) {
       if(projPlans[i].project.projUid !=''){
@@ -95,6 +97,11 @@ export class ProjPlanListComponent implements OnInit {
       (chargeBackGroup.get('projPlans') as FormArray).push(projPlan);
       }
     }
+      
+    this.calculateChargebackTotals(chargeBackGroup);
+    chargeBackGroup.valueChanges.subscribe(value => {
+      this.calculateChargebackTotals(chargeBackGroup)
+    }, (error) => console.log(error));
     return chargeBackGroup;
   }
 
@@ -103,7 +110,7 @@ export class ProjPlanListComponent implements OnInit {
     var projPlanGroup = this.fb.group({
       projUid: projPlan.project.projUid.toLowerCase(),
       projName: projPlan.project.projName,
-      totals: this.initTotals(_totals, projPlan.resources),
+      totals: this.initTotals(_totals),
       resources: this.fb.array([]),
       // selected: this.fb.control(false)
     });
@@ -111,10 +118,10 @@ export class ProjPlanListComponent implements OnInit {
       var resource = this.buildResource(projPlan.resources[i]);
       (projPlanGroup.get('resources') as FormArray).push(resource)
     }
-
-    this.calculateTotals(projPlanGroup);
+    
+    this.calculateProjectPlanTotals(projPlanGroup);
     projPlanGroup.valueChanges.subscribe(value => {
-      this.calculateTotals(projPlanGroup)
+      this.calculateProjectPlanTotals(projPlanGroup)
     }, (error) => console.log(error));
     debugger;
     return projPlanGroup;
@@ -159,7 +166,7 @@ export class ProjPlanListComponent implements OnInit {
     });
   }
 
-  initTotals(totals: FormArray, _projects: IResource[]): FormArray {
+  initTotals(totals: FormArray): FormArray {
     if (totals.controls.length < 1) {
       debugger;
       var intervalLen = this.getIntervalLength();
@@ -175,7 +182,7 @@ export class ProjPlanListComponent implements OnInit {
     return totals;
   }
 
-  calculateTotals(fg: FormGroup): void {
+  calculateProjectPlanTotals(fg: FormGroup): void {
 
     var value = fg.value;
 
@@ -195,6 +202,40 @@ export class ProjPlanListComponent implements OnInit {
         sum += val;
 
       }
+      if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+        sum = sum / 100;
+      }
+      value["totals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString()
+        , this._appSvc.queryParams.workunits)
+
+    }
+    fg.setValue(value, { emitEvent: false });
+    //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
+
+  }
+
+  calculateChargebackTotals(fg: FormGroup): void {
+
+    var value = fg.value;
+
+    if (value.readOnly == true)
+      return
+    for (var i = 0; i < value["totals"].length; i++) {
+      var sum = 0;
+      for(var k=0;k<value["projPlans"].length;k++){
+      for (var j = 0; j < value["projPlans"][k]["resources"].length; j++) {
+        if (value["projPlans"][k].resources[j]["intervals"].length < 1)
+          continue;
+        var val = parseInt(value["projPlans"][k].resources[j]["intervals"][i]["intervalValue"]);
+
+        if (!val) {
+          val = 0;
+        }
+
+        sum += val;
+
+      }
+    }
       if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
         sum = sum / 100;
       }
@@ -245,7 +286,7 @@ export class ProjPlanListComponent implements OnInit {
         this._appSvc.queryParams.toDate, this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, this._appSvc.queryParams.showTimesheetData)
         .subscribe(plans => {
           debugger;
-          this._projSvc.AddChagebacksToManager(resMgr, plans).subscribe(r => {
+          this._projSvc.AddChagebacksToManager(resMgr, selectedChargebacks).subscribe(r => {
             if (r.success == true) {
               console.log('added resplans=' + JSON.stringify(plans))
               this.setIntervalLength(plans.map(t => t.resources).reduce((a, b) => a.concat(b)))

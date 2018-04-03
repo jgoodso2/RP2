@@ -21,9 +21,6 @@ export class ProjectPlanService {
   }
 
   getProjectIdsFromChargebacks(chargebackValues: string[]): Observable<IProject[]> {
-    // let injector = ReflectiveInjector.resolveAndCreate([ProjectService,HttpClient]);
-    // let projectService: ProjectService = injector.get(ProjectService);
-    // projectService.http = injector.get(HttpClient);
     return this._projectService.getProjects().flatMap(projects => {
       return projects.filter(p => {
         return chargebackValues.indexOf(p.projectChargeBackCategory) > -1
@@ -33,22 +30,25 @@ export class ProjectPlanService {
 
   getProjectPlansFromChargebacks(chargebacks: string[], fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IProjectPlan[]> {
 
-    let emptyProjPlans: Observable<IProjectPlan[]> = Observable.of(chargebacks.map(r => {
+    let emptyProjPlans: IProjectPlan[] = chargebacks.map(r => {
       var pp = new ProjectPlan()
       pp.project = new Project();
       pp.project.projectChargeBackCategory = r;
       return pp;
-    }))
+    })
 
     let projects = this.getProjectIdsFromChargebacks(chargebacks);
     var uniqueProjects = projects.flatMap(p => Observable.from(p)).distinct(p => p.projUid);
 
-    return Observable.forkJoin(uniqueProjects.flatMap((project: IProject) => {
-      return this.getProjectPlan(`${this.config.projectServerUrl}`, project[0], fromDate, toDate, timescale, workunits)
+    return uniqueProjects.flatMap((project: IProject) => {
+      return this.getProjectPlan(`${this.config.projectServerUrl}`, project, fromDate, toDate, timescale, workunits)
 
 
-    }))
-      .concat(emptyProjPlans)
+    })
+    .toArray()
+    .flatMap(t=>t.concat(emptyProjPlans))
+    .toArray()
+      
       // .flatMap(t => { ; return t; }).
       // groupBy(t => { return t.resource.resUid.toUpperCase() }).flatMap(group => {
 
@@ -100,6 +100,7 @@ export class ProjectPlanService {
       //   }
       // })
       .map(pp => {
+        debugger;
         return pp.sort((a, b) => {
           if (a.project.projName < b.project.projName) return -1;
           if (a.project.projName > b.project.projName) return 1;
@@ -162,6 +163,8 @@ export class ProjectPlanService {
       adapterPath, body, options
 
     ).map((r: ProjectPlan) => {
+      debugger;
+      r.project.projectChargeBackCategory = project.projectChargeBackCategory;
       return r;
     })
   }
@@ -247,6 +250,7 @@ export class ProjectPlanService {
   //       return r;
   //   })
   // }
+  //TODO:Refactor  move into common service
   public getRequestDigestToken(): Observable<string> {
     let url = `${this.config.projectServerUrl}/_api/contextinfo`;
     let headers = new HttpHeaders();
@@ -286,7 +290,22 @@ export class ProjectPlanService {
                 })
         })
 }
-  public AddChagebacksToManager(resMgrUid: string, projectPlans: IProjectPlan[]): Observable<Result> {
+getDateFormatString(date: Date): string {
+  var NowMoment = moment(date)
+  return NowMoment.format('YYYY-MM-DD');
+}
+
+getTimeScaleString(value: Timescale): string {
+  switch (value.toString()) {
+    case Timescale.calendarMonths.toString(): return "Calendar Months";
+    case Timescale.financialMonths.toString(): return "Financial Months";
+    case Timescale.weeks.toString(): return "Weeks";
+    case Timescale.years.toString(): return "Years";
+    default: return "";
+
+  }
+}
+  public AddChagebacksToManager(resMgrUid: string, lookups: Lookup[]): Observable<Result> {
     let existingChargebacks: string[]=[];
 
     let headers = new HttpHeaders();
@@ -301,7 +320,7 @@ export class ProjectPlanService {
       .flatMap((data: Response) => {
         debugger;
         let chargebacks = [];
-        chargebacks = chargebacks.concat(projectPlans.map(r => r.project.projectChargeBackCategory));
+        chargebacks = chargebacks.concat(lookups.map(r => r.name));
         if (data["d"].results.length > 0) {
           if(data["d"].results[0]["Chargebacks"]){
           existingChargebacks = eval(data["d"].results[0]["Chargebacks"]) //dev
@@ -348,19 +367,5 @@ export class ProjectPlanService {
         })
       })
   }
-  getDateFormatString(date: Date): string {
-    var NowMoment = moment(date)
-    return NowMoment.format('YYYY-MM-DD');
-  }
-
-  getTimeScaleString(value: Timescale): string {
-    switch (value.toString()) {
-      case Timescale.calendarMonths.toString(): return "Calendar Months";
-      case Timescale.financialMonths.toString(): return "Financial Months";
-      case Timescale.weeks.toString(): return "Weeks";
-      case Timescale.years.toString(): return "Years";
-      default: return "";
-
-    }
-  }
+  
 }
