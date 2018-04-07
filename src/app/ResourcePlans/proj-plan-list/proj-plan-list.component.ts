@@ -1,12 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { IProjectPlan, IResource, IInterval, IProject, WorkUnits, Lookup } from '../res-plan.model'
+import { IProjectPlan, IResource, IInterval, IProject, Project, Timescale, WorkUnits, Lookup, ProjectPlan, Result } from '../res-plan.model'
 import { SimpleModalComponent } from '../../common/simple-modal.component'
 import { Observable, Subscription, Subject } from 'rxjs'
 import { FormGroup, FormBuilder, Validators, AbstractControl, ValidatorFn, FormArray, FormGroupName, } from '@angular/forms';
 import { AppStateService } from '../../services/app-state.service'
 import { IntervalPipe } from '../../common/interval.pipe'
 import { ChargebackModalCommunicatorService } from '../chargeback-modal-communicator.service'
+import { ResourcesModalCommunicatorService } from '../resources-modal-communicator.service'
 import { ProjectPlanService } from '../../services/project-plan.service'
 @Component({
   selector: 'app-proj-plan-list',
@@ -15,26 +16,29 @@ import { ProjectPlanService } from '../../services/project-plan.service'
 })
 export class ProjPlanListComponent implements OnInit {
   @ViewChild('modalChargebacks') private modalChargebacks: SimpleModalComponent;
+  @ViewChild('modalresources') private modalResources: SimpleModalComponent;
   //dataSub : Subject<any>  = Observable.from(this.projPlanData)
   dataSub: Subscription
   ///
   mainForm: FormGroup;
   _intervalCount: number = 0;
   projPlanData: IProjectPlan[];
-
-
+  errorMessage: any;
+  currentFormGroup: FormGroup;
   get chargeBacks(): FormArray {  //this getter should return all instances.
     return <FormArray>this.mainForm.get('chargeBacks');
   }
 
 
   constructor(private fb: FormBuilder, private _appSvc: AppStateService, private _route: ActivatedRoute,
-    private _chargebackSvc: ChargebackModalCommunicatorService, private _projSvc: ProjectPlanService) { }
+    private _chargebackSvc: ChargebackModalCommunicatorService, private _projSvc: ProjectPlanService
+    , private _resModalSvc: ResourcesModalCommunicatorService) { }
 
 
   ngOnInit() {
 
-
+    this._appSvc.save$.subscribe(() => this.savePlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
+      this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits))
 
     this.mainForm = this.fb.group({
       chargeBacks: this.fb.array([]),
@@ -59,7 +63,12 @@ export class ProjPlanListComponent implements OnInit {
       this.addSelectedChargebacks()
 
     }, (error) => console.log(error));
+    this._resModalSvc.modalSubmitted$.subscribe(() => {
+      this.addSelectedResources(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate, 
+        this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, this._appSvc.queryParams.showTimesheetData);
+  }, (error) => console.log(error))
     this.modalChargebacks.modalSubmitted$.subscribe(() => { this._chargebackSvc.modalSubmitClicked() }, (error) => console.log(error));
+    this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
   }
 
   buildProjPlans(projPlans: IProjectPlan[]) {
@@ -91,13 +100,13 @@ export class ProjPlanListComponent implements OnInit {
       projPlans: this.fb.array([]),
       totals: this.initTotals(_totals),
     })
-    for (var i = 0; i < projPlans .length; i++) {
-      if(projPlans[i].project.projUid !=''){
-      var projPlan = this.buildProjPlan(projPlans[i]);
-      (chargeBackGroup.get('projPlans') as FormArray).push(projPlan);
+    for (var i = 0; i < projPlans.length; i++) {
+      if (projPlans[i].project.projUid != '') {
+        var projPlan = this.buildProjPlan(projPlans[i]);
+        (chargeBackGroup.get('projPlans') as FormArray).push(projPlan);
       }
     }
-      
+
     this.calculateChargebackTotals(chargeBackGroup);
     chargeBackGroup.valueChanges.subscribe(value => {
       this.calculateChargebackTotals(chargeBackGroup)
@@ -112,13 +121,14 @@ export class ProjPlanListComponent implements OnInit {
       projName: projPlan.project.projName,
       totals: this.initTotals(_totals),
       resources: this.fb.array([]),
+      error : this.fb.control(null)
       // selected: this.fb.control(false)
     });
     for (var i = 0; i < projPlan.resources.length; i++) {
       var resource = this.buildResource(projPlan.resources[i]);
       (projPlanGroup.get('resources') as FormArray).push(resource)
     }
-    
+
     this.calculateProjectPlanTotals(projPlanGroup);
     projPlanGroup.valueChanges.subscribe(value => {
       this.calculateProjectPlanTotals(projPlanGroup)
@@ -222,20 +232,20 @@ export class ProjPlanListComponent implements OnInit {
       return
     for (var i = 0; i < value["totals"].length; i++) {
       var sum = 0;
-      for(var k=0;k<value["projPlans"].length;k++){
-      for (var j = 0; j < value["projPlans"][k]["resources"].length; j++) {
-        if (value["projPlans"][k].resources[j]["intervals"].length < 1)
-          continue;
-        var val = parseInt(value["projPlans"][k].resources[j]["intervals"][i]["intervalValue"]);
+      for (var k = 0; k < value["projPlans"].length; k++) {
+        for (var j = 0; j < value["projPlans"][k]["resources"].length; j++) {
+          if (value["projPlans"][k].resources[j]["intervals"].length < 1)
+            continue;
+          var val = parseInt(value["projPlans"][k].resources[j]["intervals"][i]["intervalValue"]);
 
-        if (!val) {
-          val = 0;
+          if (!val) {
+            val = 0;
+          }
+
+          sum += val;
+
         }
-
-        sum += val;
-
       }
-    }
       if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
         sum = sum / 100;
       }
@@ -307,4 +317,167 @@ export class ProjPlanListComponent implements OnInit {
         })
     }, (error) => { console.log(error); this._appSvc.loading(false); })
   }
+
+  addResources(_projPlan: FormGroup): void {
+    //get IResource[] array from current formgroup
+    var data = _projPlan.value.projUid;
+    this._resModalSvc.ResourcesSelected(_projPlan.value.resources);
+    this.modalResources.showModal(data);
+    this.currentFormGroup = _projPlan;
+}
+
+addSelectedResources(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean) {
+  this._appSvc.loading(true);
+  let selectedResources = this._resModalSvc.selectedResources;
+  this._projSvc.getCurrentUserId().subscribe(resMgr => {
+      let project = new Project(this.currentFormGroup.value["projUid"],
+          this.currentFormGroup.value["projName"]);
+         this._projSvc.addProjects(resMgr, [project],selectedResources ,
+          fromDate, toDate, timescale, workunits)
+          .subscribe(results => {
+              this.updateErrors(results);
+              this._resModalSvc.selectedResources = [];
+              let successfullProjects = results.filter(r => r.success == true).map(t => t.project);
+              //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
+              console.log("===added projects" + JSON.stringify(successfullProjects))
+
+              if (successfullProjects.length > 0) {
+                  this._projSvc.getProjectPlansFromProject(project,  fromDate, toDate, timescale, workunits
+                      ).subscribe(resPlans => {
+                          this.buildSelectedResources(resPlans.resources
+                            .filter(r=>selectedResources.map(t=>t.resUid).indexOf(r.resUid) > -1))//.filter(r=>r.projUid.toUpperCase))
+                          //this.header && this.header.setIntervalsFromresPlans(resPlans);
+                          this.initTotals(this.currentFormGroup.get('totals') as FormArray)
+                          this.calculateProjectPlanTotals(this.currentFormGroup);
+                          this.calculateChargebackTotals(this.currentFormGroup.parent as FormGroup);
+                      });
+
+              }
+
+              this._appSvc.loading(false);
+``
+
+          })
+  }, (error) => { console.log(error); this._appSvc.loading(false); })
+
+}
+
+buildSelectedResources(resources: IResource[]): void {
+  this.setIntervalLength(resources)
+  var intervalLength = this.getIntervalLength();
+  for (var k = 0; k < resources.length; k++) {
+      let resource: IResource = resources[k];
+      // project.intervals = [];
+      // for (var i = 0; i < intervalLength; i++) {
+      //     project.intervals.push(new Interval('', '0.0'));
+      // }
+
+      (this.currentFormGroup.controls['resources'] as FormArray).push(this.buildResource(resource));
+  }
+}
+
+  savePlans(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits): void {
+    if (this._appSvc.mainFormDirty && this.mainForm.valid) {
+
+      let projPlans:IProjectPlan[] = [].concat.apply([],this.chargeBacks.controls
+        .filter(item => item.dirty === true)
+        .map(t=>{
+          let dirtyProjPlans = (t.get('projPlans') as FormArray).controls.filter(item => item.dirty === true).map(t=>t.value as IProjectPlan).map(p=>{
+          var resources = p.resources;
+
+          let resPlan = new ProjectPlan();
+          resPlan.project = new Project(p["projUid"], p["projName"]);
+          //deep clone resources
+          resPlan.resources = JSON.parse(JSON.stringify(resources));
+
+          resPlan.resources.forEach(p => {
+            p.intervals.forEach(i => {
+              if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+                i.intervalValue = (+(i.intervalValue.replace('%', '')) / 100).toString()
+              }
+              else if (this._appSvc.queryParams.workunits == WorkUnits.hours) {
+                i.intervalValue = (+(i.intervalValue.replace('hrs', ''))).toString()
+              }
+              else if (this._appSvc.queryParams.workunits == WorkUnits.days) {
+                i.intervalValue = (+(i.intervalValue.replace('d', ''))).toString()
+              }
+            })
+          })
+
+          return resPlan;
+        })
+        return dirtyProjPlans;
+      }))
+
+
+      console.log("dirty resPlans" + JSON.stringify(projPlans))
+      this._appSvc.loading(true);
+      this._projSvc.saveProjPlans(projPlans, fromDate, toDate, timescale, workunits)
+        .subscribe(
+          (results: Result[]) => this.onSaveComplete(results),
+          (error: any) => {
+            this.errorMessage = <any>error
+            this._appSvc.loading(false);
+          });
+    }
+    //()
+    else if (!this._appSvc.mainFormDirty) {
+      //this.onSaveComplete();
+    }
+  }
+
+  onSaveComplete(results: Result[]): void {
+    // Reset the form to clear the flags
+    //this.mainForm.reset();  
+    this.updateErrors(results);
+
+    //here we are looking for projects that saved successfully and then clearing the state
+    results.forEach(result => {
+      if (result.success == true) {
+        var projectUid = result.project.projUid;
+        this.chargeBacks.controls.forEach(chargeback => {
+          (chargeback.get('projPlans') as FormArray).controls.forEach(projPlan => {
+              if (projPlan.get('projUid').value == projectUid) {
+                projPlan.patchValue({error:null});
+              }
+          });
+        });
+      }
+    });
+    // let frmState = this.mainForm.value;
+    //  this.mainForm.reset(frmState);
+    // this.mainForm.setValue(frmState);
+    this._appSvc.loading(false);
+    this._appSvc.mainFormDirty = false
+
+  }
+
+  updateErrors(errors: Result[]) {
+    let resultsWithError = errors.filter(e => e.success == false);
+    //reset errors to null before update
+    this.chargeBacks.controls.forEach(chargeback => {
+      (chargeback.get('projPlans') as FormArray).controls.forEach(projPlan => {
+        debugger;
+        projPlan.patchValue({ error: null })
+      });
+    });
+
+    this.chargeBacks.controls.forEach(chargeback => {
+      (chargeback.get('projPlans') as FormArray).controls.forEach(projPlan => {
+          if (resultsWithError && resultsWithError.length > 0 && resultsWithError.findIndex(e => e.project.projUid.toUpperCase() == projPlan.get('projUid').value.toUpperCase()) > -1) {
+            projPlan.patchValue({ error: resultsWithError.find(e => e.project.projUid.toUpperCase() == projPlan.get('projUid').value.toUpperCase()).error })
+          }
+
+      });
+    });
+  }
+
+  intervalChanged(input: any, ctrl: AbstractControl) {
+    // if (!ctrl.errors) {
+    //     if ((event.currentTarget as HTMLInputElement).value && (event.currentTarget as HTMLInputElement).value.trim() != '')
+    //         (event.currentTarget as HTMLInputElement).value = new CellWorkUnitsPipe().transform((event.currentTarget as HTMLInputElement).value, this.workunits);
+    // }
+    // debugger;
+    this._appSvc.setFormDirty(true);
+}
 }

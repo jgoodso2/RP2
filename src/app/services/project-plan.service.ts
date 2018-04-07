@@ -27,7 +27,11 @@ export class ProjectPlanService {
       })
     }).toArray()
   }
-
+  getProjectPlansFromProject(project: IProject, fromDate: Date, toDate: Date,
+    timescale: Timescale, workunits: WorkUnits)
+    : Observable<IProjectPlan> {
+      return this.getProjectPlan(`${this.config.projectServerUrl}`, project, fromDate, toDate, timescale, workunits)
+    }
   getProjectPlansFromChargebacks(chargebacks: string[], fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IProjectPlan[]> {
 
     let emptyProjPlans: IProjectPlan[] = chargebacks.map(r => {
@@ -251,6 +255,46 @@ export class ProjectPlanService {
   //   })
   // }
   //TODO:Refactor  move into common service
+  addProjects(resMgrUid: string, projects: IProject[], resources: IResource[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+
+    let ob = Observable.from(projects).flatMap(p => {
+        // return r.filter(project=>{
+        //     let val = true;
+        return this.addProject(resMgrUid, p, resources, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
+        // })
+    }).toArray()
+
+    return ob;
+}
+
+addProject(resMgrUid: string, project: IProject, resources: IResource[], fromDate: string, toDate: string, timeScale: Timescale, workScale: WorkUnits): Observable<Result> {
+    var success;
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
+
+
+    // let body = new URLSearchParams();
+
+    const body = `method=PwaAddResourcesToPlanCommand&puid=${project.projUid}&resuids=${resources.map(r=>r.resUid).join(',')}&projname=${project.projName}&fromDate=${this.getDateFormatString(new Date(fromDate))}&toDate=${this.getDateFormatString(new Date(toDate))}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+    let options = {
+        headers,
+        withCredentials: true
+    };
+
+    let adapterPath = `${this.config.adapterUrl}`
+    
+    console.log("====================================Hitting Adapter Get Res Plan for project = " + project.projName)
+    return this.http.post(
+        adapterPath, body, options
+
+    ).map(r => {
+        return r as Result
+    })
+    // return this.http.post(adapterPath,body,options).flatMap(r=>
+    //     {
+    //         return Observable.of(project);
+    //     })
+}
   public getRequestDigestToken(): Observable<string> {
     let url = `${this.config.projectServerUrl}/_api/contextinfo`;
     let headers = new HttpHeaders();
@@ -367,5 +411,26 @@ getTimeScaleString(value: Timescale): string {
         })
       })
   }
+
+  saveProjPlans(projPlan: IProjectPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+    var success;
+    //TODO
+    let headers = new HttpHeaders();
+    headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
+
+    let adapterPath = `${this.config.adapterUrl}`
+    // let body = new URLSearchParams();
+
+    const body = `method=PwaUpdateProjectPlanCommand&resourceplan=${JSON.stringify(projPlan)}&fromDate=${this.getDateFormatString(fromDate)}&toDate=${this.getDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+    let options = {
+        headers
+    };
+
+    return this.http.post(
+        adapterPath, body, options
+    ).map(r => {
+        return r as Result[];
+    })
+}
   
 }

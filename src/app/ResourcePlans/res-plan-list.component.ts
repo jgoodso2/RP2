@@ -634,7 +634,6 @@ export class ResPlanListComponent implements OnInit {
     }
 
     savePlans(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits): void {
-        ;
         if (this._appSvc.mainFormDirty && this.mainForm.valid) {
 
             let resourceplans = this.resPlans.controls
