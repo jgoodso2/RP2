@@ -432,5 +432,69 @@ getTimeScaleString(value: Timescale): string {
         return r as Result[];
     })
 }
+
+deleteResPlans(projPlans: IProjectPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+  let headers = new HttpHeaders();
+  headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
+debugger;
+  const body = `method=PwaDeleteProjectPlanCommand&resourceplan=${JSON.stringify(projPlans)}&fromDate=${this.getDateFormatString(fromDate)}&toDate=${this.getDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`;
+  let adapterPath = `${this.config.adapterUrl}`
+  let options = {
+      headers
+  };
+  return this.http.post(
+      adapterPath, body, options
+
+  ).map((r) => {
+      return r as Result[];
+  })
+
+  // return this.http.post(adapterPath,body,options).flatMap(r=>
+  //     {
+  //         return Observable.of(project);
+  //     })
+}
+HideResPlans(resMgrUid: string, projPlans: IProjectPlan[]): Observable<Result> {
+  let headers = new HttpHeaders();
+  headers = headers.set('accept', 'application/json;odata=verbose')
+  let options = {
+      withCredentials: true,
+      headers
+  }
+  let url = `${this.config.ResPlanUserStateUrl}/Items`
+  let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
+  projPlans = projPlans.filter(r => r["selected"] == true)
+  //1. get data from SP List UserState  
+  return this.http.get(url + filter, options)
+      .flatMap((data: Response) => {
+          let chargebacks = <string[]>eval(data["d"].results[0]["Chargebacks"]) //dev
+          chargebacks = chargebacks.filter(c => projPlans.map(d => d.project.projectChargeBackCategory).indexOf(c) < 0)
+          return this.getRequestDigestToken().flatMap(digest => {
+
+              let headers = new HttpHeaders();
+              headers = headers.set('Accept', 'application/json;odata=verbose')
+              headers = headers.set('Content-Type', 'application/json;odata=verbose')
+              headers = headers.set('X-RequestDigest', digest)
+
+
+              let chargebackJSON = `"[${chargebacks.map(c=>"'" + c + "'").toString()}]"`
+              headers = headers.set('IF-MATCH', '*')
+              headers = headers.set('X-HTTP-Method', 'MERGE')
+              let options = {
+                  headers: headers
+              }
+
+              let body = `{"__metadata": { "type": "SP.Data.ResourcePlanUserStateListItem" },"Chargebacks":${chargebackJSON}}"}` //dev
+              //let body = `{"__metadata": { "type": "SP.Data.ResourcePlanUserStateListItem" },"ResourceUID":${resourcesJSON}}"}` //qa
+              return this.http.post(data["d"].results[0].__metadata.uri, body, options)
+                  .map((response: Response) => {
+                      var result = new Result();
+                      result.success = true;
+                      return result;
+                  })
+          })
+      })
+
+}
   
 }

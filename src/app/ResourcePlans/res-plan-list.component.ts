@@ -686,7 +686,6 @@ export class ResPlanListComponent implements OnInit {
     }
 
     deleteResPlans(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, hideOnly: boolean): void {
-        ;
         if (this.mainForm.valid) {
 
 
@@ -837,7 +836,6 @@ export class ResPlanListComponent implements OnInit {
         return selected;
     }
     deleteResourcePlans(resPlans: IResPlan[]) {
-        ;
         resPlans.forEach(resPlan => {
             //entire res plan selected for delete
             if (resPlan["selected"] == true) {
