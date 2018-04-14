@@ -7,129 +7,154 @@
             <div formArrayName="chargeBacks" *ngIf="chargeBacks && chargeBacks.length > 0">
                 <div *ngFor="let chargebackGroup of chargeBacks.controls;index as c">
                     <div [formGroupName]="c">
-                        <collapsible-well >
+                        <collapsible-well>
 
-                        <div well-title>
-                            <tr>
-                                <td class="body-cell" style="padding-left:5px">
-                                        <input type="checkbox" formControlName="selected" (click)="toggleChargebackSelection(chargebackGroup,$event.target.checked)" />
+                            <div well-title>
+                                <tr>
+                                    <td class="body-cell" style="padding-left:5px">
+                                        <input type="checkbox" formControlName="selected" (click)="toggleChargebackSelection(chargebackGroup,$event.target.checked)"
+                                        />
                                     </td>
 
 
 
                                     <td class="body-cell col1">
-                            <input type="label" readonly style=" background:rgba(0,0,0,0);border:none;font-weight:bold " formControlName="chargeBack">
-                        </td>
-                            <div formArrayName="totals">
-                                    <td class="body-cell col" *ngFor="let total of chargebackGroup.get('totals').controls;index as l">
-                                        <div [formGroupName]="l">
-                                            <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
-                                            />
-
-
-
-                                        </div>
+                                        <input type="label" readonly style=" background:rgba(0,0,0,0);border:none;font-weight:bold " formControlName="chargeBack">
                                     </td>
-
-                                </div>
-                            </tr>
-                        </div>
-                        <div well-body>
-                            <div formArrayName="projPlans">
-                                <div id="printContent" class="table-body">
-                                    <table id="testing" class="table">
-                                        
-                                        <tbody *ngFor="let plan of chargebackGroup.get('projPlans').controls;index as i">
-
-                                            <div [formGroupName]="i" >
-                                                <collapsible-well>
-                                                <div well-title>
-                                                    <tr>
-                                                        <td class="body-cell" style="padding-left:5px">
-                                                                <input type="checkbox" formControlName="selected" (click)="toggleProjPlanSelection(plan,$event.target.checked)" />
-                                                        </td>
+                                    <div formArrayName="totals">
+                                        <td class="body-cell col" *ngFor="let total of chargebackGroup.get('totals').controls;index as l">
+                                            <div [formGroupName]="l">
+                                                <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" 
+                                                [ngClass] = "checkTotal(totalVal.value)"
+                                                placeholder="intervalValue" style="width:100%"
+                                                />
 
 
 
-                                                        <td class="body-cell col1">
-                                                            <input class="totalsRow" formControlName="projName" placeholder="Project" style="width:100%">
-                                                            <error [error]="plan.get('error').value" *ngIf="plan.get('error').value != null"></error>
-                                                        </td>
-                                                        <div formArrayName="totals">
-                                                            <td class="body-cell col" *ngFor="let total of plan.get('totals').controls;index as l">
-                                                                <div [formGroupName]="l">
-                                                                    <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
-                                                                    />
+                                            </div>
+                                        </td>
 
+                                    </div>
+                                </tr>
+                            </div>
+                            <div well-body>
+                                <div formArrayName="projPlans">
+                                    <div id="printContent" class="table-body">
+                                        <table id="testing" class="table">
 
+                                            <tbody *ngFor="let plan of chargebackGroup.get('projPlans').controls;index as i">
 
-                                                                </div>
-                                                            </td>
-
-                                                        </div>
-
-                                                    </tr>
-                                                </div>
-                                                <div well-body>
-                                                    <div formArrayName="resources">
-                                                        <div *ngFor="let proj of plan.get('resources').controls;index as j">
-                                                            <tr [formGroupName]="j">
+                                                <div [formGroupName]="i">
+                                                    <collapsible-well>
+                                                        <div well-title>
+                                                            <tr>
                                                                 <td class="body-cell" style="padding-left:5px">
-                                                                        <input type="checkbox" formControlName="selected" (click)="DeselectGroupOnUncheck(chargebackGroup,plan,proj,$event.target.checked)" />
+                                                                    <input type="checkbox" formControlName="selected" (click)="toggleProjPlanSelection(plan,$event.target.checked)" />
                                                                 </td>
-
 
 
 
                                                                 <td class="body-cell col1">
-                                                                    <input formControlName="resName" placeholder="resource" style="width:100%" />
-                                                                    <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
+                                                                    <input class="totalsRow" formControlName="projName" placeholder="Project" style="width:100%">
+                                                                    <error [error]="plan.get('error').value" *ngIf="plan.get('error').value != null"></error>
+                                                                </td>
+                                                                <div formArrayName="totals">
+                                                                    <td class="body-cell col" *ngFor="let total of plan.get('totals').controls;index as l">
+                                                                        <div [formGroupName]="l">
+                                                                            <input #totalVal class="totalsRow intervalCell" formControlName="intervalValue" placeholder="intervalValue" style="width:100%"
+                                                                            />
+
+
+
+                                                                        </div>
+                                                                    </td>
+
+                                                                </div>
+
+                                                            </tr>
+                                                        </div>
+                                                        <div well-body>
+                                                            <div formArrayName="resources">
+                                                                <div *ngFor="let proj of plan.get('resources').controls;index as j">
+                                                                    <tr [formGroupName]="j">
+                                                                        <td class="body-cell" style="padding-left:5px">
+                                                                            <input type="checkbox" formControlName="selected" (click)="DeselectGroupOnUncheck(chargebackGroup,plan,proj,$event.target.checked)"
+                                                                            />
+                                                                        </td>
+
+
+
+
+                                                                        <td class="body-cell col1">
+                                                                            <input formControlName="resName" placeholder="resource" style="width:100%" />
+                                                                            <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
                                                                 [finish]="proj.get('finishDate').value"  placeholder="project" style="width:100%" /> -->
 
-                                                                </td>
-                                                                <div formArrayName="intervals">
-                                                                    <td class="body-cell col" *ngFor="let intrvl of proj.get('intervals').controls; index as k">
-                                                                        <div [formGroupName]="k">
-                                                                            <input style="width:100%" class='' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text" onClick="this.select()"
-                                                                                autofocus formControlName="intervalValue" (change)="intervalChanged(this,intrvl.get('intervalValue'))">
+                                                                        </td>
+                                                                        <div formArrayName="intervals">
+                                                                            <td class="body-cell col" *ngFor="let intrvl of proj.get('intervals').controls; index as k">
+                                                                                <div [formGroupName]="k">
+                                                                                        <input class='intervalCell' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text"  onClick="this.select()" autofocus 
+                                                                                        formControlName="intervalValue" projectDateSpan [projStart]="plan.get('startDate').value" style="width:100%" 
+                                                                                        [projFinish]="plan.get('finishDate').value" [intervalStart] ="intrvl.get('intervalStart').value"  [intervalEnd] = "intrvl.get('intervalEnd').value"   
+                                                                                        spellcheck="false"
+                                                                                        (change)="intervalChanged(this,intrvl.get('intervalValue'))">    
+                                                                                </div>
+                                                                                <span *ngIf="intrvl.get('intervalValue').touched && intrvl.get('intervalValue').dirty && intrvl.get('intervalValue').errors">
+                                                                                    <error [error]="getIntervalValidationMessage()"></error>
+                                                                                </span>
+                                                                            </td>
                                                                         </div>
-                                                                        <span *ngIf="intrvl.get('intervalValue').touched && intrvl.get('intervalValue').dirty && intrvl.get('intervalValue').errors">
-                                                                            <error [error]="getIntervalValidationMessage()"></error>
-                                                                        </span>
-                                                                    </td>
+
+                                                                    </tr>
+                                                                    <tr [formGroupName]="j" *ngIf="_appSvc.queryParams.showTimesheetData == true">
+                                                                        <td class="body-cell" style="padding-left:5px">
+
+                                                                        </td>
+                                                                        <td class="body-cell col1">
+                                                                            <span style="width:100%;color:blue">Timesheet data</span>
+
+                                                                        </td>
+                                                                        <div formArrayName="timesheetData">
+                                                                            <td class="body-cell col" *ngFor="let intrvl of proj.get('timesheetData').controls; index as k">
+                                                                                <div [formGroupName]="k">
+                                                                                    <input readonly="readonly" class="intervalCell actualCell" formControlName="intervalValue" style="width:100%" 
+                                                                                    [value]="intrvl.get('intervalValue').value | cellWorkUnits : this.workunits">
+
+                                                                                </div>
+                                                                            </td>
+                                                                        </div>
+                                                                    </tr>
                                                                 </div>
-                                                            </tr>
+                                                                <!-- i = index of resplan formgroup -->
+
+                                                            </div>
+
+                                                            <!-- <button btn btn-primary" type="button" (click) = "addProject(plan)" > Add Project  </button> -->
+                                                            <button class="btn btn-primary" type="button" (click)="addResources(plan)"> Add Resources </button>
+
+
+
 
                                                         </div>
-                                                        <!-- i = index of resplan formgroup -->
-
-                                                    </div>
-
-                                                    <!-- <button btn btn-primary" type="button" (click) = "addProject(plan)" > Add Project  </button> -->
-                                                    <button class="btn btn-primary" type="button" (click)="addResources(plan)"> Add Resources </button>
-
-
-
-
+                                                    </collapsible-well>
                                                 </div>
-                                                </collapsible-well>
-                                            </div>
 
 
-                                        </tbody>
-                                    </table>
+                                            </tbody>
+                                        </table>
 
+                                    </div>
                                 </div>
-                            </div>
 
-                        </div>
+                            </div>
                         </collapsible-well>
                     </div>
                 </div>
             </div>
             <simple-modal #modalresources closeOnBodyClick="true" elementId="1" title="Add resources" primaryBtnText="Add Selected resources">
                 <div class="list-group">
-                        <resource-list></resource-list>
+                    <resource-list></resource-list>
                 </div>
             </simple-modal>
             <simple-modal #modalChargebacks closeOnBodyClick="true" elementId="2" title="Select Chargebacks" primaryBtnText="Add Selected Chargebacks">

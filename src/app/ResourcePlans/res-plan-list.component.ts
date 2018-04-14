@@ -228,13 +228,8 @@ export class ResPlanListComponent implements OnInit {
     }
 
     exitToBI(mainFormIsDirty) {
-
         this.checkForUnsavedChanges(mainFormIsDirty, "https://perviewqa.app.parallon.com/PWA/ProjectBICenter/")
-
     }
-
-
-
 
     calculateTotals(fg: FormGroup): void {
 
@@ -275,7 +270,6 @@ export class ResPlanListComponent implements OnInit {
         }
     }
     checkTotal(val: string) {
-        ;
         if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
             if (parseInt(val) > 100) {
                 return "totalRed"
@@ -283,7 +277,6 @@ export class ResPlanListComponent implements OnInit {
             else return "totalGreen"
         }
         else return ""
-
     }
 
     buildResPlans(plans: IResPlan[]) {
@@ -328,8 +321,8 @@ export class ResPlanListComponent implements OnInit {
                 intervals: this.fb.array([]),
                 timesheetData: this.fb.array([]),
                 selected: this.fb.control(false),
-                startDate: _project.startDate,
-                finishDate: _project.finishDate
+                startDate: _project.startDate || '',
+                finishDate: _project.finishDate || ''
             });
         for (var i = 0; i < _project.intervals.length; i++) {
             var interval = this.buildInterval(_project.intervals[i]);
@@ -529,7 +522,6 @@ export class ResPlanListComponent implements OnInit {
     }
 
     addSelectedResources() {
-        ;
         //console.log("add resource fired" + JSON.stringify(this._resModalSvc.selectedResources));
         ///EMIT HERE
         let selectedResources = this._resModalSvc.selectedResources;
@@ -947,17 +939,4 @@ export class ResPlanListComponent implements OnInit {
         debugger;
         this._appSvc.setFormDirty(true);
     }
-
-    getTimesheetButtonText() {
-
-        if (this.showTimesheetData == true) {
-            return 'Hide Timesheet Data';
-
-        }
-
-        else {
-            return 'Show timesheet Data';
-        }
-    }
-
 }

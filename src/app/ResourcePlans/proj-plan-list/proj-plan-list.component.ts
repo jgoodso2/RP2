@@ -11,6 +11,7 @@ import { ResourcesModalCommunicatorService } from '../resources-modal-communicat
 import { ProjectPlanService } from '../../services/project-plan.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { MatDialog, MatDialogRef } from '@angular/material';
+import { CellWorkUnitsPipe } from "../../common/cell-work-units.pipe"
 @Component({
   selector: 'app-proj-plan-list',
   templateUrl: './proj-plan-list.component.html',
@@ -41,12 +42,15 @@ export class ProjPlanListComponent implements OnInit {
 
 
   ngOnInit() {
+    debugger;
     this._appSvc.delete$.subscribe(() => this.openDeleteProjPlanDialog())
     this._appSvc.hide$.subscribe(() => this.deleteProjPlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
       this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, true))
     this._appSvc.save$.subscribe(() => this.savePlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
       this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits))
-
+    this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
+    this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
+    this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
     this.mainForm = this.fb.group({
       chargeBacks: this.fb.array([]),
     })
@@ -76,6 +80,30 @@ export class ProjPlanListComponent implements OnInit {
     }, (error) => console.log(error))
     this.modalChargebacks.modalSubmitted$.subscribe(() => { this._chargebackSvc.modalSubmitClicked() }, (error) => console.log(error));
     this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
+  }
+
+  exitToPerView(mainFormIsDirty) {
+    this.checkForUnsavedChanges(mainFormIsDirty, "https://perviewqa.app.parallon.com/PWA")
+  }
+
+  exitToBI(mainFormIsDirty) {
+    this.checkForUnsavedChanges(mainFormIsDirty, "https://perviewqa.app.parallon.com/PWA/ProjectBICenter/")
+  }
+
+  checkForUnsavedChanges(mainFormDirty, navigateUrl) {
+    if (mainFormDirty === true) {
+      let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
+      dialogRef.afterClosed().subscribe(result => {
+        this.confirmDialogResult = result;
+        if (result == "yes")
+          window.location.href = navigateUrl
+        //window.location.href = "http://foo.wingtip.com/PWA"
+      });
+    }
+    else {
+
+      window.location.href = navigateUrl
+    }
   }
 
   buildProjPlans(projPlans: IProjectPlan[]) {
@@ -127,17 +155,19 @@ export class ProjPlanListComponent implements OnInit {
     var projPlanGroup = this.fb.group({
       projUid: projPlan.project.projUid.toLowerCase(),
       projName: projPlan.project.projName,
+      startDate: projPlan.project.startDate || '',
+      finishDate: projPlan.project.finishDate || '',
       totals: this.initTotals(_totals),
       resources: this.fb.array([]),
       error: this.fb.control(null),
       selected: this.fb.control(false)
     });
-    if(projPlan.resources){
-    for (var i = 0; i < projPlan.resources.length; i++) {
-      var resource = this.buildResource(projPlan.resources[i]);
-      (projPlanGroup.get('resources') as FormArray).push(resource)
+    if (projPlan.resources) {
+      for (var i = 0; i < projPlan.resources.length; i++) {
+        var resource = this.buildResource(projPlan.resources[i]);
+        (projPlanGroup.get('resources') as FormArray).push(resource)
+      }
     }
-  }
 
     this.calculateProjectPlanTotals(projPlanGroup);
     projPlanGroup.valueChanges.subscribe(value => {
@@ -147,13 +177,14 @@ export class ProjPlanListComponent implements OnInit {
     return projPlanGroup;
   }
   buildResource(resource: IResource): FormGroup {
+    debugger;
     var resourceGroup = this.fb.group(
       {
         resUID: resource.resUid,
         resName: [resource.resName],
 
         intervals: this.fb.array([]),
-        //timesheetData: this.fb.array([]),
+        timesheetData: this.fb.array([]),
         selected: this.fb.control(false)
       });
     if (resource.intervals) {
@@ -163,12 +194,12 @@ export class ProjPlanListComponent implements OnInit {
       }
     }
 
-    // if (_project.timesheetData) {
-    //     for (var i = 0; i < _project.timesheetData.length; i++) {
-    //         var interval = this.buildtimesheetInterval(_project.timesheetData[i]);
-    //         (project.get('timesheetData') as FormArray).push(interval);
-    //     }
-    // }
+    if (resource.timesheetData) {
+      for (var i = 0; i < resource.timesheetData.length; i++) {
+        var interval = this.buildtimesheetInterval(resource.timesheetData[i]);
+        (resourceGroup.get('timesheetData') as FormArray).push(interval);
+      }
+    }
 
     //_project.readOnly && project.disable({emitEvent:false})
     return resourceGroup;
@@ -179,8 +210,45 @@ export class ProjPlanListComponent implements OnInit {
     return this.fb.group({
       intervalName: interval.intervalName,
       //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
-      intervalValue: interval.intervalValue,
-      //Validators.pattern(this.getIntervalValidationPattern())],
+      intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform(interval.intervalValue, this._appSvc.queryParams.workunits), this._appSvc.queryParams.workunits),
+      Validators.pattern(this.getIntervalValidationPattern())],
+      intervalStart: interval.start,
+      intervalEnd: interval.end
+
+    });
+  }
+
+  getIntervalValidationPattern(): string {
+    switch (+(this._appSvc.queryParams.workunits)) {
+      case WorkUnits.FTE:
+        return "^[0-9]+(%)?";
+      case WorkUnits.hours:
+
+        return "^[0-9]+(hrs)?";
+      case WorkUnits.days:
+        return "^[0-9]+([,.][0-9])?(d)?";
+    }
+    return "";
+  }
+
+  checkTotal(val: string) {
+    if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+        if (parseInt(val) > 100) {
+            return "totalRed"
+        }
+        else return "totalGreen"
+    }
+    else {
+      
+    }
+}
+
+  buildtimesheetInterval(interval: IInterval): FormGroup {
+
+    return this.fb.group({
+      intervalName: interval.intervalName,
+      //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
+      intervalValue: new CellWorkUnitsPipe().transform(interval.intervalValue, this._appSvc.queryParams.workunits),
       intervalStart: interval.start,
       intervalEnd: interval.end
 
@@ -468,7 +536,7 @@ export class ProjPlanListComponent implements OnInit {
           projPlans.forEach(projPlan => {
             projPlan.project = new Project(projPlan['projUid'], projPlan['projName']);
             projPlan.project.projectChargeBackCategory = t.value.chargeBack;
-            projPlan.resources = projPlan.resources.filter(r=>r['selected'] == true);
+            projPlan.resources = projPlan.resources.filter(r => r['selected'] == true);
           });
           return projPlans;
           // var _projPlans :[IProjectPlan];
@@ -643,12 +711,19 @@ export class ProjPlanListComponent implements OnInit {
     });
   }
 
+  toggleTimesheetDisplay() {
+    debugger;
+    this.router.routeReuseStrategy.shouldReuseRoute = function () { return false };
+    this.router.isActive = function () { return false; }
+    this.router.navigate(['/home/pivot', { showTimesheetData: true }], { preserveQueryParams: true });
+  }
+
   intervalChanged(input: any, ctrl: AbstractControl) {
-    // if (!ctrl.errors) {
-    //     if ((event.currentTarget as HTMLInputElement).value && (event.currentTarget as HTMLInputElement).value.trim() != '')
-    //         (event.currentTarget as HTMLInputElement).value = new CellWorkUnitsPipe().transform((event.currentTarget as HTMLInputElement).value, this.workunits);
-    // }
-    // debugger;
+    if (!ctrl.errors) {
+      if ((event.currentTarget as HTMLInputElement).value && (event.currentTarget as HTMLInputElement).value.trim() != '')
+        (event.currentTarget as HTMLInputElement).value = new CellWorkUnitsPipe().transform((event.currentTarget as HTMLInputElement).value
+          , this._appSvc.queryParams.workunits);
+    }
     this._appSvc.setFormDirty(true);
   }
 

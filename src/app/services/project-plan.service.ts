@@ -92,17 +92,17 @@ export class ProjectPlanService {
       //     rps.splice(rps.findIndex(r => r.resource.resUid.toUpperCase() == "00000000-0000-0000-0000-000000000000"), 1)
       //   return rps;
       // })
-      // .flatMap(pps => {
+      .flatMap(pps => {
 
-      //   if (showTimesheetData == true) {
-      //     return Observable.forkJoin(pps.map(pp =>{
-      //       return this.getTimesheetDataFromResource(pp, workunits)
-      //     }));
-      //   }
-      //   else {
-      //     return Observable.of(pps);
-      //   }
-      // })
+        if (showTimesheetData == true) {
+          return Observable.of(pps).flatMap(pp =>{
+            return this.getTimesheetDataFromProjectPlans(pp, workunits)
+          });
+        }
+        else {
+          return Observable.of(pps);
+        }
+      })
       .map(pp => {
         debugger;
         return pp.sort((a, b) => {
@@ -173,87 +173,88 @@ export class ProjectPlanService {
     })
   }
 
-  //   getTimesheetDataFromResource(projPlan: IProjectPlan, workUnits: WorkUnits): Observable<IProjectPlan> {
+  getTimesheetDataFromProjectPlans(projPlans: IProjectPlan[], workUnits: WorkUnits): Observable<IProjectPlan[]> {
+      return Observable.from(projPlans).flatMap(projPlan=>{
+      return Observable.from(projPlan.resources).flatMap(resource=>{
 
-  //     return Observable.forkJoin(projPlan.resources.map(resource=>{
+       return this.getTimesheetData(resource, workUnits).map(timesheetData => {
 
-  //      return this.getTimesheetData(projPlan, workUnits).flatMap(timesheetData => {
+              resource.timesheetData = [];
 
+              resource.intervals.forEach(interval => {
+                  let timesheetInterval = moment(interval.start).toDate();
+                  let actualTotal = 0, capacityTotal = 0;
 
-  //             resource.timesheetData = [];
+                  while (timesheetInterval < moment(interval.end).toDate()) {
+                      //if project has timesheet data
+                      if (timesheetData.hasOwnProperty(this.getDateFormatString(timesheetInterval))) {
+                          //if interval date has timesheet data
+                          capacityTotal += +(timesheetData[this.getDateFormatString(timesheetInterval)].Capacity);
+                          if (timesheetData[this.getDateFormatString(timesheetInterval)].TimesheetData.hasOwnProperty(projPlan.project.projUid)) {
+                              actualTotal += +(timesheetData[this.getDateFormatString(timesheetInterval)].TimesheetData[projPlan.project.projUid])
 
-  //             resource.intervals.forEach(interval => {
-  //                 let timesheetInterval = moment(interval.start).toDate();
-  //                 let actualTotal = 0, capacityTotal = 0;
+                          }
+                      }
 
-  //                 while (timesheetInterval < moment(interval.end).toDate()) {
-  //                     //if project has timesheet data
-  //                     if (timesheetData.hasOwnProperty(this.getDateFormatString(timesheetInterval))) {
-  //                         //if interval date has timesheet data
-  //                         capacityTotal += +(timesheetData[this.getDateFormatString(timesheetInterval)].Capacity);
-  //                         if (timesheetData[this.getDateFormatString(timesheetInterval)].TimesheetData.hasOwnProperty(projPlan.project.projUid)) {
-  //                             actualTotal += +(timesheetData[this.getDateFormatString(timesheetInterval)].TimesheetData[projPlan.project.projUid])
+                      //incremment by 1 day until interval end is reached
+                      timesheetInterval = moment(timesheetInterval).add(1, 'day').toDate();
+                  }
+                  let timesheetTotal = 0;
+                  if (workUnits == WorkUnits.hours) {
+                      timesheetTotal = actualTotal;
+                  }
+                  else if (workUnits == WorkUnits.days) {
+                      timesheetTotal = actualTotal / 8;
+                  }
+                  else if (workUnits == WorkUnits.FTE) {
+                      if (capacityTotal < 1) {
+                          timesheetTotal = -100;
+                      }
+                      else {
+                          timesheetTotal = Math.round((actualTotal / capacityTotal * 100));
+                      }
+                  }
+                  if (timesheetTotal < 0) {
+                    resource.timesheetData.push(new Interval(interval.intervalName, 'NA', interval.start, interval.end))
+                  }
+                  else {
+                    resource.timesheetData.push(new Interval(interval.intervalName, timesheetTotal.toString(), interval.start, interval.end))
+                  }
+              })
+              debugger;
+              return projPlan;
+          })
+         
+      })
 
-  //                         }
-  //                     }
+    }).toArray()
 
-  //                     //incremment by 1 day until interval end is reached
-  //                     timesheetInterval = moment(timesheetInterval).add(1, 'day').toDate();
-  //                 }
-  //                 let timesheetTotal = 0;
-  //                 if (workUnits == WorkUnits.hours) {
-  //                     timesheetTotal = actualTotal;
-  //                 }
-  //                 else if (workUnits == WorkUnits.days) {
-  //                     timesheetTotal = actualTotal / 8;
-  //                 }
-  //                 else if (workUnits == WorkUnits.FTE) {
-  //                     if (capacityTotal < 1) {
-  //                         timesheetTotal = -100;
-  //                     }
-  //                     else {
-  //                         timesheetTotal = Math.round((actualTotal / capacityTotal * 100));
-  //                     }
-  //                 }
-  //                 if (timesheetTotal < 0) {
-  //                   resource.timesheetData.push(new Interval(interval.intervalName, 'NA', interval.start, interval.end))
-  //                 }
-  //                 else {
-  //                   resource.timesheetData.push(new Interval(interval.intervalName, timesheetTotal.toString(), interval.start, interval.end))
-  //                 }
-  //             })
-  //         })
-  //         return projPlan;
-  //     })
+  }
 
-  // )
+  getTimesheetData(resource: IResource, workunits: WorkUnits): Observable<object> {
+    let headers = new HttpHeaders();
+    //let start: Date = new LastYear().startDate;
+    //let end: Date = moment(new LastYear().startDate).add(3,'month').toDate()
+    let start: Date = moment(new LastYear().startDate).toDate();
+    let end: Date = new Date();
+    headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
 
-  // }
+    console.log('--------------------')
+    console.log('-----   START  -------' + start)
+    console.log('--------------------')
 
-  // getTimesheetData(projPlan: IProjectPlan, workunits: WorkUnits): Observable<object> {
-  //   let headers = new HttpHeaders();
-  //   //let start: Date = new LastYear().startDate;
-  //   //let end: Date = moment(new LastYear().startDate).add(3,'month').toDate()
-  //   let start: Date = moment(new LastYear().startDate).toDate();
-  //   let end: Date = new Date();
-  //   headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
+    const body = `method=PwaGetTimsheetsCommand&resuid=${resource.resUid}&start=${start.toDateString()}&end=${end.toDateString()}`;
+    let adapterPath = `${this.config.adapterUrl}`
+    let options = {
+        headers
+    };
+    return this.http.post(
+        adapterPath, body, options
 
-  //   console.log('--------------------')
-  //   console.log('-----   START  -------' + start)
-  //   console.log('--------------------')
-
-  //   const body = `method=PwaGetTimsheetsCommand&resuid=${resPlan.resource.resUid}&start=${start.toDateString()}&end=${end.toDateString()}`;
-  //   let adapterPath = `${this.config.adapterUrl}`
-  //   let options = {
-  //       headers
-  //   };
-  //   return this.http.post(
-  //       adapterPath, body, options
-
-  //   ).map((r) => {
-  //       return r;
-  //   })
-  // }
+    ).map((r) => {
+        return r;
+    })
+  }
   //TODO:Refactor  move into common service
   addProjects(resMgrUid: string, projects: IProject[], resources: IResource[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
 
