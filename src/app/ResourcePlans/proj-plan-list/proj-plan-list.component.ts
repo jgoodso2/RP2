@@ -12,6 +12,9 @@ import { ProjectPlanService } from '../../services/project-plan.service'
 import { ConfirmDialogComponent } from '../../common/confirm-dialog/confirm-dialog.component'
 import { MatDialog, MatDialogRef } from '@angular/material';
 import { CellWorkUnitsPipe } from "../../common/cell-work-units.pipe"
+import { ExportExcelService } from '../../services/export-excel.service';
+import { MenuService } from '../../../fw/services/menu.service';
+declare const $: any
 @Component({
   selector: 'app-proj-plan-list',
   templateUrl: './proj-plan-list.component.html',
@@ -38,6 +41,8 @@ export class ProjPlanListComponent implements OnInit {
     private _chargebackSvc: ChargebackModalCommunicatorService, private _projSvc: ProjectPlanService
     , private router: Router,
     private dialog: MatDialog,
+    private _exportExcelService: ExportExcelService,
+    private menuService: MenuService,
     private _resModalSvc: ResourcesModalCommunicatorService) { }
 
 
@@ -51,6 +56,8 @@ export class ProjPlanListComponent implements OnInit {
     this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
     this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
     this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
+    this._appSvc.printToPDF$.subscribe(() => { this.printFunction() });
+    this._appSvc.exportToExcel$.subscribe(() => { this.excelExportFunction() });
     this.mainForm = this.fb.group({
       chargeBacks: this.fb.array([]),
     })
@@ -689,6 +696,58 @@ export class ProjPlanListComponent implements OnInit {
     this._appSvc.loading(false);
     this._appSvc.mainFormDirty = false
 
+  }
+
+  excelExportFunction() {
+    console.log(this.projPlanData, "is projPlanData");
+    //this._exportExcelService.excelObject.transformToCSV(this.resPlanData, 'RM2');
+
+    if (this._appSvc.mainFormDirty === true) {
+        let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
+        dialogRef.afterClosed().subscribe(result => {
+            this.confirmDialogResult = result;
+            if (result == "yes")
+                this._exportExcelService.excelObject.transformProjPlanToCSV(this.projPlanData, 'RM2');
+        });
+    }
+}
+
+//this function activates a print job by minimizing the
+    //side bar and printing the window after enough time has
+    //elapsed to reflect a full-screen.
+    printFunction(): void {
+      console.log('this is printFunction inside res-plan-list-component');
+
+      this.menuService.getCurrentView();
+      let resetView = this.menuService.getCurrentView();
+      // let resetView = this.menuService.getCurrentView();
+      if (this._appSvc.mainFormDirty === true) {
+
+          let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
+          dialogRef.afterClosed().subscribe(result => {
+              this.confirmDialogResult = result;
+              if (result === "yes") {
+                  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+                  $.when(this.menuService.printMode())
+                  .then(() => wait(1000))
+                  .then(() => this.menuService.printerFunction())
+                  .then(() => wait(25))
+                  .then(() => this.menuService.normalizeView())
+                  .catch('failed');      
+                  
+              }
+          });
+
+      }
+      else {
+          const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+          $.when(this.menuService.printMode())
+          .then(() => wait(100))
+          .then(() => this.menuService.printerFunction())
+          .then(() => wait(25))
+          .then(() => this.menuService.normalizeView())
+          .catch('failed');    
+      }
   }
 
   updateErrors(errors: Result[]) {

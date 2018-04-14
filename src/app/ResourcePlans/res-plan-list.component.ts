@@ -896,7 +896,7 @@ export class ResPlanListComponent implements OnInit {
             this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
                 this.confirmDialogResult = result;
                 if (result == "yes")
-                    this._exportExcelService.excelObject.transformToCSV(this.resPlanData, 'RM2');
+                    this._exportExcelService.excelObject.transformResPlanToCSV(this.resPlanData, 'RM2');
             });
         }
     }

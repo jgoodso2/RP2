@@ -1,7 +1,7 @@
 import { Injectable } from  '@angular/core';
 import { debug } from 'util';
 import * as moment from 'moment';
-
+import {IProjectPlan} from '../ResourcePlans/res-plan.model'
 @Injectable()
 export class ExportExcelService {
 
@@ -128,7 +128,7 @@ excelObject = {
       }//end for block
     },
 
-    transformToCSV: function(resPlanData, filename) {
+    transformResPlanToCSV: function(resPlanData, filename) {
        //build the first row (dates) - only 1 please
    
       let excelData: string = ',,';
@@ -190,6 +190,69 @@ excelObject = {
       }
 
   },
+
+  transformProjPlanToCSV: function(projPlanData:IProjectPlan[], filename) {
+    //build the first row (dates) - only 1 please
+
+   let excelData: string = ',,';
+
+   for (var i = 0; i < projPlanData.length; i++ ) {
+     if (projPlanData[i].resources.length > 0) {
+      projPlanData[i].resources[0].intervals.forEach(interval=> {
+         excelData +=  moment(interval.start).format('MM/DD/YY') +' - ' + moment(interval.end).format('MM/DD/YY') + ',' 
+       })   
+       excelData += '\r\n' 
+       break
+     }
+     else {
+       
+       continue
+     }  
+     
+   }
+
+   projPlanData.forEach(resPlan => {
+     
+       let projname = resPlan.project.projName;
+       let intervalNames : string[];
+       
+       if (resPlan.resources.length > 0) {
+           resPlan.resources.forEach(resource=>{
+             excelData += projname +',';
+             excelData += resource.resName + ','
+             resource.intervals.forEach(interval => {
+               excelData += interval.intervalValue.toString() + ','
+            })
+            excelData += '\r\n'
+       
+            if (resource.timesheetData !== null) {
+              excelData += 'Actuals,,'
+              resource.timesheetData.forEach((timesheetInterval) => {
+                excelData += timesheetInterval.intervalValue.toString() + ','
+              })
+              excelData += '\r\n'
+              
+            }//end if statement testing whether timesheet data is available
+           
+           });//end of single project instance
+       }
+       else {
+           excelData += projname + ','  + '\r\n'
+       }   
+   }); //end of data collection
+   console.log('excelData works:', excelData);
+   let csv = excelData;  
+   var blob = new Blob([csv], { type: "text/csv" });
+
+   // Determine which approach to take for the download
+   if (navigator.msSaveOrOpenBlob) {
+   // Works for Internet Explorer and Microsoft Edge
+     navigator.msSaveOrOpenBlob(blob, this._filename + ".csv");
+   } else {      
+     this._downloadAnchor(URL.createObjectURL(blob), 'csv');      
+   }
+
+},
 
 
 
