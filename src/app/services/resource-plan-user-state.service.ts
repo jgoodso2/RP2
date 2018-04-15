@@ -479,11 +479,11 @@ export class ResourcePlanUserStateService {
             return r;
 
         })
-            .merge(
-            Observable.from(resources).flatMap((r: IResource) => {
-                return Observable.of(new ResPlan(new Resource(r.resUid, r.resName)))
-            })
-            )
+            // .merge(
+            // Observable.from(resources).flatMap((r: IResource) => {
+            //     return Observable.of(new ResPlan(new Resource(r.resUid, r.resName)))
+            // })
+            // )
             .filter((t: IResPlan) => {
                 
                 return resources.find(k => t.resource.resUid === "00000000-0000-0000-0000-000000000000" || k.resUid.toUpperCase() == t.resource.resUid.toUpperCase()) != null

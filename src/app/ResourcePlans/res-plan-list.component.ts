@@ -269,14 +269,26 @@ export class ResPlanListComponent implements OnInit {
             default: return '';
         }
     }
-    checkTotal(val: string) {
+    checkTotal(val: string, capacity: string) {
+        debugger;
         if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
             if (parseInt(val) > 100) {
                 return "totalRed"
             }
             else return "totalGreen"
         }
-        else return ""
+        else if (this._appSvc.queryParams.workunits == WorkUnits.hours) {
+            if (parseInt(val) > parseInt(capacity)) {
+                return "totalRed"
+            }
+            else return "totalGreen"
+        }
+        else if (this._appSvc.queryParams.workunits == WorkUnits.days) {
+            if (parseInt(val) > (parseInt(capacity) / 8)) {
+                return "totalRed"
+            }
+            else return "totalGreen"
+        }
     }
 
     buildResPlans(plans: IResPlan[]) {
@@ -294,7 +306,7 @@ export class ResPlanListComponent implements OnInit {
         var resPlanGroup = this.fb.group({
             resUid: _resplan.resource.resUid.toLowerCase(),
             resName: _resplan.resource.resName,
-            totals: this.initTotals(_totals, _resplan.projects),
+            totals: this.initTotals(_totals, _resplan.projects, _resplan.resource.capacity),
             projects: this.fb.array([]),
             selected: this.fb.control(false)
         });
@@ -390,7 +402,7 @@ export class ResPlanListComponent implements OnInit {
         });
     }
 
-    initTotals(totals: FormArray, _projects: IProject[]): FormArray {
+    initTotals(totals: FormArray, _projects: IProject[], _capacity: IInterval[]): FormArray {
         if (totals.controls.length < 1) {
 
             var intervalLen = this.getIntervalLength();
@@ -398,7 +410,8 @@ export class ResPlanListComponent implements OnInit {
 
                 var total = this.fb.group({
                     intervalName: '',
-                    intervalValue: new IntervalPipe().transform('0', this.workunits)
+                    intervalValue: new IntervalPipe().transform('0', this.workunits),
+                    capacity: _capacity[i].intervalValue
                 });
                 totals.push(total);
             }
@@ -581,7 +594,7 @@ export class ResPlanListComponent implements OnInit {
                             , showTimesheetData).subscribe(resPlans => {
                                 this.buildSelectedProjects(resPlans[0].projects)//.filter(r=>r.projUid.toUpperCase))
                                 this.header && this.header.setIntervalsFromresPlans(resPlans);
-                                this.initTotals(this.currentFormGroup.get('totals') as FormArray, resPlans[0].projects)
+                                this.initTotals(this.currentFormGroup.get('totals') as FormArray, resPlans[0].projects, resPlans[0].resource.capacity)
                                 this.calculateTotals(this.currentFormGroup);
 
                             });
@@ -665,11 +678,11 @@ export class ResPlanListComponent implements OnInit {
             this._appSvc.loading(true);
             this.saveResPlansSub = this._resPlanUserStateSvc.saveResPlans(resourceplans, fromDate, toDate, timescale, workunits)
                 .subscribe(
-                (results: Result[]) => this.onSaveComplete(results),
-                (error: any) => {
-                    this.errorMessage = <any>error
-                    this._appSvc.loading(false);
-                });
+                    (results: Result[]) => this.onSaveComplete(results),
+                    (error: any) => {
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);
+                    });
         }
         //()
         else if (!this._appSvc.mainFormDirty) {
@@ -733,43 +746,43 @@ export class ResPlanListComponent implements OnInit {
             else {
                 this.delResPlansSub = this._resPlanUserStateSvc.deleteResPlans(resourceplans, fromDate, toDate, timescale, workunits)
                     .flatMap(
-                    (results: Result[]) => {
-                        ;
-                        this.updateErrors(results);
-                        return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
-                            resourceplans.forEach(resPlan => {
-                                //if resource marked for selection check if all projects were successful by comparing count of projects prior to upadte and after
-                                let projectsMarkedForDeleteCount = resPlan.projects.length;
+                        (results: Result[]) => {
+                            ;
+                            this.updateErrors(results);
+                            return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
+                                resourceplans.forEach(resPlan => {
+                                    //if resource marked for selection check if all projects were successful by comparing count of projects prior to upadte and after
+                                    let projectsMarkedForDeleteCount = resPlan.projects.length;
 
-                                resPlan.projects = resPlan.projects.filter(function (p) { return results.findIndex(function (r) { return r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase(); }) > -1; });
-                                // if(resPlan["selected"] == true)
-                                // {
-                                //    resPlan["selected"] = (projectsMarkedForDeleteCount == resPlan.projects.length);
-                                // }
-                            });
+                                    resPlan.projects = resPlan.projects.filter(function (p) { return results.findIndex(function (r) { return r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase(); }) > -1; });
+                                    // if(resPlan["selected"] == true)
+                                    // {
+                                    //    resPlan["selected"] = (projectsMarkedForDeleteCount == resPlan.projects.length);
+                                    // }
+                                });
 
 
-                            return this._resPlanUserStateSvc.HideResPlans(resMgr, resourceplans as IResPlan[]).map(r => {
-                                if (r.success == true) {
-                                    this.deleteResourcePlans(resourceplans)
-                                    this._appSvc.loading(false);
-                                }
-                                else {
-                                    this._appSvc.loading(false);
-                                }
+                                return this._resPlanUserStateSvc.HideResPlans(resMgr, resourceplans as IResPlan[]).map(r => {
+                                    if (r.success == true) {
+                                        this.deleteResourcePlans(resourceplans)
+                                        this._appSvc.loading(false);
+                                    }
+                                    else {
+                                        this._appSvc.loading(false);
+                                    }
+                                },
+                                    (error: any) => {
+                                        this.errorMessage = <any>error
+                                        this._appSvc.loading(false);
+                                    }
+                                )
                             },
                                 (error: any) => {
-                                    this.errorMessage = <any>error
+                                    this.errorMessage = <any>error;
                                     this._appSvc.loading(false);
                                 }
                             )
-                        },
-                            (error: any) => {
-                                this.errorMessage = <any>error;
-                                this._appSvc.loading(false);
-                            }
-                        )
-                    }).subscribe(() => { this._appSvc.loading(false) }, () => { this._appSvc.loading(false) })
+                        }).subscribe(() => { this._appSvc.loading(false) }, () => { this._appSvc.loading(false) })
             }
         }
         //()
@@ -866,12 +879,12 @@ export class ResPlanListComponent implements OnInit {
                 if (result === "yes") {
                     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                     $.when(this.menuService.printMode())
-                    .then(() => wait(1000))
-                    .then(() => this.menuService.printerFunction())
-                    .then(() => wait(25))
-                    .then(() => this.menuService.normalizeView())
-                    .catch('failed');      
-                    
+                        .then(() => wait(1000))
+                        .then(() => this.menuService.printerFunction())
+                        .then(() => wait(25))
+                        .then(() => this.menuService.normalizeView())
+                        .catch('failed');
+
                 }
             });
 
@@ -879,11 +892,11 @@ export class ResPlanListComponent implements OnInit {
         else {
             const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
             $.when(this.menuService.printMode())
-            .then(() => wait(100))
-            .then(() => this.menuService.printerFunction())
-            .then(() => wait(25))
-            .then(() => this.menuService.normalizeView())
-            .catch('failed');    
+                .then(() => wait(100))
+                .then(() => this.menuService.printerFunction())
+                .then(() => wait(25))
+                .then(() => this.menuService.normalizeView())
+                .catch('failed');
         }
     }
 

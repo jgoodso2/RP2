@@ -1,7 +1,7 @@
 import { Injectable } from  '@angular/core';
 import { debug } from 'util';
 import * as moment from 'moment';
-import {IProjectPlan} from '../ResourcePlans/res-plan.model'
+
 @Injectable()
 export class ExportExcelService {
 
@@ -191,7 +191,7 @@ excelObject = {
 
   },
 
-  transformProjPlanToCSV: function(projPlanData:IProjectPlan[], filename) {
+  transformProjPlanToCSV: function(projPlanData, filename) {
     //build the first row (dates) - only 1 please
 
    let excelData: string = ',,';

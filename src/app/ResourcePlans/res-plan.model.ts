@@ -21,7 +21,7 @@ export interface IResource {
   };
   intervals?: IInterval[];
   timesheetData?: IInterval[];
-  capacity?:IInterval[];
+  capacity? :IInterval[];
 }
 
 export interface IProject {
