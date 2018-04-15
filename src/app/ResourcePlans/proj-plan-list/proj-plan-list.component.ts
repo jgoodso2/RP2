@@ -37,7 +37,7 @@ export class ProjPlanListComponent implements OnInit {
   }
 
 
-  constructor(private fb: FormBuilder, private _appSvc: AppStateService, private _route: ActivatedRoute,
+  constructor(private fb: FormBuilder, public _appSvc: AppStateService, private _route: ActivatedRoute,
     private _chargebackSvc: ChargebackModalCommunicatorService, private _projSvc: ProjectPlanService
     , private router: Router,
     private dialog: MatDialog,

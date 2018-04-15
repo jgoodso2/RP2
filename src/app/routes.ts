@@ -4,6 +4,7 @@ import { ResPlanHomeComponent } from './ResourcePlans/res-plan-home/res-plan-hom
 import { JumbotronComponent  } from './jumbotron/jumbotron.component'
 import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.component'
 import { ResPlanEditGuard   }  from './services/resPlanEditGuard.service' 
+import { ProjPlanEditGuard   }  from './services/proj-plan-edit-guard.service' 
 import { ProjPlanListComponent }  from './ResourcePlans/proj-plan-list/proj-plan-list.component'
 
 import { ResourcePlansResolverService } from './services/resource-plans-resolver.service'
@@ -25,10 +26,7 @@ export const appRoutes: Routes = [
         { path: '', redirectTo: 'resPlans', pathMatch: 'full' , canDeactivate: [ ResPlanEditGuard ]},
         { path: 'jumbo', component: JumbotronComponent },
         { path: 'pivot', component: ProjPlanListComponent,
-          resolve: {projPlans: ProjectPlanResolverService }
-       }
-
-
+          resolve: {projPlans: ProjectPlanResolverService},canDeactivate: [ProjPlanEditGuard] }
       ]
 }
 ]

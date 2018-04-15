@@ -27,7 +27,7 @@ export class ActionsMenuComponent implements OnInit {
 
   submit()
   {
-  
+    
     this._appStateSvc.saveClick();
   }
 
