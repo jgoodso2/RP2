@@ -314,6 +314,7 @@ export class ProjPlanListComponent implements OnInit {
   }
 
   initTotals(totals: FormArray): FormArray {
+    debugger;
     if (totals.controls.length < 1) {
       debugger;
       var intervalLen = this.getIntervalLength();
@@ -405,7 +406,6 @@ export class ProjPlanListComponent implements OnInit {
         if (resources[j] && resources[j].intervals) {
           this._intervalCount = resources[j].intervals.length;
         }
-        return;
       }
     }
 
