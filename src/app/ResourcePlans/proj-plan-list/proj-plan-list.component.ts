@@ -405,7 +405,9 @@ export class ProjPlanListComponent implements OnInit {
       for (var j = 0; j < resources.length; j++) {
         if (resources[j] && resources[j].intervals) {
           this._intervalCount = resources[j].intervals.length;
+          return;
         }
+       
       }
     }
 
