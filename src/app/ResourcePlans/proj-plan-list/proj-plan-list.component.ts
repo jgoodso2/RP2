@@ -44,23 +44,44 @@ export class ProjPlanListComponent implements OnInit {
     private dialog: MatDialog,
     private _exportExcelService: ExportExcelService,
     private menuService: MenuService,
-    private _appUtilSvc:AppUtilService,
+    private _appUtilSvc: AppUtilService,
     private _resModalSvc: ResourcesModalCommunicatorService) { }
-    
-    private AddResSub : Subscription;
 
+  private AddResSub: Subscription;
+  private OpenDelSub: Subscription;
+  private DelSub: Subscription;
+  private SaveSub: Subscription;
+  private ShowActualsSub: Subscription;
+  private ExitToPrvSub: Subscription;
+  private ExitBISub: Subscription;
+  private PrintSub: Subscription;
+  private ExportSub: Subscription;
+  private ChargeBackModalSub: Subscription;
+  private ResModalSub: Subscription;
+  private ChargeBackModalCallbackSub: Subscription;
+  private ResModalCallbackSub: Subscription;
+  private ValueChangeSub: Subscription;
+  private ProjValueChangeSub: Subscription
+  private getPPSub: Subscription
+  private AddChkSub: Subscription
+  private getCurrUserSub: Subscription
+  private AddprojSub: Subscription
+  private getPPFromProjSub: Subscription
+  private SavePPSub: Subscription
+  private DlgSub: Subscription
+  private DelPPSub: Subscription
   ngOnInit() {
     debugger;
-    this._appSvc.delete$.subscribe(() => this.openDeleteProjPlanDialog())
-    this._appSvc.hide$.subscribe(() => this.deleteProjPlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
+    this.OpenDelSub = this._appSvc.delete$.subscribe(() => this.openDeleteProjPlanDialog())
+    this.DelSub = this._appSvc.hide$.subscribe(() => this.deleteProjPlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
       this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, true))
-    this._appSvc.save$.subscribe(() => this.savePlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
+    this.SaveSub = this._appSvc.save$.subscribe(() => this.savePlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
       this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits))
-    this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
-    this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
-    this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
-    this._appSvc.printToPDF$.subscribe(() => { this.printFunction() });
-    this._appSvc.exportToExcel$.subscribe(() => { this.excelExportFunction() });
+    this.ShowActualsSub = this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
+    this.ExitToPrvSub = this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
+    this.ExitBISub = this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
+    this.PrintSub = this._appSvc.printToPDF$.subscribe(() => { this.printFunction() });
+    this.ExportSub = this._appSvc.exportToExcel$.subscribe(() => { this.excelExportFunction() });
     this.mainForm = this.fb.group({
       chargeBacks: this.fb.array([]),
     })
@@ -79,21 +100,44 @@ export class ProjPlanListComponent implements OnInit {
     //     this.addSelectedProjects(this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData);
     // }, (error) => console.log(error))
     console.log("=========multi subscribe")
-    this._chargebackSvc.modalSubmitted$.subscribe(() => {
+    this.ChargeBackModalSub = this._chargebackSvc.modalSubmitted$.subscribe(() => {
       debugger;
       this.addSelectedChargebacks()
 
     }, (error) => console.log(error));
-    this._resModalSvc.modalSubmitted$.subscribe(() => {
+    this.ResModalSub = this._resModalSvc.modalSubmitted$.subscribe(() => {
       this.addSelectedResources(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate,
         this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, this._appSvc.queryParams.showTimesheetData);
     }, (error) => console.log(error))
-    this.modalChargebacks.modalSubmitted$.subscribe(() => { this._chargebackSvc.modalSubmitClicked() }, (error) => console.log(error));
-    this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
+    this.ChargeBackModalCallbackSub = this.modalChargebacks.modalSubmitted$.subscribe(() => { this._chargebackSvc.modalSubmitClicked() }, (error) => console.log(error));
+    this.ResModalCallbackSub = this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
   }
 
   ngOnDestroy() {
     this._appUtilSvc.safeUnSubscribe(this.AddResSub)
+    this._appUtilSvc.safeUnSubscribe(this.AddResSub)
+    this._appUtilSvc.safeUnSubscribe(this.OpenDelSub)
+    this._appUtilSvc.safeUnSubscribe(this.DelSub)
+    this._appUtilSvc.safeUnSubscribe(this.SaveSub)
+    this._appUtilSvc.safeUnSubscribe(this.ShowActualsSub)
+    this._appUtilSvc.safeUnSubscribe(this.ExitToPrvSub)
+    this._appUtilSvc.safeUnSubscribe(this.ExitBISub)
+    this._appUtilSvc.safeUnSubscribe(this.PrintSub)
+    this._appUtilSvc.safeUnSubscribe(this.ExportSub)
+    this._appUtilSvc.safeUnSubscribe(this.ChargeBackModalSub)
+    this._appUtilSvc.safeUnSubscribe(this.ResModalSub)
+    this._appUtilSvc.safeUnSubscribe(this.ChargeBackModalCallbackSub)
+    this._appUtilSvc.safeUnSubscribe(this.ResModalCallbackSub)
+    this._appUtilSvc.safeUnSubscribe(this.ValueChangeSub)
+    this._appUtilSvc.safeUnSubscribe(this.ProjValueChangeSub)
+    this._appUtilSvc.safeUnSubscribe(this.getPPSub)
+    this._appUtilSvc.safeUnSubscribe(this.AddChkSub)
+    this._appUtilSvc.safeUnSubscribe(this.getCurrUserSub)
+    this._appUtilSvc.safeUnSubscribe(this.AddprojSub)
+    this._appUtilSvc.safeUnSubscribe(this.getPPFromProjSub)
+    this._appUtilSvc.safeUnSubscribe(this.SavePPSub)
+    this._appUtilSvc.safeUnSubscribe(this.DlgSub)
+    this._appUtilSvc.safeUnSubscribe(this.DelPPSub)
   }
 
   exitToPerView(mainFormIsDirty) {
@@ -107,7 +151,7 @@ export class ProjPlanListComponent implements OnInit {
   checkForUnsavedChanges(mainFormDirty, navigateUrl) {
     if (mainFormDirty === true) {
       let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
-      dialogRef.afterClosed().subscribe(result => {
+      this.DlgSub = dialogRef.afterClosed().subscribe(result => {
         this.confirmDialogResult = result;
         if (result == "yes")
           window.location.href = navigateUrl
@@ -158,7 +202,7 @@ export class ProjPlanListComponent implements OnInit {
     }
 
     this.calculateChargebackTotals(chargeBackGroup);
-    chargeBackGroup.valueChanges.subscribe(value => {
+    this.ValueChangeSub = chargeBackGroup.valueChanges.subscribe(value => {
       this.calculateChargebackTotals(chargeBackGroup)
     }, (error) => console.log(error));
     return chargeBackGroup;
@@ -184,7 +228,7 @@ export class ProjPlanListComponent implements OnInit {
     }
 
     this.calculateProjectPlanTotals(projPlanGroup);
-    projPlanGroup.valueChanges.subscribe(value => {
+    this.ProjValueChangeSub = projPlanGroup.valueChanges.subscribe(value => {
       this.calculateProjectPlanTotals(projPlanGroup)
     }, (error) => console.log(error));
     debugger;
@@ -247,15 +291,15 @@ export class ProjPlanListComponent implements OnInit {
 
   checkTotal(val: string) {
     if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
-        if (parseInt(val) > 100) {
-            return "totalRed"
-        }
-        else return "totalGreen"
+      if (parseInt(val) > 100) {
+        return "totalRed"
+      }
+      else return "totalGreen"
     }
     else {
-      
+
     }
-}
+  }
 
   buildtimesheetInterval(interval: IInterval): FormGroup {
 
@@ -387,11 +431,11 @@ export class ProjPlanListComponent implements OnInit {
     this._projSvc.getCurrentUserId().subscribe(resMgr => {
 
       console.log('selected chargebacks=' + JSON.stringify(this._chargebackSvc.selectedChargebacks))
-      this._projSvc.getProjectPlansFromChargebacks(selectedChargebacks.map(t => t.name), this._appSvc.queryParams.fromDate,
+      this.getPPSub = this._projSvc.getProjectPlansFromChargebacks(selectedChargebacks.map(t => t.name), this._appSvc.queryParams.fromDate,
         this._appSvc.queryParams.toDate, this._appSvc.queryParams.timescale, this._appSvc.queryParams.workunits, this._appSvc.queryParams.showTimesheetData)
         .subscribe(plans => {
           debugger;
-          this._projSvc.AddChagebacksToManager(resMgr, selectedChargebacks).subscribe(r => {
+          this.AddChkSub = this._projSvc.AddChagebacksToManager(resMgr, selectedChargebacks).subscribe(r => {
             if (r.success == true) {
               console.log('added resplans=' + JSON.stringify(plans))
               this.setIntervalLength(plans.map(t => t.resources).reduce((a, b) => a.concat(b)))
@@ -424,10 +468,10 @@ export class ProjPlanListComponent implements OnInit {
   addSelectedResources(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean) {
     this._appSvc.loading(true);
     let selectedResources = this._resModalSvc.selectedResources;
-    this._projSvc.getCurrentUserId().subscribe(resMgr => {
+    this.getCurrUserSub = this._projSvc.getCurrentUserId().subscribe(resMgr => {
       let project = new Project(this.currentFormGroup.value["projUid"],
         this.currentFormGroup.value["projName"]);
-      this._projSvc.addProjects(resMgr, [project], selectedResources,
+      this.AddprojSub = this._projSvc.addProjects(resMgr, [project], selectedResources,
         fromDate, toDate, timescale, workunits)
         .subscribe(results => {
           this.updateErrors(results);
@@ -437,7 +481,7 @@ export class ProjPlanListComponent implements OnInit {
           console.log("===added projects" + JSON.stringify(successfullProjects))
 
           if (successfullProjects.length > 0) {
-            this._projSvc.getProjectPlansFromProject(project, fromDate, toDate, timescale, workunits
+            this.getPPFromProjSub = this._projSvc.getProjectPlansFromProject(project, fromDate, toDate, timescale, workunits
             ).subscribe(resPlans => {
               this.buildSelectedResources(resPlans.resources
                 .filter(r => selectedResources.map(t => t.resUid).indexOf(r.resUid) > -1))//.filter(r=>r.projUid.toUpperCase))
@@ -507,7 +551,7 @@ export class ProjPlanListComponent implements OnInit {
 
       console.log("dirty resPlans" + JSON.stringify(projPlans))
       this._appSvc.loading(true);
-      this._projSvc.saveProjPlans(projPlans, fromDate, toDate, timescale, workunits)
+      this.SavePPSub = this._projSvc.saveProjPlans(projPlans, fromDate, toDate, timescale, workunits)
         .subscribe(
           (results: Result[]) => this.onSaveComplete(results),
           (error: any) => {
@@ -573,7 +617,7 @@ export class ProjPlanListComponent implements OnInit {
       this._appSvc.loading(true);
       if (hideOnly == true) {
         this._appSvc.loading(true);
-        this._projSvc.getCurrentUserId().flatMap(resMgr => {
+        this.getCurrUserSub = this._projSvc.getCurrentUserId().flatMap(resMgr => {
           return this._projSvc.HideResPlans(resMgr, projplans).map(r => {
             if (r.success == true) {
 
@@ -600,7 +644,7 @@ export class ProjPlanListComponent implements OnInit {
         }, () => { this._appSvc.loading(false) })
       }
       else {
-        this._projSvc.deleteResPlans(projplans, fromDate, toDate, timescale, workunits)
+        this.DelPPSub = this._projSvc.deleteResPlans(projplans, fromDate, toDate, timescale, workunits)
           .flatMap(
             (results: Result[]) => {
               this.updateErrors(results);
@@ -710,51 +754,51 @@ export class ProjPlanListComponent implements OnInit {
     //this._exportExcelService.excelObject.transformToCSV(this.resPlanData, 'RM2');
 
     if (this._appSvc.mainFormDirty === true) {
-        let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
-        dialogRef.afterClosed().subscribe(result => {
-            this.confirmDialogResult = result;
-            if (result == "yes")
-                this._exportExcelService.excelObject.transformProjPlanToCSV(this.projPlanData, 'RM2');
-        });
+      let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
+      this.DlgSub = dialogRef.afterClosed().subscribe(result => {
+        this.confirmDialogResult = result;
+        if (result == "yes")
+          this._exportExcelService.excelObject.transformProjPlanToCSV(this.projPlanData, 'RM2');
+      });
     }
-}
+  }
 
-//this function activates a print job by minimizing the
-    //side bar and printing the window after enough time has
-    //elapsed to reflect a full-screen.
-    printFunction(): void {
-      console.log('this is printFunction inside res-plan-list-component');
+  //this function activates a print job by minimizing the
+  //side bar and printing the window after enough time has
+  //elapsed to reflect a full-screen.
+  printFunction(): void {
+    console.log('this is printFunction inside res-plan-list-component');
 
-      this.menuService.getCurrentView();
-      let resetView = this.menuService.getCurrentView();
-      // let resetView = this.menuService.getCurrentView();
-      if (this._appSvc.mainFormDirty === true) {
+    this.menuService.getCurrentView();
+    let resetView = this.menuService.getCurrentView();
+    // let resetView = this.menuService.getCurrentView();
+    if (this._appSvc.mainFormDirty === true) {
 
-          let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
-          dialogRef.afterClosed().subscribe(result => {
-              this.confirmDialogResult = result;
-              if (result === "yes") {
-                  const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-                  $.when(this.menuService.printMode())
-                  .then(() => wait(1000))
-                  .then(() => this.menuService.printerFunction())
-                  .then(() => wait(25))
-                  .then(() => this.menuService.normalizeView())
-                  .catch('failed');      
-                  
-              }
-          });
-
-      }
-      else {
+      let dialogRef = this.openDialog({ title: "Are You Sure?", content: "You have unsaved changes" })
+      this.DlgSub = dialogRef.afterClosed().subscribe(result => {
+        this.confirmDialogResult = result;
+        if (result === "yes") {
           const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
           $.when(this.menuService.printMode())
-          .then(() => wait(100))
-          .then(() => this.menuService.printerFunction())
-          .then(() => wait(25))
-          .then(() => this.menuService.normalizeView())
-          .catch('failed');    
-      }
+            .then(() => wait(1000))
+            .then(() => this.menuService.printerFunction())
+            .then(() => wait(25))
+            .then(() => this.menuService.normalizeView())
+            .catch('failed');
+
+        }
+      });
+
+    }
+    else {
+      const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+      $.when(this.menuService.printMode())
+        .then(() => wait(100))
+        .then(() => this.menuService.printerFunction())
+        .then(() => wait(25))
+        .then(() => this.menuService.normalizeView())
+        .catch('failed');
+    }
   }
 
   updateErrors(errors: Result[]) {
@@ -862,7 +906,7 @@ export class ProjPlanListComponent implements OnInit {
         title: "Can't Delete - Unsaved Changes On Page",
         content: "Click Cancel and then save your changes.   Click OK to erase all changes"
       });
-      dialogRef.afterClosed().subscribe(result => {
+      this.DlgSub = dialogRef.afterClosed().subscribe(result => {
         this.confirmDialogResult = result;
         debugger;
         if (result == "yes") {
@@ -877,7 +921,7 @@ export class ProjPlanListComponent implements OnInit {
     //if form is not dirty
     else {
       let dialogRef = this.openDialog({ title: "Are You Sure?", content: "This action will permanently delete resource plan assignments from the selected project(s)." })
-      dialogRef.afterClosed().subscribe(result => {
+      this.DlgSub = dialogRef.afterClosed().subscribe(result => {
         this.confirmDialogResult = result;
         if (result == "yes")
           this.deleteProjPlans(this._appSvc.queryParams.fromDate, this._appSvc.queryParams.toDate, this._appSvc.queryParams.timescale,
