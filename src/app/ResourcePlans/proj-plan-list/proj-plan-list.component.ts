@@ -14,6 +14,7 @@ import { MatDialog, MatDialogRef } from '@angular/material';
 import { CellWorkUnitsPipe } from "../../common/cell-work-units.pipe"
 import { ExportExcelService } from '../../services/export-excel.service';
 import { MenuService } from '../../../fw/services/menu.service';
+import { AppUtilService } from '../../common/app-util.service'
 declare const $: any
 @Component({
   selector: 'app-proj-plan-list',
@@ -43,8 +44,10 @@ export class ProjPlanListComponent implements OnInit {
     private dialog: MatDialog,
     private _exportExcelService: ExportExcelService,
     private menuService: MenuService,
+    private _appUtilSvc:AppUtilService,
     private _resModalSvc: ResourcesModalCommunicatorService) { }
-
+    
+    private AddResSub : Subscription;
 
   ngOnInit() {
     debugger;
@@ -62,7 +65,7 @@ export class ProjPlanListComponent implements OnInit {
       chargeBacks: this.fb.array([]),
     })
 
-    this._appSvc.addChargebacks$.subscribe(() => this.addChargebacks())
+    this.AddResSub = this._appSvc.addChargebacks$.subscribe(() => this.addChargebacks())
     this._route.data.subscribe(values => {
       this.projPlanData = values.projPlans;
       debugger;
@@ -87,6 +90,10 @@ export class ProjPlanListComponent implements OnInit {
     }, (error) => console.log(error))
     this.modalChargebacks.modalSubmitted$.subscribe(() => { this._chargebackSvc.modalSubmitClicked() }, (error) => console.log(error));
     this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
+  }
+
+  ngOnDestroy() {
+    this._appUtilSvc.safeUnSubscribe(this.AddResSub)
   }
 
   exitToPerView(mainFormIsDirty) {
@@ -351,7 +358,7 @@ export class ProjPlanListComponent implements OnInit {
     debugger;
     if (this._intervalCount < 1) {
       for (var j = 0; j < resources.length; j++) {
-        if (resources[j].intervals) {
+        if (resources[j] && resources[j].intervals) {
           this._intervalCount = resources[j].intervals.length;
         }
         return;
