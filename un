@@ -1,0 +1,529 @@
+[33mcommit 44b08eac398ea7b104c069c37146c667ef860174[m[33m ([m[1;36mHEAD -> [m[1;32mMaterial-Menu[m[33m, [m[1;31mOrigin/Material-Menu[m[33m)[m
+Author: ixi8265 <ixi8265@PARAIXI8265P>
+Date:   Wed Aug 14 08:28:35 2019 -0500
+
+    Prod Version 2019
+
+[33mcommit 6d61657474c4865f0637404c54649c851065521b[m
+Author: ixi8265 <ixi8265@PARAIXI8265P>
+Date:   Sat Apr 21 09:25:01 2018 -0500
+
+    Changed url to prod
+
+[33mcommit edf50082a9a65638c2321d154bce896e08fec001[m
+Author: ixi8265 <ixi8265@PARAIXI8265P>
+Date:   Thu Apr 19 09:29:09 2018 -0500
+
+    for some reason the projActive Status enum was commented out...
+
+[33mcommit f277d581efaba99282fcf0685bbdfae38c1f7ed5[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Mon Mar 19 08:21:32 2018 -0500
+
+    Menu Changes
+
+[33mcommit a7eae9cd57917b31a8af58cc13423025a215fdbf[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 17 09:36:00 2018 -0500
+
+    before switching branches
+
+[33mcommit b6b2b17a85745482b6ab482068d7677928f1642d[m
+Merge: e9aed2b df985cb
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 17 09:17:16 2018 -0500
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit df985cb28f2febb9a6a9cfc824465fcfa9518a65[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Fri Mar 16 09:26:42 2018 -0500
+
+    header row disappear and chacing issues fix
+
+[33mcommit e9aed2b0a240db956df187f8180144e367355309[m[33m ([m[1;32mChargeBackPivot[m[33m)[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Mar 6 11:59:17 2018 -0600
+
+    lost export to excel
+
+[33mcommit b35d4d687b4845ec29bec2cb03593e39a0823aa8[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Tue Mar 6 11:25:18 2018 -0600
+
+    Reset view after printPDF complete
+
+[33mcommit 45c8619487c49926db37cff0eadb49790ce2c60f[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Mar 5 15:50:27 2018 -0600
+
+    margin fixes....
+
+[33mcommit 557501b38b5bf43baff7b4f0efef5d3fffdcd983[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Mar 5 12:06:15 2018 -0600
+
+    printToPDF optimization for 13mos
+
+[33mcommit e56f75ebe75091620c2488cc6fa7e8be9be82bb0[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Mon Mar 5 08:35:54 2018 -0600
+
+    Using service to determine main form dirty state... this._appSvc.mainFormDirty
+
+[33mcommit dafac49fd319266342177c3fc8b5dc9758eed44e[m
+Merge: f729dd5 709a281
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Mar 4 08:14:56 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit 709a281952179df3496eb9eac3e078a93b4b9d0f[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sun Mar 4 07:57:19 2018 -0600
+
+    Undirty cells on save
+
+[33mcommit f729dd52c272512179995a2b64b8708e7e7cdd41[m
+Merge: 689a2f8 200a1a1
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 3 11:48:10 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit 689a2f817dc16287a075cb50da489cac1f50e7a6[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 3 11:48:04 2018 -0600
+
+    comment on projactive status
+
+[33mcommit 200a1a1bb58943e49ee1cc35f5c370c940a7892c[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sat Mar 3 11:42:29 2018 -0600
+
+    Save failing after delete fix
+
+[33mcommit fd641b4c4f047309d10c32f2e739d4919a134050[m
+Merge: d28288f 71a5c70
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 3 11:04:26 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit d28288f89a62b6aa6b77e509046581f704f85843[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 3 11:04:17 2018 -0600
+
+    CONFIG
+
+[33mcommit 71a5c7037dcbf192cc3959e2caa9f9956d32cea0[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sat Mar 3 10:58:33 2018 -0600
+
+    header row date range fix issue solved by cloning examination
+
+[33mcommit 82a64e2ef24f777c5daffa332d1ebc715338c2e0[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sat Mar 3 08:24:39 2018 -0600
+
+    added project active status
+
+[33mcommit c5ede643d100e71cfc7d29fc22f4390d67b04836[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sat Mar 3 08:23:45 2018 -0600
+
+    Delete Resource erase changes not working issue fix by routing preserve route
+
+[33mcommit 77e424cfb2ab1374152680708ddf206a4a8ffcae[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sat Mar 3 07:20:04 2018 -0600
+
+    Setting MainForm to Pristine after Save (on appSvc)
+
+[33mcommit d7c5c920a8836acc69bba61ec5f2bf775caf855a[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Fri Mar 2 17:34:27 2018 -0600
+
+    Resources order by fix
+
+[33mcommit 8bcb3e8ddb688dfabf06264015260a9b1b203daa[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Fri Mar 2 16:46:22 2018 -0600
+
+    Delete and then Save issue fixes by stopping delete when dirty
+
+[33mcommit c5ada17309f71db90158c3c84fe2991bd085d9a5[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Fri Mar 2 11:57:37 2018 -0600
+
+    fixed marginR on printToPDF
+
+[33mcommit f2038fc32c5cddd8afb7393ec09c69548a76cbdc[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Fri Mar 2 10:58:18 2018 -0600
+
+    fixed excelExport- project name false data entry of 0
+
+[33mcommit 1d9608eab0975f447c9ea719e5eef23db291165b[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Fri Mar 2 10:33:52 2018 -0600
+
+    fixed printToPDF margins
+
+[33mcommit 74159435a9463e7087b2690157dfb73fcc406993[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Fri Mar 2 10:18:20 2018 -0600
+
+    repeating header on print complete
+
+[33mcommit 08f884a3db4b0f3f6256481f7d78695b86d7e16e[m[33m ([m[1;32mcopy-of-Material-Menu[m[33m)[m
+Merge: 8c65ab1 0018b15
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Fri Mar 2 09:23:38 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit 8c65ab157cf5fce088fe0f0b1e349add2a24ee9f[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Fri Mar 2 09:23:33 2018 -0600
+
+    cleanup
+
+[33mcommit 14ed2b23527cecb895e9e67d146857488d774e72[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Fri Mar 2 09:21:15 2018 -0600
+
+    cleanup
+
+[33mcommit 0018b15c0c7f457d3b17661376b27098b026e2a9[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Thu Mar 1 18:55:26 2018 -0600
+
+    delete comments
+
+[33mcommit 47d42f673e0fad00f4072cb118f5aaa573393930[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 17:41:14 2018 -0600
+
+    Exit to BI change
+
+[33mcommit 0c81e9ca40a5a4f9f844cef3dc150a954f62c10f[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 16:29:07 2018 -0600
+
+    cosmetic
+
+[33mcommit f8bd1b4580fae102d192217650a4fe81c0d40f3a[m
+Merge: 59fe111 3001803
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 14:58:48 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit 30018036ac9adafbb8e2c0aad03a055a9d3ed018[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Thu Mar 1 14:53:36 2018 -0600
+
+    Caching Interceptor fixes
+
+[33mcommit 59fe111a84d7cad7dc2e646d300434ad7478157c[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 14:33:37 2018 -0600
+
+    typo
+
+[33mcommit 7882349b16246fbf8aa31843935c7c097e7b10c8[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 13:29:12 2018 -0600
+
+    Casing issue
+
+[33mcommit aa9f184c203c338068b6a9c2cfc53195a8f3a7d9[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Thu Mar 1 13:22:56 2018 -0600
+
+    project picker and cosmetic changes
+
+[33mcommit 4332da9bad7e5796e56cbbb87670de4017f934e9[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Thu Mar 1 08:22:00 2018 -0600
+
+    Pull Timesheet data on add resources in the background
+
+[33mcommit 94d44f3413b3d55e679fb52562b74d5fda6abdef[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Wed Feb 28 05:56:40 2018 -0600
+
+    updated jquery version
+
+[33mcommit ea263f6f275e545003d3f4bf03192caa7215a409[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Wed Feb 28 05:53:35 2018 -0600
+
+    background Caching of timesheet data
+
+[33mcommit 3b19c441574b467a706bc4b74d0441c59182dc21[m
+Merge: ae5e500 5addb7c
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Feb 27 12:55:51 2018 -0600
+
+    caching
+
+[33mcommit ae5e500f8298070217aa028e7da05e99b45968ea[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Feb 27 12:52:43 2018 -0600
+
+    disable tracing
+
+[33mcommit 5addb7ca2ee74e08160f48b71f4dd3daceb32fd8[m
+Merge: 1c57367 5c1b82d
+Author: Nishant <nishant@wingtip.com>
+Date:   Tue Feb 27 12:44:31 2018 -0600
+
+    comment
+
+[33mcommit 1c57367de422fa6f549b214f0ed0181e61726b3d[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Tue Feb 27 12:22:10 2018 -0600
+
+    Caching The get resource pland data and invalidate cache on save
+
+[33mcommit 34e65a7f8005cd34c6da39396ce9726acc3be223[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Mon Feb 26 15:02:17 2018 -0600
+
+    removed debuggers
+
+[33mcommit 5c1b82d68ec0431d25a46155f72b39671590e504[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 26 14:59:17 2018 -0600
+
+    remove checkHeader function
+
+[33mcommit 3b7a81826dbeb5b0792a62bb5e906ea14b16506d[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Mon Feb 26 14:58:28 2018 -0600
+
+    removed debugger from various components
+
+[33mcommit 952146199295bc75a2915f1c381012b9bc3c7dc2[m
+Merge: 9b64a5e 6c78f27
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 26 14:11:45 2018 -0600
+
+    after pulling johns
+
+[33mcommit 6c78f27e18152156ecdec44948914bf613b67946[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Feb 25 13:11:50 2018 -0600
+
+    Route Guard added
+
+[33mcommit 4f74962cdfdab69c83b24ec550164c5bbfe83796[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Feb 25 08:43:50 2018 -0600
+
+    Routeguard added
+
+[33mcommit 4dba7b52afe40ec42a20b8deab31d5aaaed683a5[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Fri Feb 23 07:10:42 2018 -0600
+
+    title bar color
+
+[33mcommit 9b64a5ecf8b4496780a9792da1aedb302c963583[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Thu Feb 22 14:09:06 2018 -0600
+
+    repeat date headers on print
+
+[33mcommit e95fd936352747ed5d3d55e00b5610842f76c9a1[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Wed Feb 21 15:04:51 2018 -0600
+
+    added percentage wording & check for unsaved work
+
+[33mcommit fdce6ca5a68b9d80339e528b382a6093045f9323[m[33m ([m[1;32mPerformanceOptimizations[m[33m)[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Feb 20 09:42:10 2018 -0600
+
+    before new Performance Branch
+
+[33mcommit 1596bf8ad496cf2c910a9fecedb161a3bf242a2b[m
+Author: John G <jgoodson@BUDDY>
+Date:   Sun Feb 18 09:48:37 2018 -0600
+
+    top bar color
+
+[33mcommit 1e00a23937a94a362afd37fa9e7ab260becd9de5[m
+Author: John G <jgoodson@BUDDY>
+Date:   Sun Feb 18 09:40:44 2018 -0600
+
+    turned off route tracing
+
+[33mcommit b80702ace61bd3144f1644b4e9ed476169201570[m
+Author: John G <jgoodson@BUDDY>
+Date:   Sun Feb 18 09:22:46 2018 -0600
+
+    Memory Leak and title bar color
+
+[33mcommit 61a9e786266d1404e3f9e4cf1333b5a2a1ec62e3[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sun Feb 18 09:10:56 2018 -0600
+
+    Safe Unsubscribe all over
+
+[33mcommit 61822f45f666de23e27e05bbaae50c9cf5f0b00e[m
+Author: Nishant <nishant@wingtip.com>
+Date:   Sun Feb 18 07:58:22 2018 -0600
+
+    clean up subscriptions
+
+[33mcommit cbc3e54293cc1aa0412d83dbe5dd2fab6213c041[m
+Author: John G <jgoodson@BUDDY>
+Date:   Fri Feb 16 16:14:47 2018 -0600
+
+    fixed duplicate resources issue
+
+[33mcommit 45e542aa0fef109574b14a5276eeda7badccf571[m
+Merge: e106cef 5598ed9
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Wed Feb 14 15:53:15 2018 -0600
+
+    merged exitButtonChanges
+
+[33mcommit e106cef35334b48c644c31da1a16e71fe4e02133[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Wed Feb 14 15:17:16 2018 -0600
+
+    fixed header overflow
+
+[33mcommit 5598ed9681f1b5eae909c4c37e1731e1bb907096[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Wed Feb 14 14:22:10 2018 -0600
+
+    Exit to BI button
+
+[33mcommit debf20a35b11107de75b4e35ccbb83618ba795b2[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Feb 13 08:44:32 2018 -0600
+
+    cleaned up rogue subscriptions on resplanlist component
+
+[33mcommit 6889ddee97ec1021f49660d7795895338a9f334e[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 12 15:23:13 2018 -0600
+
+    added timesheetActuals to excelExport
+
+[33mcommit 6d4532f994fe0924de992f80f104b899b732876f[m
+Merge: 20019df 9241348
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 12 10:17:22 2018 -0600
+
+    fixed merged conflict--startTimeSheetActuals
+
+[33mcommit 20019dffed766d4e09c39ab94444caaefab9b552[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 12 10:11:03 2018 -0600
+
+    recreate excel function
+
+[33mcommit 92413487445854407201641930b64eacf3b2169e[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Mon Feb 12 09:30:50 2018 -0600
+
+    cleaned up subscriptions on main component
+
+[33mcommit c4403e3bb0a65523ab6aec23150671f7009896bc[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Thu Feb 8 14:39:36 2018 -0600
+
+    changed css printMedia to landscape print
+
+[33mcommit 719ae767c23d562f8762e9e1c2c5508182e5e83c[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Thu Feb 8 13:28:23 2018 -0600
+
+    fixed header date format on excelExport
+
+[33mcommit aa75f26b4e08fff564fdaf3a56d95bb8c3fc9736[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Thu Feb 8 10:40:34 2018 -0600
+
+    fixed header navigation z index issue resolved
+
+[33mcommit 836677a8fa346b605a05892a40103b0a07b81d2b[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Wed Feb 7 15:28:58 2018 -0600
+
+    changed left margin on pdf print
+
+[33mcommit dcb66c4c8b8f43bdb4b7a0825c790da1ff8dd20d[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Wed Feb 7 10:30:27 2018 -0600
+
+    sticky header complete
+
+[33mcommit 7ed6d104092aeeb8f6de4ff1c220aba4a97467eb[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Tue Feb 6 07:17:11 2018 -0600
+
+    unsubscribed to resource deleted observable
+
+[33mcommit df705ac8819cb24cbd73416227dd33b9ce8390ca[m
+Merge: 3dbdbc2 7134bbe
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 5 08:37:44 2018 -0600
+
+    fixed merge conflicts for cosmetic chg, fixed bugs, excel export
+
+[33mcommit 3dbdbc265301e80e6636fa21184a2024c7620817[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Mon Feb 5 08:23:28 2018 -0600
+
+    Export to excel function reloaded
+
+[33mcommit 2f736436250e5c9cac2307ee1904b86ea8f24158[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Feb 4 10:45:30 2018 -0600
+
+    Cosmetic changes - centering and such
+
+[33mcommit 7134bbe63a7fd31a68421c4b97c1407d4a03408b[m
+Author: Ted Pattison <tedp@WINGTIP.COM>
+Date:   Sun Feb 4 10:32:02 2018 -0600
+
+    css canges to makecell content center aligned and timesheet color blue
+
+[33mcommit b9ebebac0491bb8ec561746d18a89ee1b24b5675[m
+Author: Ted Pattison <tedp@WINGTIP.COM>
+Date:   Sun Feb 4 10:06:45 2018 -0600
+
+    fix page load break
+
+[33mcommit 38331459328d4bd49219cf677e7ead97f697ceea[m
+Merge: c5483b4 282cc79
+Author: Ted Pattison <tedp@WINGTIP.COM>
+Date:   Sun Feb 4 10:04:58 2018 -0600
+
+    Merge branch 'Material-Menu' of https://github.com/jgoodso2/RP2 into Material-Menu
+
+[33mcommit 282cc7977b0f4f631f3f2d1910bb80765fe67ea7[m
+Merge: bafc225 cbb7132
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Feb 4 10:07:54 2018 -0600
+
+    after synching
+
+[33mcommit bafc225b572d38a5b5aed6a5f826b30fc329ef49[m
+Author: Goodson John <IXI8265@HCA.corpad.net>
+Date:   Sun Feb 4 10:06:23 2018 -0600
+
+    Cleaned up subscriptions... unsibscribe on ngDestroy
+
+[33mcommit 4586ab7779dc2b4510e26ba4f7592fc521e622bc[m
+Author: Nwaelele Ikechukwu <EJZ7102@hca.corpad.net>
+Date:   Fri Feb 2 08:39:45 2018 -0600
+
+    completed function for toExcel
