@@ -8,6 +8,7 @@ import { appRoutes } from './routes'
 
 import {HttpClientModule} from '@angular/common/http';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
+import { Ng2CompleterModule} from 'ng2-completer'
 
 import { DateRangePicker } from './common/dateRangePicker/dateRangePicker.component'
 
@@ -99,6 +100,7 @@ export function initConfig(configSvc: ConfigService){
           ReactiveFormsModule,
           HttpClientModule,
           Ng2SmartTableModule,
+          Ng2CompleterModule,
           FwModule,
          MatDatepickerModule,
          MatInputModule,

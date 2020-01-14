@@ -44,16 +44,16 @@ declare const window: Window;
 
 export class ResPlanListComponent implements OnInit {
 
-    @ViewChild('modalProjects') private modalProjects: SimpleModalComponent;
-    @ViewChild('modalResources') private modalResources: SimpleModalComponent;
-    @ViewChild('header') private header: ResPlanHeaderRowComponent;
+    @ViewChild('modalProjects', {static: false} ) private modalProjects: SimpleModalComponent;
+    @ViewChild('modalResources', {static: false} ) private modalResources: SimpleModalComponent;
+    @ViewChild('header', {static: false} ) private header: ResPlanHeaderRowComponent;
 
 
     mainForm: FormGroup;
     resPlanData: IResPlan[] = [];
     projData: IProject[];
     currentFormGroup: FormGroup;
-    errorMessage: any;
+    errorMessage: string;
     _intervalCount: number = 0;
     resPlanUserState: IResPlan[];
     fromDate: Date;
@@ -723,14 +723,14 @@ export class ResPlanListComponent implements OnInit {
                             this._appSvc.loading(false);
                         }
                     },
-                        (error: any) => {
-                            this.errorMessage = <any>error
+                    (error: any) => {
+                        this.errorMessage = <any>error
                             this._appSvc.loading(false);
                         }
                     )
                 },
-                    (error: any) => {
-                        this.errorMessage = <any>error;
+                (error: any) => {
+                    this.errorMessage = <any>error;
                         this._appSvc.loading(false);
                     }
                 ).subscribe((r) => {
@@ -766,14 +766,14 @@ export class ResPlanListComponent implements OnInit {
                                     this._appSvc.loading(false);
                                 }
                             },
-                                (error: any) => {
-                                    this.errorMessage = <any>error
+                            (error: any) => {
+                                this.errorMessage = <any>error
                                     this._appSvc.loading(false);
                                 }
                             )
                         },
-                            (error: any) => {
-                                this.errorMessage = <any>error;
+                        (error: any) => {
+                            this.errorMessage = <any>error
                                 this._appSvc.loading(false);
                             }
                         )

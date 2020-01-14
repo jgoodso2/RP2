@@ -42,7 +42,7 @@ export class SimpleModalComponent {
   @Input() elementId: string;  //ditto
   @Input() closeOnBodyClick: string;
   @Input() primaryBtnText: string; 
-  @ViewChild('modalcontainer') containerEl: ElementRef;
+  @ViewChild('modalcontainer', {static: false} ) containerEl: ElementRef;
   modalId:string;
 
   private modalSubmittedSource = new Subject<string>();
