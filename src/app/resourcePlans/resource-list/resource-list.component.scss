@@ -1,10 +1,10 @@
-:host /deep/ .widgets {
+:host .widgets {
     .smart-table-container {
       width: 100%;
     }
   }
   
-  :host /deep/ {
+  :host  {
     ng2-smart-table {
       th, td {
         border: 1px solid gray !important;

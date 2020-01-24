@@ -7,6 +7,7 @@ import { RouterModule , CanDeactivate  } from '@angular/router'
 import { appRoutes } from './routes'
 
 import {HttpClientModule} from '@angular/common/http';
+import { HttpModule } from '@angular/http';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 import { Ng2CompleterModule} from 'ng2-completer'
 
@@ -24,7 +25,7 @@ import { ResPlanListComponent} from './resourcePlans/res-plan-list.component'
 import { SimpleModalComponent} from './common/simple-modal.component';
 import { ProjectListComponent } from './resourcePlans/project-list/project-list.component';
 
-import { MatDatepickerModule,MatInputModule,MatNativeDateModule,MatTableModule,MatButtonModule,MatDialogModule} from '@angular/material';
+import { MatDatepickerModule,MatInputModule,MatNativeDateModule,MatTableModule,MatButtonModule,MatDialogModule, MatMenuModule ,MatIconModule} from '@angular/material';
 import { ProjectService} from './services/project-service.service'
 import { ResourcePlanService } from './services/resource-plan.service'
 import { ResourcePlanUserStateService } from './services/resource-plan-user-state.service';
@@ -99,6 +100,7 @@ export function initConfig(configSvc: ConfigService){
     RouterModule.forRoot(appRoutes ,  { enableTracing: false } )  ,
           ReactiveFormsModule,
           HttpClientModule,
+          HttpModule,
           Ng2SmartTableModule,
           Ng2CompleterModule,
           FwModule,
@@ -107,7 +109,9 @@ export function initConfig(configSvc: ConfigService){
          MatNativeDateModule,
          MatTableModule,
          MatButtonModule,
-         MatDialogModule
+         MatDialogModule,
+         MatMenuModule,
+         MatIconModule
   ],
   entryComponents: [ConfirmDialogComponent],
   providers: [  ModalCommunicator, ResourcesModalCommunicatorService,ProjectService, 

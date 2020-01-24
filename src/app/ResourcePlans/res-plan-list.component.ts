@@ -44,9 +44,9 @@ declare const window: Window;
 
 export class ResPlanListComponent implements OnInit {
 
-    @ViewChild('modalProjects', {static: false} ) private modalProjects: SimpleModalComponent;
-    @ViewChild('modalResources', {static: false} ) private modalResources: SimpleModalComponent;
-    @ViewChild('header', {static: false} ) private header: ResPlanHeaderRowComponent;
+    @ViewChild('modalProjects', {static: false} )  modalProjects: SimpleModalComponent;
+    @ViewChild('modalResources', {static: false} )  modalResources: SimpleModalComponent;
+    @ViewChild('header', {static: false} ) header: ResPlanHeaderRowComponent;
 
 
     mainForm: FormGroup;
@@ -163,13 +163,14 @@ export class ResPlanListComponent implements OnInit {
         //this.modalResources.modalSubmitted$.subscribe(() => this._resModalSvc.modalSubmitClicked(), (error) => console.log(error));
         //this.modalProjects.modalSubmitted$.subscribe(() => this._modalSvc.modalSubmitClicked(), (error) => console.log(error));
         //what is this below??
-        this.resModalEmit = this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
-        this.projModalEmit = this.modalProjects.modalSubmitted$.subscribe(() => { this._modalSvc.modalSubmitClicked() }, (error) => console.log(error));
+       
     }
 
 
     ngAfterViewChecked(): void {
         //console.log('ng after view checke fired.')
+        this.resModalEmit = this.modalResources.modalSubmitted$.subscribe(() => { this._resModalSvc.modalSubmitClicked() }, (error) => console.log(error));
+        this.projModalEmit = this.modalProjects.modalSubmitted$.subscribe(() => { this._modalSvc.modalSubmitClicked() }, (error) => console.log(error));
     }
 
     ngOnDestroy() {
@@ -729,10 +730,10 @@ export class ResPlanListComponent implements OnInit {
                         }
                     )
                 },
-                (error: any) => {
-                    this.errorMessage = <any>error;
-                        this._appSvc.loading(false);
-                    }
+                // (error: any) => {
+                //     this.errorMessage = <any>error;
+                //         this._appSvc.loading(false);
+                //     }
                 ).subscribe((r) => {
                     this._appSvc.loading(false)
 
@@ -766,16 +767,16 @@ export class ResPlanListComponent implements OnInit {
                                     this._appSvc.loading(false);
                                 }
                             },
-                            (error: any) => {
-                                this.errorMessage = <any>error
-                                    this._appSvc.loading(false);
-                                }
-                            )
+                            // (error: any) => {
+                            //     this.errorMessage = <any>error
+                            //         this._appSvc.loading(false);
+                            //     }
+                            ) 
                         },
-                        (error: any) => {
-                            this.errorMessage = <any>error
-                                this._appSvc.loading(false);
-                            }
+                        // (error: any) => {
+                        //     this.errorMessage = <any>error
+                        //         this._appSvc.loading(false);
+                        //     }
                         )
                     }).subscribe(() => { this._appSvc.loading(false) }, () => { this._appSvc.loading(false) })
             }

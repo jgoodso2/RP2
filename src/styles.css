@@ -41,8 +41,8 @@ pm-app div.panel.panel-primary {
     transition: transform .5s ease;
 }
 
- @import '~@angular/material/prebuilt-themes/deeppurple-amber.css'; 
- 
+ /* @import '~@angular/material/prebuilt-themes/deeppurple-amber.css'; 
+  */
  
 @keyframes slideIn {
   from {
@@ -203,3 +203,5 @@ pm-app div.panel.panel-primary {
     }
 
 }
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

@@ -45,10 +45,17 @@ export class SimpleModalComponent {
   @ViewChild('modalcontainer', {static: false} ) containerEl: ElementRef;
   modalId:string;
 
-  private modalSubmittedSource = new Subject<string>();
-  modalSubmitted$ = this.modalSubmittedSource.asObservable();
+
+  private modalSubmittedSource: Subject<string>; 
+  modalSubmitted$: Observable<string> ;
   
-  constructor( ) {}
+  constructor( 
+  ) {
+    debugger
+    this.modalSubmittedSource = new Subject<string>();
+    this.modalSubmitted$ = this.modalSubmittedSource.asObservable();
+ 
+  }
 
   closeModal() {
     if(this.closeOnBodyClick.toLocaleLowerCase() === "true") {
