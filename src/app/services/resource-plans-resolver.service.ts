@@ -54,7 +54,7 @@ export class ResourcePlansResolverService implements Resolve<IResPlan[]> {
     this._appState.queryParams.showTimesheetData = showTimesheetData
 
     return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr=>{
-    return this._resPlanUserStateSvc.getResPlans(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
+    return this._resPlanUserStateSvc.getResourcePlansFiltered(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
       .map(resPlans => {
         if (resPlans) {
           console.log('Resplans from resolver: ')

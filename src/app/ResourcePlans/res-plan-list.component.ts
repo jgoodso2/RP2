@@ -288,12 +288,14 @@ export class ResPlanListComponent implements OnInit {
     }
 
     buildResPlans(plans: IResPlan[]) {
+        if(plans){
         //let resPlansGrp :FormGroup[] = [];
         //console.log('add resources ==========================================' + JSON.stringify(plans));
         for (var i = 0; i < plans.length; i++) {
             var resPlan = this.buildResPlan(plans[i]);
             this.resPlans.push(resPlan);
         }
+    }
         //this.resPlans.push.apply(resPlansGrp)
     }
 

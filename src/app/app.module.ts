@@ -70,7 +70,7 @@ export function initConfig(configSvc: ConfigService){
   declarations: [
     AppComponent,
     ResPlanDetailsComponent,
-  
+    
     CollapsibleWellComponent,
     HeaderRowComponent,
     ResPlanListComponent, 

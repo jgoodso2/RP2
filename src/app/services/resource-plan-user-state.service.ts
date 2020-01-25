@@ -22,11 +22,13 @@ export class ResourcePlanUserStateService {
     constructor(private http: HttpClient, private _configSvc: ConfigService, private resourcePlanFilteredSvc:ResourcePlanFilteredService) {
         this.config = _configSvc.config;
     }
-    getResourcePlansFiltered(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean)
+
+
+    getResourcePlansFiltered(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean) : Observable<IResPlan[]>
     {
        let resPlan$ = this.getResPlans(resMgrUid,fromDate,toDate,timescale,workunits,showTimesheetData);
        let workSpaceResources$ = this.getWorkspaceResourcesForResourceManager(resMgrUid);
-        this.resourcePlanFilteredSvc.getResourcePlansFiltered(resPlan$,workSpaceResources$);
+       return this.resourcePlanFilteredSvc.getResourcePlansFiltered(resPlan$,workSpaceResources$);
     }
     getCurrentUserId(): Observable<string> {
 
@@ -70,7 +72,12 @@ export class ResourcePlanUserStateService {
         let options = {
             headers
         };
-        return this.http.get<IResource[]>(url, options).pluck('resources');
+        return this.http.get<IResource[]>(url, options).pluck('d').pluck('results').map((d:Array<any>)=>{
+            if(d && d.length)
+           return JSON.parse(d[0]['ResourceUID']);
+           else
+          return [];
+        })
             
     }
 
@@ -163,7 +170,6 @@ export class ResourcePlanUserStateService {
 
     ///Add Resource Plan use case
     getResPlansFromResources(resMgrUid: string, resources: IResource[], fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
-        debugger;
         let projectsThatUserHasAccessOn = this.getProjectIdsFromAssignmentsForResources(resources);
         return this.getResPlansFromProjects(resMgrUid, resources, projectsThatUserHasAccessOn, fromDate, toDate, timescale, workunits, showTimesheetData)
     }

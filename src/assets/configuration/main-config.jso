@@ -1,6 +1,6 @@
 {
     "projectServerUrl" : "https://perviewqa.app.parallon.com/PWA",
-    "ResPlanUserStateUrl" : "https://perviewqa.app.parallon.com/PWA/_api/web/lists/GetByTitle('ResourceUserState')",
+    "ResPlanUserStateUrl" : "https://perviewqa.app.parallon.com/PWA/_api/web/lists/GetByTitle('ResourcePlanUserState')",
     "adapterUrl":"https://perviewqa.app.parallon.com/PWA/_layouts/15/PwaPSIWrapper2/PwaAdapter.aspx",
     "projectPickerViewGuid" : "8c57b14c-6c13-e811-8116-0050568f3b8a",
     "resourcePickerViewGuid" : "6443f934-d71b-e811-8111-0050568f18e4"

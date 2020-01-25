@@ -37,6 +37,7 @@ export class ResPlanHeaderRowComponent implements OnInit {
 
   public setIntervals(resPlans: IResPlan[]) {
     let projectWithIntervals = []
+    if(resPlans){
       for(var i=0;i<resPlans.length;i++)
       {
            if(resPlans[i].projects && resPlans[i].projects.length > 0 && resPlans[i].projects[0].intervals && resPlans[i].projects[0].intervals.length > 0)
@@ -45,6 +46,7 @@ export class ResPlanHeaderRowComponent implements OnInit {
             break;
            }
       }
+    }
 
  
       if (projectWithIntervals) {

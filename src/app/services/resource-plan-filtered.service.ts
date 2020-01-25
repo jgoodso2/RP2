@@ -9,28 +9,40 @@ export class ResourcePlanFilteredService {
 
   constructor() { }
 
-  getResourcePlansFiltered(resPlans: Observable<IResPlan[]>, workSpaceResources:Observable<IResource[]>)
+  getResourcePlansFiltered(resPlans: Observable<IResPlan[]>, workSpaceResources:Observable<IResource[]>) : Observable<IResPlan[]>
     {
         return combineLatest(
           resPlans,
           workSpaceResources
       )
       .pipe(
-        map(([resplans, wsResources]) =>
+        tap(data => console.log("hey...this is the filtered data: " + JSON.stringify(data)))
+        ,map(([resplans, workspaceResources]) =>
         {
         resplans.forEach(resPlan=>
           {
             //pick the workspace item  that matches the resource manager uid
-            if(wsResources)
-            {
+            
             //pick the resoure from within the workspace item to get to hidden projects for the  resource that belongs to current resource plan
-            let resourceWorkSpaceItem :IResource = wsResources.find(w=>w.resUid == resPlan.resource.resUid);
-              if (resourceWorkSpaceItem)
+            let resourceWorkSpaceItem :IResource = workspaceResources.find(w=>w.resUid == resPlan.resource.resUid);
+            debugger;
+            if(resourceWorkSpaceItem && resourceWorkSpaceItem.hiddenProjects)
             //weed out hidden projects
-            resPlan.projects = resPlan.projects.filter(p=>resourceWorkSpaceItem.hiddenProjects.map(r=>r.projectUID).findIndex(h=>p.projUid == h) < 0);
-            }
+            resPlan.projects = resPlan.projects.filter(p=>resourceWorkSpaceItem.hiddenProjects.map(r=>r.projectUID.toUpperCase()).findIndex(h=>p.projUid.toUpperCase() == h.toUpperCase()) < 0);
+            
           })
-          return resPlans;
-        }))
+          debugger;
+          console.log("filtered data =" + JSON.stringify(resPlans))
+         return resplans;
+        })
+        
+        
+        ,
+        catchError(err => {
+          //this.errorMessageSubject.next(err);
+          return EMPTY;
+        })
+      );
+  
 }
 }
