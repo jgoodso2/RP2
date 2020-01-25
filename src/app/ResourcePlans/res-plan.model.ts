@@ -1,3 +1,15 @@
+export interface IResPlanUserWorkSpaceItem {
+  resourceManagerUID: string, 
+  resources:  IResource[]
+
+}
+
+export interface IHiddenProject {
+  
+          projectName: string,
+          projectUID: string,
+}
+
 export interface IResPlan {
   resource: IResource
   projects?: IProject[];
@@ -13,6 +25,7 @@ export interface IResource {
     title: string;
     manager: string;
   };
+  hiddenProjects?: IHiddenProject[], 
 }
 
 export interface IProject {

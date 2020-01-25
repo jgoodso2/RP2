@@ -61,7 +61,7 @@
                                             <div *ngFor="let proj of plan.get('projects').controls;index as j">
                                                 <tr [formGroupName]="j">
                                                     <td class="body-cell" style="padding-left:5px">
-                                                        <input type="checkbox" formControlName="selected" (click)="DeselectGroupOnUncheck(plan,proj,$event.target.checked)" />
+                                                        <input type="checkbox" formControlName="selected" (click)="toggleProjectSelection(plan,proj,$event.target.checked)" />
                                                     </td>
 
 

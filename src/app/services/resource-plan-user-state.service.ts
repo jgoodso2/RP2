@@ -11,16 +11,23 @@ import { Observable } from 'rxjs';
 import * as moment from 'moment'
 
 
-import { IResPlan, ResPlan, IProject, Project, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result } from '../resourcePlans/res-plan.model'
+import { IResPlan, ResPlan, IProject, Project,IHiddenProject, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result, IResPlanUserWorkSpaceItem } from '../resourcePlans/res-plan.model'
+import { combineLatest } from 'rxjs/operators';
+import { ResourcePlanFilteredService } from './resource-plan-filtered.service';
 declare var $: any;
 
 @Injectable()
 export class ResourcePlanUserStateService {
     config: Config;
-    constructor(private http: HttpClient, private _configSvc: ConfigService) {
+    constructor(private http: HttpClient, private _configSvc: ConfigService, private resourcePlanFilteredSvc:ResourcePlanFilteredService) {
         this.config = _configSvc.config;
     }
-
+    getResourcePlansFiltered(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean)
+    {
+       let resPlan$ = this.getResPlans(resMgrUid,fromDate,toDate,timescale,workunits,showTimesheetData);
+       let workSpaceResources$ = this.getWorkspaceResourcesForResourceManager(resMgrUid);
+        this.resourcePlanFilteredSvc.getResourcePlansFiltered(resPlan$,workSpaceResources$);
+    }
     getCurrentUserId(): Observable<string> {
 
         //console.log("configuration = " + JSON.stringify(this.config))
@@ -46,14 +53,14 @@ export class ResourcePlanUserStateService {
                     })
             })
     }
-
-    getUniqueResourcesForResManager(resUid: string): Observable<IResource[]> {
+    
+    getWorkspaceResourcesForResourceManager(resMgrUid: string): Observable<IResource[]> {
         let baseUrl = `${this.config.ResPlanUserStateUrl}/Items`
 
         //remember to change UID0 to UID
         let select = '$select=ResourceUID'  //dev
         //let select = '$select=ResourceUID'  //qa
-        let filter = `$filter=ResourceManagerUID eq '${resUid}'`;
+        let filter = `$filter=ResourceManagerUID eq '${resMgrUid}'`;
         //1. get data from SP List UserState 
         let url = baseUrl + '?' + filter + '&' + select;
         let headers = new HttpHeaders();
@@ -63,17 +70,8 @@ export class ResourcePlanUserStateService {
         let options = {
             headers
         };
-        return this.http.get(url, options)
-            .map((data: Response) => {
-                ;
-                if (data["d"].results.length > 0)
-                    return JSON.parse(data["d"].results
-                        .map(r => r["ResourceUID"])) as IResource[] //dev
-                //.map(r=>r["ResourceUID"])) as IResource[] //qa
-                else {
-                    return []
-                }
-            })
+        return this.http.get<IResource[]>(url, options).pluck('resources');
+            
     }
 
     getProjectIdsFromAssignmentsForResources(resources: IResource[]): Observable<IResPlan[]> {
@@ -120,20 +118,35 @@ export class ResourcePlanUserStateService {
 
 
     }
-
+    // getResorcePlansFiltered(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean)
+    // {
+    //     return combineLatest(
+    //         this.getResPlans(resMgrUid, fromDate,toDate ,timescale,workunits,showTimesheetData),
+    //         this.getWorkspaceResourcesForResourceManager(resMgrUid)
+    //     )
+    //         .pipe(
+    //             //scan((acc: Product[], value: Product) => [...acc, value]),
+    //             tap(data => console.log('CombineLatest Observable: ', JSON.stringify(data))),
+    //             catchError(err => {
+    //                 console.error(err);
+    //                 return throwError(err);
+    //             })
+    //         );
+    // }
     getResPlans(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
         //let uniqueProjectsForResMgr = this.getUniqueProjectsForResManager(resMgrUid);
-        let resourceForResMgr = this.getUniqueResourcesForResManager(resMgrUid);
+        let resourcesForResMgr = this.getWorkspaceResourcesForResourceManager(resMgrUid)
+
 
         //let uniqueProjectsForAllResMgr = resourceForResMgr.flatMap(resources => this.getUniqueProjectsAcrossResMgrs(resMgrUid, resources));
         let resProjMap: [IResPlan];
-        let uniqueProjectsResMgrHasAccessOn = resourceForResMgr.flatMap(resources => this.getProjectIdsFromAssignmentsForResources(resources));
+        let uniqueProjectsResMgrHasAccessOn = resourcesForResMgr.flatMap(resources => this.getProjectIdsFromAssignmentsForResources(resources));
         //let mergedProjects = uniqueProjectsForResMgr.merge(uniqueProjectsForAllResMgr)
 
     
 
 
-        return resourceForResMgr.flatMap(resources => {
+        return resourcesForResMgr.flatMap(resources => {
 
 
             return this.getResPlansFromProjects(resMgrUid, resources, uniqueProjectsResMgrHasAccessOn, fromDate, toDate, timescale, workunits, showTimesheetData)
@@ -595,7 +608,7 @@ export class ResourcePlanUserStateService {
         //         return Observable.of(project);
         //     })
     }
-    HideResPlans(resMgrUid: string, resPlans: IResPlan[]): Observable<Result> {
+    HideResourcesOrProjects(resMgrUid: string, resPlans: IResPlan[]): Observable<Result> {
         let headers = new HttpHeaders();
         headers = headers.set('accept', 'application/json;odata=verbose')
         let options = {
@@ -604,12 +617,21 @@ export class ResourcePlanUserStateService {
         }
         let url = `${this.config.ResPlanUserStateUrl}/Items`
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
-        resPlans = resPlans.filter(r => r["selected"] == true)
+        resPlans = resPlans.filter(r => r["selected"] == true) //TODO : Shouldn't selected property be on resource?
+        resPlans.forEach(resPlan=>{
+            resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
+                let hiddenProject:IHiddenProject = 
+                {
+                    projectName : p.projName,
+                    projectUID : p.projUid
+                };
+                return hiddenProject;
+            });
+        })
         //1. get data from SP List UserState  
         return this.http.get(url + filter, options)
 
             .flatMap((data: Response) => {
-                ;
                 let resources = <IResource[]>JSON.parse(data["d"].results[0]["ResourceUID"]) //dev
                     //let resources = <IResource[]>JSON.parse(data.json().d.results[0]["ResourceUID"]) //qa
                     .map(resource => { return new Resource(resource.resUid, resource.resName) })
@@ -622,8 +644,10 @@ export class ResourcePlanUserStateService {
                     headers = headers.set('X-RequestDigest', digest)
 
 
-                    debugger
-                    let resourcesJSON = `'[${resources.map(t => '{"resUid":"' + t.resUid + '","resName":"' + t.resName.replace("'","")  + '"}').join(",")}]'`
+                    let resourcesJSON = `'[${resources.map(t => '{"resUid":"' + t.resUid + '"'
+                    + ',"resName":"' + t.resName.replace("'","")  
+                    + ',"hiddenProjects:"' + t.hiddenProjects + '"'
+                    + '}').join(",")}]'`
                     headers = headers.set('IF-MATCH', '*')
                     headers = headers.set('X-HTTP-Method', 'MERGE')
                     let options = {
@@ -722,8 +746,8 @@ export class ResourcePlanUserStateService {
     getAllTimesheetData(workunits:WorkUnits) : Observable<IResPlan>
     {
         return this.getCurrentUserId().flatMap(resMgrUid=>{
-        let resourceForResMgr = this.getUniqueResourcesForResManager(resMgrUid);
-        return resourceForResMgr.flatMap(resources=>
+        let resourcesForResMgr = this.getWorkspaceResourcesForResourceManager(resMgrUid)
+        return resourcesForResMgr.flatMap(resources=>
         {
             return Observable.from(resources).flatMap(resource=>{
               return this.getTimesheetDataFromResource(new ResPlan(resource,[]),workunits)

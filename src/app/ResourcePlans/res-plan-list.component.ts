@@ -491,13 +491,17 @@ export class ResPlanListComponent implements OnInit {
     }
     toggleResPlanSelection(_resPlan: FormGroup, selected: boolean) {
 
-        ;
         _resPlan.controls['selected'].setValue(selected, { emitEvent: false });
         (_resPlan.controls['projects'] as FormArray).controls.forEach(element => {
             (element as FormGroup).controls['selected'].setValue(selected, { emitEvent: false })
         });
-        this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDelete());
-        this._appSvc.resourceSelected(this.AnyResPlanSelectedForHide());
+        this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+        this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+    }
+    toggleProjectSelection(_resPlan: FormGroup, _proj: FormGroup,selected: boolean)
+    {
+        _proj.controls["selected"].setValue(selected, { emitEvent: false });
+        this.DeselectGroupOnUncheck(_resPlan,_proj,selected)
     }
     DeselectGroupOnUncheck(_resPlan: FormGroup, _proj: FormGroup, value: boolean) {
         _proj.controls['selected'].setValue(value, { emitEvent: false });
@@ -505,8 +509,8 @@ export class ResPlanListComponent implements OnInit {
             _resPlan.controls['selected'].setValue(false, { emitEvent: false });
         }
 
-        this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDelete());
-        this._appSvc.resourceSelected(this.AnyResPlanSelectedForHide());
+        this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+        this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
     }
     addProject(_resPlan: FormGroup): void {
         //get IProjects[] array from current formgroup
@@ -714,7 +718,7 @@ export class ResPlanListComponent implements OnInit {
             if (hideOnly == true) {
                 this._appSvc.loading(true);
                 this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
-                    return this._resPlanUserStateSvc.HideResPlans(resMgr, resourceplans as IResPlan[]).map(r => {
+                    return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans as IResPlan[]).map(r => {
                         if (r.success == true) {
 
                             this.deleteResourcePlans(resourceplans)
@@ -758,7 +762,7 @@ export class ResPlanListComponent implements OnInit {
                             });
 
 
-                            return this._resPlanUserStateSvc.HideResPlans(resMgr, resourceplans as IResPlan[]).map(r => {
+                            return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans as IResPlan[]).map(r => {
                                 if (r.success == true) {
                                     this.deleteResourcePlans(resourceplans)
                                     this._appSvc.loading(false);
@@ -812,7 +816,7 @@ export class ResPlanListComponent implements OnInit {
         this._appSvc.mainFormDirty = false
 
     }
-    AnyResPlanSelectedForDelete(): boolean {
+    AnyResPlanSelectedForDeleteOrHide(): boolean {
         let selected: boolean = false;
         this.resPlans.controls.forEach(resPlan => {
             if ((resPlan as FormGroup).controls['selected'].value == true) {
