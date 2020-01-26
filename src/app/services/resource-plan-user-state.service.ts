@@ -503,6 +503,7 @@ export class ResourcePlanUserStateService {
     }
 
 
+    //Result returns error or success
     addProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
 
         let ob = Observable.from(projects).flatMap(p => {
@@ -510,9 +511,18 @@ export class ResourcePlanUserStateService {
             //     let val = true;
             return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
             // })
-        }).toArray()
+        }).toArray().do(projectsUpdated=>{
+                this.unHideProject(resMgrUid,projects,resource).subscribe();
+        })
 
         return ob;
+    }
+
+    unHideProject(resMgrUid: string,projects: IProject[], resource: IResource) :Observable<Result>
+    {
+           projects.forEach(p=>p["selected"] = false);
+           let resPlan:IResPlan = new ResPlan(resource,projects);
+           return this.HideResourcesOrProjects(resMgrUid,[resPlan]);
     }
 
     addProject(resMgrUid: string, project: IProject, resource: IResource, fromDate: string, toDate: string, timeScale: Timescale, workScale: WorkUnits): Observable<Result> {
@@ -623,9 +633,9 @@ export class ResourcePlanUserStateService {
         }
         let url = `${this.config.ResPlanUserStateUrl}/Items`
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
-        resPlans = resPlans.filter(r => r["selected"] == true) //TODO : Shouldn't selected property be on resource?
         resPlans.forEach(resPlan=>{
             resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
+                debugger;
                 let hiddenProject:IHiddenProject = 
                 {
                     projectName : p.projName,
@@ -634,13 +644,22 @@ export class ResourcePlanUserStateService {
                 return hiddenProject;
             });
         })
+        let allResPlans  : IResPlan[];
+        allResPlans =  Object.assign(resPlans,[],allResPlans);
+        resPlans = resPlans.filter(r => r["selected"] == true) 
+        debugger;
+        
         //1. get data from SP List UserState  
         return this.http.get(url + filter, options)
 
             .flatMap((data: Response) => {
                 let resources = <IResource[]>JSON.parse(data["d"].results[0]["ResourceUID"]) //dev
                     //let resources = <IResource[]>JSON.parse(data.json().d.results[0]["ResourceUID"]) //qa
-                    .map(resource => { return new Resource(resource.resUid, resource.resName) })
+                    .map(resource => { 
+                        let currentResource =  new Resource(resource.resUid, resource.resName);  //TODO : return IResource as against Resource
+                        currentResource.hiddenProjects = resource.hiddenProjects;
+                        return currentResource;
+                     })
                 resources = resources.filter(r => resPlans.map(d => d.resource.resUid.toUpperCase()).indexOf(r.resUid.toUpperCase()) < 0)
                 return this.getRequestDigestToken().flatMap(digest => {
 
@@ -649,11 +668,19 @@ export class ResourcePlanUserStateService {
                     headers = headers.set('Content-Type', 'application/json;odata=verbose')
                     headers = headers.set('X-RequestDigest', digest)
 
+                    //get the hidden projects for resource
+                    resources.forEach(resource=>{
+                        //get resPlan
+                        let resPlan = allResPlans.filter(r=>r.resource && r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())
+                        resource.hiddenProjects = resource.hiddenProjects.concat(allResPlans[0].resource.hiddenProjects)
+                    })
 
-                    let resourcesJSON = `'[${resources.map(t => '{"resUid":"' + t.resUid + '"'
-                    + ',"resName":"' + t.resName.replace("'","")  
-                    + ',"hiddenProjects:"' + t.hiddenProjects + '"'
-                    + '}').join(",")}]'`
+                    // let resourcesJSON = `[${resources.map(t => '{"resUid":"' + t.resUid + '"'
+                    // + ',"resName":"' + t.resName.replace("'","")   + '"'
+                    // + ',"hiddenProjects":"' + t.hiddenProjects + '"'
+                    // + '}').join(",")}]`
+                    let resourcesJSON = `'${JSON.stringify(resources)}'`
+                    debugger;
                     headers = headers.set('IF-MATCH', '*')
                     headers = headers.set('X-HTTP-Method', 'MERGE')
                     let options = {

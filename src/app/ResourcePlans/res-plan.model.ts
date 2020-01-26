@@ -94,7 +94,7 @@ export class Interval implements IInterval {
 }
 
 export class Resource implements IResource {
-  constructor(public resUid = '0', public resName = '', public rbs = '', public timesheetMgr = '') { }
+  constructor(public resUid = '0', public resName = '', public rbs = '', public timesheetMgr = '',public hiddenProjects=[]) { }
 }
 
 
