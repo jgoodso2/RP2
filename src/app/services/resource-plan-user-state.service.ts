@@ -639,14 +639,18 @@ export class ResourcePlanUserStateService {
             .flatMap((data: Response) => {
                 let resources = <IResource[]>JSON.parse(data["d"].results[0]["ResourceUID"]) //dev
                     //let resources = <IResource[]>JSON.parse(data.json().d.results[0]["ResourceUID"]) //qa
-                    .map(resource => { return new Resource(resource.resUid, resource.resName) })
+                    .map(resource => { 
+                        let r  = new Resource(resource.resUid, resource.resName);
+                        r.hiddenProjects = resource.hiddenProjects || []; //assign hidden projects read from SharePoint List
+                        return r;
+                     }) 
 
-                let resourcesNotSelectedForHide = resources.filter(r => resPlans.filter(r=>r['selected'] == false).map(d => d.resource.resUid.toUpperCase()).indexOf(r.resUid.toUpperCase()) < 0)
+                let resourcesNotSelectedForHide = resources.filter(r=>resPlans.filter(rp=>rp['selected'] == false).map(rp=>rp.resource.resUid.toUpperCase()).indexOf(r.resUid.toUpperCase()) > -1)
                 //for every resource update hidden projects from form model
                 resourcesNotSelectedForHide .forEach(resource=>{
                     //get resource plan from form model
                     let resPlan = resPlans.filter(r=>r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())[0];
-                    resource.hiddenProjects.concat(resPlan.projects.filter(p=>p["selected"] == true).map(h=>{
+                    resource.hiddenProjects = resource.hiddenProjects.concat(resPlan.projects.filter(p=>p["selected"] == true).map(h=>{
                         let hiddenProject :IHiddenProject = {
                             projectUID : h.projUid,
                             projectName : h.projName
