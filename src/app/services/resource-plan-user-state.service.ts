@@ -519,7 +519,6 @@ export class ResourcePlanUserStateService {
 
     unHideProject(resMgrUid: string,projects: IProject[], resource: IResource) :Observable<Result>
     {
-        debugger;   
         projects.forEach(p=>p["selected"] = false);
            let resPlan:IResPlan = new ResPlan(resource,projects);
            return this.HideResourcesOrProjects(resMgrUid,[resPlan]);
@@ -633,16 +632,16 @@ export class ResourcePlanUserStateService {
         }
         let url = `${this.config.ResPlanUserStateUrl}/Items`
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
-        resPlans.forEach(resPlan=>{
-            resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
-                let hiddenProject:IHiddenProject = 
-                {
-                    projectName : p.projName,
-                    projectUID : p.projUid
-                };
-                return hiddenProject;
-            });
-        })
+        // resPlans.forEach(resPlan=>{
+        //     resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
+        //         let hiddenProject:IHiddenProject = 
+        //         {
+        //             projectName : p.projName,
+        //             projectUID : p.projUid
+        //         };
+        //         return hiddenProject;
+        //     });
+        // })
         let allResPlans  : IResPlan[];
         allResPlans =  Object.assign(resPlans,[],allResPlans);
         resPlans = resPlans.filter(r => r["selected"] == true) 
@@ -670,7 +669,21 @@ export class ResourcePlanUserStateService {
                     resources.forEach(resource=>{
                         //get resPlan
                         let resPlan = allResPlans.filter(r=>r.resource && r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())
-                        resource.hiddenProjects = resource.hiddenProjects.concat(allResPlans[0].resource.hiddenProjects)
+
+                        // add more hidden projects
+                        resource.hiddenProjects = resource.hiddenProjects.concat(allResPlans[0].projects.filter(p=>p["selected"] == true).map(p=>
+                            {
+                                let hiddenProject :IHiddenProject = 
+
+                                {
+                                    projectUID : p.projUid,
+                                    projectName : p.projName
+                                }
+                                return hiddenProject;
+                            })
+                        )
+                        //unhide projects
+                        resource.hiddenProjects = resource.hiddenProjects.filter(h=> h.projectUID in allResPlans[0].projects.filter(p=>p["selected"] == false));
                     })
 
                     // let resourcesJSON = `[${resources.map(t => '{"resUid":"' + t.resUid + '"'
