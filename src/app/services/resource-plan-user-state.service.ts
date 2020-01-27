@@ -632,32 +632,29 @@ export class ResourcePlanUserStateService {
         }
         let url = `${this.config.ResPlanUserStateUrl}/Items`
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
-        // resPlans.forEach(resPlan=>{
-        //     resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
-        //         let hiddenProject:IHiddenProject = 
-        //         {
-        //             projectName : p.projName,
-        //             projectUID : p.projUid
-        //         };
-        //         return hiddenProject;
-        //     });
-        // })
-        let allResPlans  : IResPlan[];
-        allResPlans =  Object.assign(resPlans,[],allResPlans);
-        resPlans = resPlans.filter(r => r["selected"] == true) 
-        
+        //resPlans = resPlans.filter(r => r["selected"] == true)
         //1. get data from SP List UserState  
         return this.http.get(url + filter, options)
 
             .flatMap((data: Response) => {
                 let resources = <IResource[]>JSON.parse(data["d"].results[0]["ResourceUID"]) //dev
                     //let resources = <IResource[]>JSON.parse(data.json().d.results[0]["ResourceUID"]) //qa
-                    .map(resource => { 
-                        let currentResource =  new Resource(resource.resUid, resource.resName);  //TODO : return IResource as against Resource
-                        currentResource.hiddenProjects = resource.hiddenProjects;
-                        return currentResource;
-                     })
-                resources = resources.filter(r => resPlans.map(d => d.resource.resUid.toUpperCase()).indexOf(r.resUid.toUpperCase()) < 0)
+                    .map(resource => { return new Resource(resource.resUid, resource.resName) })
+
+                let resourcesNotSelectedForHide = resources.filter(r => resPlans.filter(r=>r['selected'] == false).map(d => d.resource.resUid.toUpperCase()).indexOf(r.resUid.toUpperCase()) < 0)
+                //for every resource update hidden projects from form model
+                resourcesNotSelectedForHide .forEach(resource=>{
+                    //get resource plan from form model
+                    let resPlan = resPlans.filter(r=>r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())[0];
+                    resource.hiddenProjects.concat(resPlan.projects.filter(p=>p["selected"] == true).map(h=>{
+                        let hiddenProject :IHiddenProject = {
+                            projectUID : h.projUid,
+                            projectName : h.projName
+                        }
+                        return hiddenProject;
+                    }))
+                })
+
                 return this.getRequestDigestToken().flatMap(digest => {
 
                     let headers = new HttpHeaders();
@@ -665,32 +662,8 @@ export class ResourcePlanUserStateService {
                     headers = headers.set('Content-Type', 'application/json;odata=verbose')
                     headers = headers.set('X-RequestDigest', digest)
 
-                    //get the hidden projects for resource
-                    resources.forEach(resource=>{
-                        //get resPlan
-                        let resPlan = allResPlans.filter(r=>r.resource && r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())
 
-                        // add more hidden projects
-                        resource.hiddenProjects = resource.hiddenProjects.concat(allResPlans[0].projects.filter(p=>p["selected"] == true).map(p=>
-                            {
-                                let hiddenProject :IHiddenProject = 
-
-                                {
-                                    projectUID : p.projUid,
-                                    projectName : p.projName
-                                }
-                                return hiddenProject;
-                            })
-                        )
-                        //unhide projects
-                        resource.hiddenProjects = resource.hiddenProjects.filter(h=> h.projectUID in allResPlans[0].projects.filter(p=>p["selected"] == false));
-                    })
-
-                    // let resourcesJSON = `[${resources.map(t => '{"resUid":"' + t.resUid + '"'
-                    // + ',"resName":"' + t.resName.replace("'","")   + '"'
-                    // + ',"hiddenProjects":"' + t.hiddenProjects + '"'
-                    // + '}').join(",")}]`
-                    let resourcesJSON = `'${JSON.stringify(resources)}'`
+                    let resourcesJSON = `'${JSON.stringify(resourcesNotSelectedForHide)}'`;
                     headers = headers.set('IF-MATCH', '*')
                     headers = headers.set('X-HTTP-Method', 'MERGE')
                     let options = {

@@ -1,1 +1,28 @@
-[{"resUid": "1e761b00-8c40-ea11-80bc-00155d4a8803","resName": "John Goodson","hiddenProjects": [] }]
+[
+    {
+        "resUid": "10c931ee-1765-4ad1-b179-a92b3bd3624b",
+        "resName": "Gray Katrina",
+        "rbs": "",
+        "timesheetMgr": "",
+        "hiddenProjects": []
+    },
+    {
+        "resUid": "d50aa1bf-0136-4759-a864-a5983e4c9017",
+        "resName": "Goodson John",
+        "rbs": "",
+        "timesheetMgr": "",
+        "hiddenProjects": [
+            {
+                "projectName": "boo",
+                "projectUID": "123"
+            }
+        ]
+    },
+    {
+        "resUid": "82866b88-7413-453c-acaa-a4d13103df40",
+        "resName": "Donna Stephen",
+        "rbs": "",
+        "timesheetMgr": "",
+        "hiddenProjects": []
+    }
+]
