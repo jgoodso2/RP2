@@ -51,7 +51,6 @@ export class SimpleModalComponent {
   
   constructor( 
   ) {
-    debugger
     this.modalSubmittedSource = new Subject<string>();
     this.modalSubmitted$ = this.modalSubmittedSource.asObservable();
  

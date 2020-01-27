@@ -25,13 +25,11 @@ export class ResourcePlanFilteredService {
             
             //pick the resoure from within the workspace item to get to hidden projects for the  resource that belongs to current resource plan
             let resourceWorkSpaceItem :IResource = workspaceResources.find(w=>w.resUid == resPlan.resource.resUid);
-            debugger;
             if(resourceWorkSpaceItem && resourceWorkSpaceItem.hiddenProjects)
             //weed out hidden projects
             resPlan.projects = resPlan.projects.filter(p=>resourceWorkSpaceItem.hiddenProjects.map(r=>r.projectUID.toUpperCase()).findIndex(h=>p.projUid.toUpperCase() == h.toUpperCase()) < 0);
             
           })
-          debugger;
           console.log("filtered data =" + JSON.stringify(resPlans))
          return resplans;
         })

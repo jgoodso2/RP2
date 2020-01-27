@@ -97,7 +97,6 @@ export class ResourcePlanUserStateService {
             ;
         //console.log('=======================hitting project server for assigments')
         return Observable.from(resources).flatMap(t => {
-            debugger
             let filter = `$filter=ResourceName eq '${t.resName.replace("'","''")}' and AssignmentType eq 101`
             let url = baseUrl + '?' + filter + '&' + select;
           
@@ -520,7 +519,8 @@ export class ResourcePlanUserStateService {
 
     unHideProject(resMgrUid: string,projects: IProject[], resource: IResource) :Observable<Result>
     {
-           projects.forEach(p=>p["selected"] = false);
+        debugger;   
+        projects.forEach(p=>p["selected"] = false);
            let resPlan:IResPlan = new ResPlan(resource,projects);
            return this.HideResourcesOrProjects(resMgrUid,[resPlan]);
     }
@@ -635,7 +635,6 @@ export class ResourcePlanUserStateService {
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
         resPlans.forEach(resPlan=>{
             resPlan.resource.hiddenProjects = resPlan.projects.filter(r=>r["selected"] == true).map(p=>{
-                debugger;
                 let hiddenProject:IHiddenProject = 
                 {
                     projectName : p.projName,
@@ -647,7 +646,6 @@ export class ResourcePlanUserStateService {
         let allResPlans  : IResPlan[];
         allResPlans =  Object.assign(resPlans,[],allResPlans);
         resPlans = resPlans.filter(r => r["selected"] == true) 
-        debugger;
         
         //1. get data from SP List UserState  
         return this.http.get(url + filter, options)
@@ -680,7 +678,6 @@ export class ResourcePlanUserStateService {
                     // + ',"hiddenProjects":"' + t.hiddenProjects + '"'
                     // + '}').join(",")}]`
                     let resourcesJSON = `'${JSON.stringify(resources)}'`
-                    debugger;
                     headers = headers.set('IF-MATCH', '*')
                     headers = headers.set('X-HTTP-Method', 'MERGE')
                     let options = {
