@@ -42,7 +42,7 @@ declare const window: Window;
 })
 
 
-export class ResPlanListComponent implements OnInit {
+export class ResPlanListComponent implements OnInit,OnDestroy {
 
     @ViewChild('modalProjects', {static: false} )  modalProjects: SimpleModalComponent;
     @ViewChild('modalResources', {static: false} )  modalResources: SimpleModalComponent;
@@ -150,14 +150,9 @@ export class ResPlanListComponent implements OnInit {
             this.buildResPlans(values.resPlans);
             //console.log(JSON.stringify(values.resPlans))
         }, (error) => console.log(error))
-        this.projModalSubmission = this._modalSvc.modalSubmitted$.subscribe(() => {
-            this.addSelectedProjects(this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData);
-        }, (error) => console.log(error))
+       
         console.log("=========multi subscribe")
-        this.resModalSubmission = this._resModalSvc.modalSubmitted$.subscribe(() => {
-            this.addSelectedResources()
-
-        }, (error) => console.log(error));
+        
 
 
         //this.modalResources.modalSubmitted$.subscribe(() => this._resModalSvc.modalSubmitClicked(), (error) => console.log(error));
@@ -519,7 +514,10 @@ export class ResPlanListComponent implements OnInit {
 
         var data = _resPlan.value.resUid;
         this._modalSvc.projectsAssigned(_resPlan.value.projects);
-        //console.log('projects in RP = ' + JSON.stringify(_resPlan.value.projects))
+        this.projModalSubmission = this._modalSvc.modalSubmitted$.subscribe(() => {
+            this.addSelectedProjects(this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData);
+            this.projModalSubmission && this.projModalSubmission.unsubscribe();
+        }, (error) => console.log(error))
         this.modalProjects.showModal(data);
         var _projects: [IProject];
         var project = new Project();
@@ -532,6 +530,10 @@ export class ResPlanListComponent implements OnInit {
         //console.log('resources selected=' + JSON.stringify(resourcesSelected))
 
         this._resModalSvc.ResourcesSelected(resourcesSelected)
+        this.resModalSubmission = this._resModalSvc.modalSubmitted$.subscribe(() => {
+            this.addSelectedResources()
+            this.resModalSubmission && this.resModalSubmission.unsubscribe();
+        }, (error) => console.log(error));
         this.modalResources.showModal('');
     }
 
@@ -578,7 +580,7 @@ export class ResPlanListComponent implements OnInit {
         this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().subscribe(resMgr => {
             let resource = new Resource(this.currentFormGroup.value["resUid"],
                 this.currentFormGroup.value["resName"]);
-            this.addProjectsSub = this._resPlanUserStateSvc.addProjects(resMgr, this._modalSvc.selectedProjects, resource,
+            this.addProjectsSub = this._resPlanUserStateSvc.addOrShowProjects(resMgr, this._modalSvc.selectedProjects, resource,
                 fromDate, toDate, timescale, workunits)
                 .subscribe(results => {
                     //let projects = this._modalSvc.selectedProjects;
@@ -588,7 +590,7 @@ export class ResPlanListComponent implements OnInit {
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project);
                     //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
-
+debugger;
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
                             Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits

@@ -198,21 +198,21 @@ export class ResourcePlanUserStateService {
         };
         let url = `${this.config.ResPlanUserStateUrl}/Items`
         let filter = `?$filter=ResourceManagerUID eq '${resMgrUid}'`
+        let isNewEntry = false;
         return this.http.get(url + filter, options)
             .flatMap((data: Response) => {
                 let resources = [];
                 resources = resources.concat(resourcePlans.map(r => r.resource));
                 if (data["d"].results.length > 0) {
-                    existingResources = JSON.parse(data["d"].results[0]["ResourceUID"]).map(resource => { 
-                        let r= new Resource(resource.resUid, resource.resName) ;
-                        r.hiddenProjects = resource.hiddenProjects || [];
-                        return r;
-                    }) //dev
+                    existingResources = JSON.parse(data["d"].results[0]["ResourceUID"]).map(resource => { return new Resource(resource.resUid, resource.resName) }) //dev
                     //existingResources = JSON.parse(data.json().d.results[0]["ResourceUID"]).map(resource => { return new Resource(resource.resUid, resource.resName) }) //qa
                     existingResources = existingResources
                         .filter(e => resources.map(r => r.resUid.toUpperCase()).indexOf(e.resUid.toUpperCase()) < 0)
                 }
-               
+                else {
+                    isNewEntry = true;
+                }
+
                 return this.getRequestDigestToken().flatMap(digest => {
 
                     let url = `${this.config.ResPlanUserStateUrl}/Items`
@@ -221,12 +221,21 @@ export class ResourcePlanUserStateService {
                     headers = headers.set('Accept', 'application/json;odata=verbose')
                     headers = headers.set('Content-Type', 'application/json;odata=verbose')
                     headers = headers.set('X-RequestDigest', digest)
-                    
+                    if (isNewEntry == false) {
+                        headers = headers.set('X-HTTP-Method', 'MERGE')
+                        headers = headers.set('IF-MATCH', '*')
+                    }
                     let options = {
                         headers: headers
                     }
                     //let resources = `'[${resourcePlans.map(t => 
 
+
+                    if (isNewEntry == false) {
+                        url = data["d"].results[0].__metadata.uri;
+                        resources = existingResources.concat(resources);
+                    }
+                    
                     // note that we escape any apostrophe's with a double escape
                     let resourcesJSON = `'[${resources.map(t => '{"resUid":"' + t.resUid + '","resName":"' + t.resName.replace("'","\\'") + '"}').join(",")}]'`
                     let body = `{"__metadata": { "type": "SP.Data.ResourcePlanUserStateListItem" },"ResourceManagerUID": "${resMgrUid}"
@@ -492,13 +501,60 @@ export class ResourcePlanUserStateService {
 
     }
 
+    addOrShowProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+         //get projects with assignments for current resource
+         let projectsWithResPlans = this.getProjectIdsFromAssignmentsForResources([resource]).map(rp=>{
+             if(rp)
+             {
+                return rp[0].projects.map(p=>p.projUid.toUpperCase());
+             }
+             else 
+             {
+                 return [];
+             }
+            })
+         
+        
+         let projectsToAdd$ =projectsWithResPlans.map(pa=>{
+             if(pa){
+              return projects.filter(p=>p.projUid.toUpperCase()).filter(p=> pa.indexOf(p.projUid.toUpperCase()) < 0);
+             }
+             else
+             return projects; //return all projects since 
+         })
 
+          let projectsToUnHide$ = projectsWithResPlans.map(pa=>{
+            if(pa){
+             return projects.filter(p=>p.projUid.toUpperCase()).filter(p=> pa.indexOf(p.projUid.toUpperCase()) > -1);
+            }
+            else
+            return [];
+         })
+
+        let results$ = projectsToAdd$.flatMap(projToAdd=>
+            {
+             return this.addProjects(resMgrUid,projToAdd,resource,fromDate,toDate,timeScale,workScale).flatMap(results=>{
+                 this.unHideProjects(resMgrUid,projects,resource).subscribe();
+                 return projectsToUnHide$.flatMap(projectForunHideProjects=>{
+                    let resultsForUnHideProjects: Result[]= [];
+                    projectForunHideProjects.forEach(up=>{
+                        let result = new Result();
+                        result.project = up;
+                        result.resUid = resource.resUid;
+                        result.success = true;
+                        resultsForUnHideProjects.push(result);
+                    })
+                    results = results.concat(resultsForUnHideProjects)
+                    debugger;
+                    return results;
+                 }).toArray()
+             })
+            })
+        return results$
+    }
     //Result returns error or success
     addProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
         
-         //let projectsWithAssignments = this.getProjectIdsFromAssignmentsForResources([resource]);
-        // let projectsToAdd = projectsWithAssignments.
-
 
         //old code
         let ob = Observable.from(projects).flatMap(p => {
@@ -506,9 +562,7 @@ export class ResourcePlanUserStateService {
             //     let val = true;
             return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
             // })
-        }).toArray().do(projectsUpdated=>{
-                this.unHideProjects(resMgrUid,projects,resource).subscribe();
-        })
+        }).toArray()
 
         return ob;
     }
@@ -699,15 +753,18 @@ export class ResourcePlanUserStateService {
                     //let resources = <IResource[]>JSON.parse(data.json().d.results[0]["ResourceUID"]) //qa
                     .map(resource => { 
                          let r = new Resource(resource.resUid, resource.resName);
-                         r.hiddenProjects = r.hiddenProjects || []  //get resources from Sharepoint list
+                         r.hiddenProjects = resource.hiddenProjects || []  //get resources from Sharepoint list
+                         return r;
                         })
 
                 //for every resource passed in as argument , unhide projects from projects found in each resPlan
                 resources.forEach(resource=>{
                     //get resource plan from res Plan argument
                     let resPlan = resPlans.filter(r=>r.resource.resUid.toUpperCase() == resource.resUid.toUpperCase())[0];
+                    if(resPlan){ //if resource found in the input
                     resource.hiddenProjects = resource.hiddenProjects.filter(r=>resPlan.projects.map(p=>p.projUid.toUpperCase())
-                                           .indexOf(r.projectUID.toUpperCase()) > -1)
+                                           .indexOf(r.projectUID.toUpperCase()) < 0)
+                    }
                 })
 
                 return this.getRequestDigestToken().flatMap(digest => {
