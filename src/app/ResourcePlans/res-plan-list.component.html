@@ -53,8 +53,25 @@
                                                 </td>
 
                                             </div>
-                                            <input formControlName="resUid" placeholder="id" style='display:none'>
                                         </tr>
+                                            <div formArrayName="timesheetTotals" *ngIf="this.showTimesheetData == true">
+                                                <tr>
+                                                <td class="body-cell" style="padding-left:17px">
+                                                        
+                                                </td>
+                                                <td class="body-cell col1">
+                                                    <span style="width:100%;color:blue">Timesheet Totals</span>
+                                                    
+                                                </td>
+                                                <td class="body-cell col" *ngFor="let total of plan.get('timesheetTotals').controls;index as l"  >
+                                                    <div [formGroupName]="l">
+                                                        <input #totalVal readonly class ="totalsRow intervalCell actualCell" [ngClass] = "checkTotal(totalVal.value)"  formControlName="intervalValue" placeholder="intervalValue" style="width:100%" /> 
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </div>
+                                            <input formControlName="resUid" placeholder="id" style='display:none'>
+                                    
                                     </div>
                                     <div well-body>
                                         <div formArrayName="projects">

@@ -4,13 +4,13 @@
 //   }
 // }
 
-:host .widgets {
+::ng-deep .widgets {
   .smart-table-container {
     width: 100%;
   }
 }
 
-:host  {
+::ng-deep  {
   ng2-smart-table {
     th, td {
       border: 1px solid gray !important;
@@ -74,13 +74,15 @@
     }
     
   }
+}
 
-  th[ng2-st-checkbox-select-all]  input[type="checkbox"] {
+::ng-deep th[ng2-st-checkbox-select-all]  input[type="checkbox"] {
    display:none;
   }
-  .ng2-smart-actions input[type="checkbox"] {
+  
+::ng-deep .ng2-smart-actions input[type="checkbox"] {
     width:20px;
     height:20px;
 }
-}
+
   
