@@ -262,6 +262,36 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
         //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
 
     }
+    calculateTimesheetTotals(fg: FormGroup): void {
+
+        let value = fg.value;
+        //for each interval in the timesheet total row
+        for (var i = 0; i < value["timesheetTotals"].length; i++) {
+            var sum = 0;
+            //sum up the timesheet data for each project for the interval column
+            for (var j = 0; j < value["projects"].length; j++) {
+                if (value["projects"][j]["timesheetData"].length < 1)
+                    continue;
+                var val = parseInt(value["projects"][j]["timesheetData"][i]["intervalValue"]);
+
+                if (!val) {
+                    val = 0;
+                }
+
+                sum += val;
+
+            }
+            if (this._appSvc.queryParams.workunits == WorkUnits.FTE) {
+                sum = sum / 100;
+            }
+            //update the sum for the column
+            value["timesheetTotals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString(), this.workunits) + this.getWorkUnitChar(this._appSvc.queryParams.workunits);
+
+        }
+        fg.setValue(value, { emitEvent: false });
+        //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
+
+    }
     getWorkUnitChar(workUnits: WorkUnits): string {
         switch (+(workUnits)) {
             case WorkUnits.days: return 'd';
@@ -296,10 +326,12 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
 
     buildResPlan(_resplan: IResPlan): FormGroup {
         var _totals = this.fb.array([]);
+        var _timesheetTotals = this.fb.array([]);
         var resPlanGroup = this.fb.group({
             resUid: _resplan.resource.resUid.toLowerCase(),
             resName: _resplan.resource.resName,
             totals: this.initTotals(_totals, _resplan.projects),
+            timesheetTotals: this.initTotals(_timesheetTotals, _resplan.projects),
             projects: this.fb.array([]),
             selected: this.fb.control(false)
         });
@@ -309,6 +341,7 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
         }
 
         this.calculateTotals(resPlanGroup);
+        this.calculateTimesheetTotals(resPlanGroup);
         this.resPlanGroupChangesSub = resPlanGroup.valueChanges.subscribe(value => {
             this.calculateTotals(resPlanGroup)
         }, (error) => console.log(error));
@@ -384,7 +417,7 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
 
 
     buildtimesheetInterval(interval: IInterval): FormGroup {
-
+debugger;
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
