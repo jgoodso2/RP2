@@ -42,11 +42,11 @@ declare const window: Window;
 })
 
 
-export class ResPlanListComponent implements OnInit,OnDestroy {
+export class ResPlanListComponent implements OnInit, OnDestroy {
 
-    @ViewChild('modalProjects', {static: false} )  modalProjects: SimpleModalComponent;
-    @ViewChild('modalResources', {static: false} )  modalResources: SimpleModalComponent;
-    @ViewChild('header', {static: false} ) header: ResPlanHeaderRowComponent;
+    @ViewChild('modalProjects', { static: false }) modalProjects: SimpleModalComponent;
+    @ViewChild('modalResources', { static: false }) modalResources: SimpleModalComponent;
+    @ViewChild('header', { static: false }) header: ResPlanHeaderRowComponent;
 
 
     mainForm: FormGroup;
@@ -150,15 +150,15 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
             this.buildResPlans(values.resPlans);
             //console.log(JSON.stringify(values.resPlans))
         }, (error) => console.log(error))
-       
+
         console.log("=========multi subscribe")
-        
+
 
 
         //this.modalResources.modalSubmitted$.subscribe(() => this._resModalSvc.modalSubmitClicked(), (error) => console.log(error));
         //this.modalProjects.modalSubmitted$.subscribe(() => this._modalSvc.modalSubmitClicked(), (error) => console.log(error));
         //what is this below??
-       
+
     }
 
 
@@ -313,14 +313,14 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
     }
 
     buildResPlans(plans: IResPlan[]) {
-        if(plans){
-        //let resPlansGrp :FormGroup[] = [];
-        //console.log('add resources ==========================================' + JSON.stringify(plans));
-        for (var i = 0; i < plans.length; i++) {
-            var resPlan = this.buildResPlan(plans[i]);
-            this.resPlans.push(resPlan);
+        if (plans) {
+            //let resPlansGrp :FormGroup[] = [];
+            //console.log('add resources ==========================================' + JSON.stringify(plans));
+            for (var i = 0; i < plans.length; i++) {
+                var resPlan = this.buildResPlan(plans[i]);
+                this.resPlans.push(resPlan);
+            }
         }
-    }
         //this.resPlans.push.apply(resPlansGrp)
     }
 
@@ -417,7 +417,7 @@ export class ResPlanListComponent implements OnInit,OnDestroy {
 
 
     buildtimesheetInterval(interval: IInterval): FormGroup {
-debugger;
+        debugger;
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
@@ -463,9 +463,9 @@ debugger;
             });
             this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
                 this.confirmDialogResult = result;
-                
+
                 if (result == "yes") {
-                  
+
                     this._appSvc.mainFormDirty = false;
                     this.router.routeReuseStrategy.shouldReuseRoute = function () { return false };
                     this.router.isActive = function () { return false; }
@@ -528,10 +528,9 @@ debugger;
         this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
         this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
     }
-    toggleProjectSelection(_resPlan: FormGroup, _proj: FormGroup,selected: boolean)
-    {
+    toggleProjectSelection(_resPlan: FormGroup, _proj: FormGroup, selected: boolean) {
         _proj.controls["selected"].setValue(selected, { emitEvent: false });
-        this.DeselectGroupOnUncheck(_resPlan,_proj,selected)
+        this.DeselectGroupOnUncheck(_resPlan, _proj, selected)
     }
     DeselectGroupOnUncheck(_resPlan: FormGroup, _proj: FormGroup, value: boolean) {
         _proj.controls['selected'].setValue(value, { emitEvent: false });
@@ -623,7 +622,7 @@ debugger;
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project);
                     //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
-debugger;
+                    debugger;
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
                             Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
@@ -715,11 +714,11 @@ debugger;
             this._appSvc.loading(true);
             this.saveResPlansSub = this._resPlanUserStateSvc.saveResPlans(resourceplans, fromDate, toDate, timescale, workunits)
                 .subscribe(
-                (results: Result[]) => this.onSaveComplete(results),
-                (error: any) => {
-                    this.errorMessage = <any>error
-                    this._appSvc.loading(false);
-                });
+                    (results: Result[]) => this.onSaveComplete(results),
+                    (error: any) => {
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);
+                    });
         }
         //()
         else if (!this._appSvc.mainFormDirty) {
@@ -765,16 +764,16 @@ debugger;
                             this._appSvc.loading(false);
                         }
                     },
-                    (error: any) => {
-                        this.errorMessage = <any>error
+                        (error: any) => {
+                            this.errorMessage = <any>error
                             this._appSvc.loading(false);
                         }
                     )
                 },
-                // (error: any) => {
-                //     this.errorMessage = <any>error;
-                //         this._appSvc.loading(false);
-                //     }
+                    // (error: any) => {
+                    //     this.errorMessage = <any>error;
+                    //         this._appSvc.loading(false);
+                    //     }
                 ).subscribe((r) => {
                     this._appSvc.loading(false)
 
@@ -783,43 +782,43 @@ debugger;
             else {
                 this.delResPlansSub = this._resPlanUserStateSvc.deleteResPlans(resourceplans, fromDate, toDate, timescale, workunits)
                     .flatMap(
-                    (results: Result[]) => {
-                        ;
-                        this.updateErrors(results);
-                        return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
-                            resourceplans.forEach(resPlan => {
-                                //if resource marked for selection check if all projects were successful by comparing count of projects prior to upadte and after
-                                let projectsMarkedForDeleteCount = resPlan.projects.length;
+                        (results: Result[]) => {
+                            ;
+                            this.updateErrors(results);
+                            return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
+                                resourceplans.forEach(resPlan => {
+                                    //if resource marked for selection check if all projects were successful by comparing count of projects prior to upadte and after
+                                    let projectsMarkedForDeleteCount = resPlan.projects.length;
 
-                                resPlan.projects = resPlan.projects.filter(function (p) { return results.findIndex(function (r) { return r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase(); }) > -1; });
-                                // if(resPlan["selected"] == true)
-                                // {
-                                //    resPlan["selected"] = (projectsMarkedForDeleteCount == resPlan.projects.length);
-                                // }
-                            });
+                                    resPlan.projects = resPlan.projects.filter(function (p) { return results.findIndex(function (r) { return r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase(); }) > -1; });
+                                    // if(resPlan["selected"] == true)
+                                    // {
+                                    //    resPlan["selected"] = (projectsMarkedForDeleteCount == resPlan.projects.length);
+                                    // }
+                                });
 
 
-                            return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans as IResPlan[]).map(r => {
-                                if (r.success == true) {
-                                    this.deleteResourcePlans(resourceplans)
-                                    this._appSvc.loading(false);
-                                }
-                                else {
-                                    this._appSvc.loading(false);
-                                }
+                                return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans as IResPlan[]).map(r => {
+                                    if (r.success == true) {
+                                        this.deleteResourcePlans(resourceplans)
+                                        this._appSvc.loading(false);
+                                    }
+                                    else {
+                                        this._appSvc.loading(false);
+                                    }
+                                },
+                                    // (error: any) => {
+                                    //     this.errorMessage = <any>error
+                                    //         this._appSvc.loading(false);
+                                    //     }
+                                )
                             },
-                            // (error: any) => {
-                            //     this.errorMessage = <any>error
-                            //         this._appSvc.loading(false);
-                            //     }
-                            ) 
-                        },
-                        // (error: any) => {
-                        //     this.errorMessage = <any>error
-                        //         this._appSvc.loading(false);
-                        //     }
-                        )
-                    }).subscribe(() => { this._appSvc.loading(false) }, () => { this._appSvc.loading(false) })
+                                // (error: any) => {
+                                //     this.errorMessage = <any>error
+                                //         this._appSvc.loading(false);
+                                //     }
+                            )
+                        }).subscribe(() => { this._appSvc.loading(false) }, () => { this._appSvc.loading(false) })
             }
         }
         //()
@@ -917,12 +916,12 @@ debugger;
                 if (result === "yes") {
                     const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                     $.when(this.menuService.printMode())
-                    .then(() => wait(1000))
-                    .then(() => this.menuService.printerFunction())
-                    .then(() => wait(25))
-                    .then(() => this.menuService.normalizeView())
-                    .catch('failed');      
-                    
+                        .then(() => wait(1000))
+                        .then(() => this.menuService.printerFunction())
+                        .then(() => wait(25))
+                        .then(() => this.menuService.normalizeView())
+                        .catch('failed');
+
                 }
             });
 
@@ -930,11 +929,11 @@ debugger;
         else {
             const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
             $.when(this.menuService.printMode())
-            .then(() => wait(100))
-            .then(() => this.menuService.printerFunction())
-            .then(() => wait(25))
-            .then(() => this.menuService.normalizeView())
-            .catch('failed');    
+                .then(() => wait(100))
+                .then(() => this.menuService.printerFunction())
+                .then(() => wait(25))
+                .then(() => this.menuService.normalizeView())
+                .catch('failed');
         }
     }
 
@@ -986,11 +985,12 @@ debugger;
     }
 
     intervalChanged(input: any, ctrl: AbstractControl) {
+        debugger;
         if (!ctrl.errors) {
             if ((event.currentTarget as HTMLInputElement).value && (event.currentTarget as HTMLInputElement).value.trim() != '')
                 (event.currentTarget as HTMLInputElement).value = new CellWorkUnitsPipe().transform((event.currentTarget as HTMLInputElement).value, this.workunits);
         }
-    
+
         this._appSvc.setFormDirty(true);
     }
 
@@ -1005,5 +1005,8 @@ debugger;
             return 'Show timesheet Data';
         }
     }
-
+    selectText(element) {
+        var myRegexp = /[0-9]*/g;
+        element.setSelectionRange(0, myRegexp.exec(element.value)[0].length); //index of where the number ends
+    }
 }

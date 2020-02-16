@@ -95,11 +95,11 @@
                                                     <div formArrayName="intervals">
                                                         <td class="body-cell col" *ngFor="let intrvl of proj.get('intervals').controls; index as k">
                                                             <div [formGroupName]="k">
-                                                                <input class='intervalCell' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text"  onClick="this.select()" autofocus 
+                                                                <input class='intervalCell' [ngClass]="intrvl.get('intervalValue').dirty && 'dirtyCell'" type="text"  (click)="selectText($event.target)" autofocus 
                                                                 formControlName="intervalValue" projectDateSpan [projStart]="proj.get('startDate').value" style="width:100%" 
                                                                 [projFinish]="proj.get('finishDate').value" [intervalStart] ="intrvl.get('intervalStart').value"  [intervalEnd] = "intrvl.get('intervalEnd').value"   
                                                                 spellcheck="false"
-                                                                (change)="intervalChanged(this,intrvl.get('intervalValue'))">                                                                                                            
+                                                                (change)="intervalChanged(this,intrvl.get('intervalValue'))" >                                                                                                            
                                                             </div>
                                                             <span *ngIf="intrvl.get('intervalValue').touched && intrvl.get('intervalValue').dirty && intrvl.get('intervalValue').errors">
                                                                 <error [error]="getIntervalValidationMessage()"></error>
