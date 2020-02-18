@@ -26,7 +26,7 @@
                         <tr *ngFor="let project of resPlan.projects">
 
                             <td>
-                                <div class="body-cell col1"> {{project.name}} </div>
+                                <div title="{{project.name}}" class="body-cell col1"> {{project.name}} </div>
 
                             </td>
                             <td *ngFor="let interval of project.intervals">
