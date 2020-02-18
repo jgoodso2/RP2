@@ -343,7 +343,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.calculateTotals(resPlanGroup);
         this.calculateTimesheetTotals(resPlanGroup);
         this.resPlanGroupChangesSub = resPlanGroup.valueChanges.subscribe(value => {
-            this.calculateTotals(resPlanGroup)
+            this.calculateTotals(resPlanGroup);
+            this.calculateTimesheetTotals(resPlanGroup);
         }, (error) => console.log(error));
         return resPlanGroup;
     }
