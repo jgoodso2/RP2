@@ -243,7 +243,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             for (var j = 0; j < value["projects"].length; j++) {
                 if (value["projects"][j]["intervals"].length < 1)
                     continue;
-                var val = parseInt(value["projects"][j]["intervals"][i]["intervalValue"]);
+                var val = parseFloat(value["projects"][j]["intervals"][i]["intervalValue"]);
 
                 if (!val) {
                     val = 0;
@@ -258,7 +258,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             value["totals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString(), this.workunits) + this.getWorkUnitChar(this._appSvc.queryParams.workunits);
 
         }
-        fg.setValue(value, { emitEvent: false });
+        fg.patchValue({totals :value["totals"] },{ emitEvent: false });
         //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
 
     }
@@ -272,7 +272,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             for (var j = 0; j < value["projects"].length; j++) {
                 if (value["projects"][j]["timesheetData"].length < 1)
                     continue;
-                var val = parseInt(value["projects"][j]["timesheetData"][i]["intervalValue"]);
+                var val = parseFloat(value["projects"][j]["timesheetData"][i]["intervalValue"]);
 
                 if (!val) {
                     val = 0;
@@ -288,9 +288,22 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             value["timesheetTotals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString(), this.workunits) + this.getWorkUnitChar(this._appSvc.queryParams.workunits);
 
         }
-        fg.setValue(value, { emitEvent: false });
+        fg.patchValue({timesheetTotals :value["timesheetTotals"] }, { emitEvent: false });
         //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
 
+    }
+    formatTimesheetTotals(value:string)
+    {
+        if(this.workunits == WorkUnits.hours)
+        {
+          return parseFloat(value).toFixed(0);
+        }
+        else if(this.workunits == WorkUnits.days){
+            return parseFloat(value).toFixed(1);
+        }
+        else{
+            return parseFloat(value).toFixed(0);
+        }
     }
     getWorkUnitChar(workUnits: WorkUnits): string {
         switch (+(workUnits)) {
