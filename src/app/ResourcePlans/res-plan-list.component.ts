@@ -294,6 +294,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
     formatTimesheetTotals(value:string)
     {
+        if(value && value.toUpperCase() != "NA"){
         if(this.workunits == WorkUnits.hours)
         {
           return parseFloat(value).toFixed(0);
@@ -304,6 +305,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         else{
             return parseFloat(value).toFixed(0);
         }
+    }
+    return value;
+
     }
     getWorkUnitChar(workUnits: WorkUnits): string {
         switch (+(workUnits)) {
