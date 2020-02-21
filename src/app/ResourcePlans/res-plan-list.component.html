@@ -59,8 +59,8 @@
                                                 <td class="body-cell" style="padding-left:17px">
                                                         
                                                 </td>
-                                                <td class="body-cell col1">
-                                                    <span style="width:100%;color:blue;font-style:italic">Timesheet Totals</span>
+                                                <td class="body-cell col1" style="text-align: right;">
+                                                    <span style="width:100%;color:blue;padding-right:10px;"><strong>Timesheet Totals</strong></span>
                                                     
                                                 </td>
                                                 <td class="body-cell col" *ngFor="let total of plan.get('timesheetTotals').controls;index as l"  >
@@ -120,7 +120,7 @@
                                                             <div [formGroupName]="k">
                                                                 <input  readonly="readonly" class="intervalCell actualCell"
                                                                 formControlName="intervalValue"  style="width:100%" 
-                                                                [value] = "intrvl.get('intervalValue').value | cellWorkUnits : this.workunits"
+                                                                [value] = "formatTimesheetTotals(intrvl.get('intervalValue').value) | cellWorkUnits : this.workunits"
                                                                  >                                                                                                            
                                                                 
                                                             </div>
