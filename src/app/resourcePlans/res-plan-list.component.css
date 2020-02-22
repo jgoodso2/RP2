@@ -116,4 +116,30 @@ input[type="number"]:focus {
     order: 1;
 }
 
+.customTooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
 
+.customTooltip .tooltiptext {
+  visibility: hidden;
+  width: 320px;
+  background-color: #f5f0f0;
+  color: #363434;
+  font-family: Helvetica;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px 5px 5px;
+  border: 1px solid black;
+
+  /* Position the tooltip */
+  position: absolute;
+  margin-top:20px;
+  margin-left:50%;
+  z-index: 1;
+}
+
+.customTooltip:hover .tooltiptext {
+  visibility: visible;
+}
