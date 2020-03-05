@@ -134,10 +134,11 @@ input[type="number"]:focus {
   border: 1px solid black;
 
   /* Position the tooltip */
-  position: absolute;
+  position: fixed;
   margin-top:20px;
-  margin-left:50%;
-  z-index: 1;
+  margin-left:106px;
+  z-index: 1006;
+  opacity: 5;
 }
 
 .customTooltip:hover .tooltiptext {
