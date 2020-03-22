@@ -1,42 +1,42 @@
-[
-    {
-        "resUid": "10c931ee-1765-4ad1-b179-a92b3bd3624b",
-        "resName": "Gray Katrina",
-        "rbs": "",
-        "timesheetMgr": "",
-        "hiddenProjects": [
+{
+    "d": {
+        "results": [
             {
-                "projectUID": "477df71a-484e-4fd0-b1bb-9dee2102a77e",
-                "projectName": "1 KLGM Test 4"
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'57e03b9f-1942-ea11-80bd-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'57e03b9f-1942-ea11-80bd-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "ProjectName": "Project 1"
             },
             {
-                "projectUID": "5f874c5f-cfe2-e811-b8a6-f0d5bf0708fe",
-                "projectName": "1 SD Test Project"
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'6ce03b9f-1942-ea11-80bd-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'6ce03b9f-1942-ea11-80bd-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "6173277e-9040-ea11-80bc-00155d4a8803",
+                "ProjectName": "Project 2"
             },
             {
-                "projectUID": "73a61cd9-ed9a-e611-b65b-a0b3cc2a2d73",
-                "projectName": "1 Demo Project A"
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'53d979ae-406c-ea11-80c3-00155d4a8803',ProjectId=guid'57f2dea6-9040-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'53d979ae-406c-ea11-80c3-00155d4a8803',ProjectId=guid'57f2dea6-9040-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "57f2dea6-9040-ea11-80bc-00155d4a8803",
+                "ProjectName": "Project 3"
             },
             {
-                "projectUID": "6aaa4d3d-ffc2-e611-9229-a0b3cc2a2d73",
-                "projectName": "1 Demo Project B"
-            },
-            {
-                "projectUID": "e5185544-76cc-e611-80ee-0050568f1156",
-                "projectName": "1 Demo Project C"
-            }
-        ]
-    },
-    {
-        "resUid": "a7b731c1-35e9-4d1e-968f-e1f978881c8f",
-        "resName": "Adams Shani",
-        "rbs": "",
-        "timesheetMgr": "",
-        "hiddenProjects": [
-            {
-                "projectUID": "a4a1552a-7c2b-e811-810f-0050568f1156",
-                "projectName": "2018 All Client CRM PFSD Meeting"
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'488443ee-5455-ea11-80bd-00155d4a8803',ProjectId=guid'0aefdae2-5455-ea11-80bd-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'488443ee-5455-ea11-80bd-00155d4a8803',ProjectId=guid'0aefdae2-5455-ea11-80bd-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "0aefdae2-5455-ea11-80bd-00155d4a8803",
+                "ProjectName": "Large Project Name with too may characters to test if offset width is less than the scroll widththe text overflows by checking"
             }
         ]
     }
-]
+}

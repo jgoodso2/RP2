@@ -14,7 +14,7 @@ export class CachingInterceptorService implements HttpInterceptor {
       withCredentials: true
     });
 
-    let requestsToCache = ["PwaGetProjectsForEditCommand","PwaGetResourcesCommand","PwaGetResourcePlansCommand","PwaGetTimsheetsCommand"];
+    let requestsToCache = ["PwaGetProjectsForEditCommand","PwaGetResourcesCommand","PwaGetTimsheetsCommand"];
     // requests that won't be deleted from cache
     let isRequestToCache : boolean = false;
     // Before doing anything, it's important to only cache GET requests.
