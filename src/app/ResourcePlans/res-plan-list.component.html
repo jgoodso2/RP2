@@ -85,13 +85,13 @@
 
 
                                                     <td class="body-cell col1">
-                                                       
-                                                          
+                                                        
                                                         <input formControlName="projName" placeholder="project" #cell style="width:100%" title="{{proj.get('projName').value}}" />
+                                                        
                                                         
                                                         <!-- <input formControlName="startDate" projectDateSpan [start]="proj.get('startDate').value" 
                                                         [finish]="proj.get('finishDate').value"  placeholder="project" style="width:100%" /> -->
-                                                       
+                                                        
                                                        
                                                         <message [message]="proj.get('readOnlyReason').value" *ngIf="proj.get('readOnly').value"></message>
                                                         <error [error]="proj.get('error').value" *ngIf="proj.get('error').value != null"></error>
