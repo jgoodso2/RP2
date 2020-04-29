@@ -19,7 +19,7 @@ export const appRoutes: Routes = [
         },
           
         { path: 'customDates', component: DateRangePicker},
-        { path: 'perview', redirectTo: "https://perviewqa.app.parallon.com/pwa" ,pathMatch: 'full'},
+        { path: 'perview', redirectTo: "https://perview.app.parallon.com/pwa" ,pathMatch: 'full'},
         { path: '', redirectTo: 'resPlans', pathMatch: 'full' , canDeactivate: [ ResPlanEditGuard ]},
         { path: 'jumbo', component: JumbotronComponent },
       ]
