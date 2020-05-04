@@ -13,9 +13,11 @@ export class AppStateService {
   private formDirtyState = new Subject<boolean>();
   private deleteState = new Subject<boolean>();
   private hideState = new Subject<boolean>();
+  private pmAllocationState = new Subject<boolean>();
   private saveSource = new Subject<void>();
   public addResourcesSource = new Subject<void>();
   private deleteSource = new Subject<void>();
+  private pmAllocationSource = new Subject<void>();
   private hideSource = new Subject<void>();
   private showActualsSource = new Subject<boolean>();
   private exitToPerviewSource = new Subject<void>(); 
@@ -29,8 +31,10 @@ export class AppStateService {
   formDirtyState$ = this.formDirtyState.asObservable();
   deleteState$ = this.deleteState.asObservable();
   hideState$ = this.hideState.asObservable();
+  pmAllocationState$ = this.pmAllocationState.asObservable();
   save$ = this.saveSource.asObservable();
   addResources$ = this.addResourcesSource.asObservable();
+  pmAllocation$ = this.pmAllocationSource.asObservable();
   delete$ = this.deleteSource.asObservable();
   hide$ = this.hideSource.asObservable();
   showActuals$ = this.showActualsSource.asObservable();
@@ -71,6 +75,10 @@ export class AppStateService {
 
   deleteClick() {
     this.deleteSource.next();
+  }
+
+  PMAllocationClick() {
+    this.pmAllocationSource.next();
   }
 
   hideClick() {

@@ -13,11 +13,14 @@ export class ActionsMenuComponent implements OnInit {
   disableSave: boolean;
   disableDelete:boolean = true;
   disableHide:boolean =true;
+  disablePMAllocation:boolean = true;
 
   ngOnInit() {
     this._appStateSvc.formDirtyState$.subscribe(value=>this.disableSave = !value)
      this._appStateSvc.deleteState$.subscribe(value=>{this.disableDelete = !value})
-     this._appStateSvc.hideState$.subscribe(value=>{this.disableHide= !value})
+     this._appStateSvc.hideState$.subscribe(value=>{this.disableHide= !value })
+     this._appStateSvc.hideState$.subscribe(value=>{this.disablePMAllocation= !value })
+    // this._appStateSvc.pmAllocationState$.subscribe(value=>{this.disablePMAllocation= !value })
      
   }
 
@@ -34,6 +37,10 @@ export class ActionsMenuComponent implements OnInit {
   addResources()
   {
     this._appStateSvc.addResourcesClick();
+  }
+
+  getPMAllocation() {
+    this._appStateSvc.PMAllocationClick();
   }
 
   delete()
@@ -94,5 +101,7 @@ export class ActionsMenuComponent implements OnInit {
     }
   
   }
+
+
 
 }

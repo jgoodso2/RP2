@@ -10,6 +10,7 @@
     <button [disabled]="disableDelete"  mat-menu-item (click)="delete()">Delete</button>
     <button  [disabled]="disableHide" mat-menu-item (click)="hide()">Hide</button>
     <button   mat-menu-item (click)="toggleText($event)">{{getShowActualsText()}}</button>
+    <button [disabled]="disablePMAllocation"  mat-menu-item (click)="getPMAllocation()">PM Allocation</button>
   </mat-menu>
 
   <mat-menu #export="matMenu">
