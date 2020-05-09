@@ -43,6 +43,7 @@ export interface IProject {
 
   intervals?: IInterval[];
   timesheetData?: IInterval[];
+  pmAllocation?: string;
 }
 export interface IInterval {
 
@@ -80,7 +81,8 @@ export class Project implements IProject {
     public projectChargeBackCategory = '',
     public departments = '',
     public startDate = null, public finishDate = null,
-    public projActiveStatus = ProjectActiveStatus.inProgress
+    public projActiveStatus = ProjectActiveStatus.inProgress,
+  public pmAllocation = ''
 
   ) { }
 }
@@ -137,5 +139,9 @@ export class Result {
   error: string;
   debugError: string;
   resUid: string;
+  resourceName?: string;
+  pmAllocation?: string;
+  owner?: string;
+
 }
 

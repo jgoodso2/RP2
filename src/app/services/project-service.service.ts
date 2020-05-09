@@ -59,6 +59,7 @@ export class ProjectService {
                     .find(p => p.Name == "Finish").Value).toDateString();
                     //lets check for null first
                 newProject.projActiveStatus = project[i]["CustomFields"].find(p => p.Name == "Project Active Status").Value
+                newProject.pmAllocation = project[i]["CustomFields"].find(p => p.Name == "PM Allocation").Value
 
             
                 projects.push(newProject);

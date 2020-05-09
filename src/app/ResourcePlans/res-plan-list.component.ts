@@ -694,7 +694,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     savePlans(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits): void {
         ;
         if (this._appSvc.mainFormDirty && this.mainForm.valid) {
-
+            console.log('you best not be runnig)');
             let resourceplans = this.resPlans.controls
                 .filter(item => item.dirty === true)
                 .map(t => {

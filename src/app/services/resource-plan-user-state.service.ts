@@ -254,11 +254,11 @@ export class ResourcePlanUserStateService {
 
         let emptyResPlans = Observable.of(resources.map(r => new ResPlan(r, [])))
         var uniqueProjects = resPlans.flatMap(r => Observable.from(r).flatMap(r => r.projects)).distinct(x => x.projUid);
-        
+        console.log('these are the unique projects exactly: ', uniqueProjects);
         return uniqueProjects.flatMap((project: IProject) => {
             return this.getResPlan(resources, `${this.config.projectServerUrl}`, project, fromDate, toDate, timescale, workunits)
 
-        }).toArray() .map(r=>{return r})
+        }).toArray() .map(r=>{console.log('r is this exactly:', r);return r})
 
 
             .concat(emptyResPlans)
@@ -485,7 +485,7 @@ export class ResourcePlanUserStateService {
             // ;
             // console.log("++++++++++++++++++++++++++++++++++++++++")
             // Object.assign({}, resPlans, r)
-            
+            console.log('what is r exactly??',r.values, "r values" );
             return r;
 
         })
@@ -504,6 +504,7 @@ export class ResourcePlanUserStateService {
     addOrShowProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
          //get projects with assignments for current resource
          let projectsWithResPlans = this.getProjectIdsFromAssignmentsForResources([resource]).map(rp=>{
+             console.log('what is rp exactly', rp)
              if(rp)
              {
                 return rp[0].projects.map(p=>p.projUid.toUpperCase());
@@ -524,6 +525,8 @@ export class ResourcePlanUserStateService {
          })
 
           let projectsToUnHide$ = projectsWithResPlans.map(pa=>{
+              console.log('pa excatly:', pa);
+              
             if(pa){
              return projects.filter(p=>p.projUid.toUpperCase()).filter(p=> pa.indexOf(p.projUid.toUpperCase()) > -1);
             }
@@ -534,6 +537,10 @@ export class ResourcePlanUserStateService {
         let results$ = projectsToAdd$.flatMap(projToAdd=>
             {
              return this.addProjects(resMgrUid,projToAdd,resource,fromDate,toDate,timeScale,workScale).flatMap(results=>{
+                 console.log('get it done: weird', results) //this is the good spot right here
+
+                results = this.usePMAllocationDefaults(results);
+
                  this.unHideProjects(resMgrUid,projects,resource).subscribe();
                  return projectsToUnHide$.flatMap(projectForunHideProjects=>{
                     let resultsForUnHideProjects: Result[]= [];
@@ -542,8 +549,11 @@ export class ResourcePlanUserStateService {
                         result.project = up;
                         result.resUid = resource.resUid;
                         result.success = true;
+                        result.resourceName = resource.resName;
                         resultsForUnHideProjects.push(result);
                     })
+                    console.log('before debug results', results);
+                    
                     results = results.concat(resultsForUnHideProjects)
                     debugger;
                     return results;
@@ -563,9 +573,38 @@ export class ResourcePlanUserStateService {
             return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
             // })
         }).toArray()
+        console.log('this is it huhh', ob.subscribe(data => console.log(data)));
+        
 
         return ob;
     }
+
+     usePMAllocationDefaults(results: Result[]) {
+        let  defaultResults = results.map( (result) => {
+             this.applyProjectManagerAllocation(result)
+         }) 
+        //PM Check(): filter projects based on owner and resName being equal or not. RETURNS ARRAY
+            //if empty array then do nothing /  alert 'no projects selected apply'
+
+            //if array has lentgh then for each result take PM allocation and spread through interval array.
+            //applyPMAllocation RETURNS modified result
+        //
+
+     }
+
+     applyProjectManagerAllocation(result) {
+        if (this.pmCheck(result) === true) {
+            result.pmAllocation = result.project.pmAllocation;
+        }
+        return result;
+    }
+
+     pmCheck(result: Result): Boolean {
+        if (result.owner === result.project.owner) { console.log('truthy value on weird owner'); return true;}
+        else {return false;}
+     }
+
+    
 
     unHideProjects(resMgrUid: string,projects: IProject[], resource: IResource) :Observable<Result>
     {
@@ -582,7 +621,8 @@ export class ResourcePlanUserStateService {
 
         // let body = new URLSearchParams();
 
-
+        console.log('what is project exactly / does it have what I need??', project);
+        console.log('this is the spot huh');
         //change here in resName to make the request happy when there are apostrophe's in the resName... here we simply delete the apostrophe.
         const body = `method=PwaAddResourcePlanCommand&puid=${project.projUid}&resuid=${resource.resUid}&resName=${resource.resName.replace("'","")}&projname=${project.projName}&fromDate=${this.getDateFormatString(new Date(fromDate))}&toDate=${this.getDateFormatString(new Date(toDate))}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
@@ -597,7 +637,14 @@ export class ResourcePlanUserStateService {
             adapterPath, body, options
 
         ).map(r => {
-            return r as Result
+            console.log('right spot for the reight result?', r);
+            var pmAllocationAdditions = {resourceName: resource.resName, pmAllocation: project.pmAllocation, projectOwner: project.owner}
+            var newResult = Object.assign({}, r) as Result
+            newResult.resourceName = resource.resName
+            newResult.pmAllocation = project.pmAllocation
+            newResult.owner = project.owner
+
+            return newResult as Result
         })
         // return this.http.post(adapterPath,body,options).flatMap(r=>
         //     {
