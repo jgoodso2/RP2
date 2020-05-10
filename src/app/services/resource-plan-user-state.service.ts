@@ -537,10 +537,10 @@ export class ResourcePlanUserStateService {
         let results$ = projectsToAdd$.flatMap(projToAdd=>
             {
              return this.addProjects(resMgrUid,projToAdd,resource,fromDate,toDate,timeScale,workScale).flatMap(results=>{
+             
                  console.log('get it done: weird', results) //this is the good spot right here
-
-                results = this.usePMAllocationDefaults(results);
-
+                    debugger;
+                
                  this.unHideProjects(resMgrUid,projects,resource).subscribe();
                  return projectsToUnHide$.flatMap(projectForunHideProjects=>{
                     let resultsForUnHideProjects: Result[]= [];
@@ -559,8 +559,11 @@ export class ResourcePlanUserStateService {
                     return results;
                  }).toArray()
              })
-            })
-        return results$
+        })
+        let modifiedResults$ = results$.flatMap( (results) => { console.log('ha these results man', results); return this.usePMAllocationDefaults(results);}).toArray();
+         //results = this.usePMAllocationDefaults(results);
+
+        return modifiedResults$;
     }
     //Result returns error or success
     addProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
@@ -579,8 +582,14 @@ export class ResourcePlanUserStateService {
         return ob;
     }
 
-     usePMAllocationDefaults(results: Result[]) {
-        let  defaultResults = results.map( (result) => {
+     usePMAllocationDefaults(results: Result[]):Result[] { //why didn't the model work??
+     console.log('real weird', results);
+        let filteredResults = results.filter((result) => result.resUid != undefined )
+        console.log('single-filtered', filteredResults);
+        
+        let defaultResults: any[] = filteredResults.map( (result: Result) => {
+            console.log('weird single result', result);
+            
              this.applyProjectManagerAllocation(result)
          }) 
         //PM Check(): filter projects based on owner and resName being equal or not. RETURNS ARRAY
@@ -589,19 +598,27 @@ export class ResourcePlanUserStateService {
             //if array has lentgh then for each result take PM allocation and spread through interval array.
             //applyPMAllocation RETURNS modified result
         //
-
+         return defaultResults as Result[];
      }
 
-     applyProjectManagerAllocation(result) {
+     applyProjectManagerAllocation(result: Result): Result {
+         console.log('passed in weird into applyProjectManagerAllocation', result);
+         
         if (this.pmCheck(result) === true) {
             result.pmAllocation = result.project.pmAllocation;
+            console.log('changed PMALLOCATION', result);
+            
         }
         return result;
     }
 
      pmCheck(result: Result): Boolean {
-        if (result.owner === result.project.owner) { console.log('truthy value on weird owner'); return true;}
-        else {return false;}
+        console.log('passed in weird into PMCHECK', result);
+        if (result.owner === result.resourceName) { console.log('truthy value on weird owner'); return true;}
+        else {
+              console.log('nope muahaha');
+               return false;
+        }
      }
 
     
