@@ -582,23 +582,33 @@ export class ResourcePlanUserStateService {
         return ob;
     }
 
-     usePMAllocationDefaults(results: Result[]):Result[] { //why didn't the model work??
+     usePMAllocationDefaults(results: Result[]):any[] { //why didn't the model work??
      console.log('real weird', results);
+        let newResults = [];
         let filteredResults = results.filter((result) => result.resUid != undefined )
         console.log('single-filtered', filteredResults);
         
-        let defaultResults: any[] = filteredResults.map( (result: Result) => {
+        let defaultResults = filteredResults.map( (result) => {
             console.log('weird single result', result);
             
              this.applyProjectManagerAllocation(result)
          }) 
+
+         results.forEach(  (result) => {
+            newResults.push(this.applyProjectManagerAllocation(result))
+         })
         //PM Check(): filter projects based on owner and resName being equal or not. RETURNS ARRAY
             //if empty array then do nothing /  alert 'no projects selected apply'
 
             //if array has lentgh then for each result take PM allocation and spread through interval array.
             //applyPMAllocation RETURNS modified result
         //
-         return defaultResults as Result[];
+        debugger;
+        console.log('better now', defaultResults);
+        console.log('post malone', newResults);
+        
+        // return defaultResults;
+        return newResults;
      }
 
      applyProjectManagerAllocation(result: Result): Result {
@@ -609,16 +619,19 @@ export class ResourcePlanUserStateService {
             console.log('changed PMALLOCATION', result);
             
         }
-        return result;
+        debugger;
+        return  result; //[result, this.pmCheck(result)];
     }
 
      pmCheck(result: Result): Boolean {
         console.log('passed in weird into PMCHECK', result);
-        if (result.owner === result.resourceName) { console.log('truthy value on weird owner'); return true;}
+        if (result.project.owner === result.resourceName) { console.log('truthy value on weird owner');debugger; return true;}
         else {
               console.log('nope muahaha');
+              debugger;
                return false;
         }
+     
      }
 
     

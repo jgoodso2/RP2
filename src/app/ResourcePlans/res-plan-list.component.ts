@@ -447,6 +447,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     initTotals(totals: FormArray, _projects: IProject[]): FormArray {
+      console.log('what projects can i use here? court', _projects)
         if (totals.controls.length < 1) {
 
             var intervalLen = this.getIntervalLength();
@@ -632,7 +633,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 this.currentFormGroup.value["resName"]);
             this.addProjectsSub = this._resPlanUserStateSvc.addOrShowProjects(resMgr, this._modalSvc.selectedProjects, resource,
                 fromDate, toDate, timescale, workunits)
-                .subscribe(results => {
+                .subscribe(results => { debugger;
+                    console.log('this is what i have been missing', results)
                     //let projects = this._modalSvc.selectedProjects;
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
@@ -975,7 +977,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     updateErrors(errors: Result[]) {
         let resultsWithError = errors.filter(e => e.success == false);
-
+        console.log('so-called errors', resultsWithError);
         //reset errors to null before update
         this.resPlans.controls.forEach(resPlan => {
             (resPlan.get('projects') as FormArray).controls.forEach(project => {
