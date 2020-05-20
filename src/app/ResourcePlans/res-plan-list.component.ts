@@ -367,6 +367,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     buildProject(_project: IProject) {
+        console.log(_project, "which project and when?")
         var project = this.fb.group(
             {
                 projUid: _project.projUid,
@@ -381,7 +382,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 finishDate: _project.finishDate
             });
         for (var i = 0; i < _project.intervals.length; i++) {
-            var interval = this.buildInterval(_project.intervals[i]);
+            var interval = this.buildInterval(_project.intervals[i], _project);
             (project.get('intervals') as FormArray).push(interval);
         }
 
@@ -396,12 +397,13 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return project;
     }
 
-    buildInterval(interval: IInterval): FormGroup {
-
+    buildInterval(interval: IInterval, _project): FormGroup {
+    
+        console.log(interval, interval.intervalValue)
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
-            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform(interval.intervalValue, this.workunits), this.workunits),
+            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform(this.usePMAllocation(interval.intervalValue,_project), this.workunits), this.workunits), //beers
             Validators.pattern(this.getIntervalValidationPattern())],
             intervalStart: interval.start,
             intervalEnd: interval.end
@@ -435,7 +437,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
     buildtimesheetInterval(interval: IInterval): FormGroup {
-        debugger;
+     
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
@@ -461,6 +463,12 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             }
         }
         return totals;
+    }
+
+    usePMAllocation(intervalValue,_project) {
+
+        console.log(_project, 'what is this nonsense??? Does this run every time??')
+        return intervalValue
     }
 
     openDialog(data: any) // the second argument is a callback argument definition in typescript
@@ -636,9 +644,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 .subscribe(results => { debugger;
                     console.log('this is what i have been missing', results)
                     //let projects = this._modalSvc.selectedProjects;
+                   //let successResults =  results as IProject[]
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
-                    ;
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project);
                     //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
@@ -647,6 +655,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
                             Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
                             , showTimesheetData).subscribe(resPlans => {
+                                debugger
+                                console.log(resPlans, 'circles')
                                 this.buildSelectedProjects(resPlans[0].projects)//.filter(r=>r.projUid.toUpperCase))
                                 this.header && this.header.setIntervals(resPlans);
                                 this.initTotals(this.currentFormGroup.get('totals') as FormArray, resPlans[0].projects)
@@ -657,7 +667,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     }
 
                     this._appSvc.loading(false);
-
 
                 })
         }, (error) => { console.log(error); this._appSvc.loading(false); })

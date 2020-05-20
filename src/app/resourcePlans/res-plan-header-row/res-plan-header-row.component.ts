@@ -35,7 +35,7 @@ export class ResPlanHeaderRowComponent implements OnInit {
     this.onselectAllChanged.emit(value);
   }
 
-  public setIntervals(resPlans: IResPlan[]) {
+  public setIntervals(resPlans:IResPlan[]) {
     let projectWithIntervals = []
     if(resPlans){
       for(var i=0;i<resPlans.length;i++)

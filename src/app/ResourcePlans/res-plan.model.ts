@@ -142,6 +142,7 @@ export class Result {
   resourceName?: string;
   pmAllocation?: string;
   owner?: string;
+  projUid?: string;
 
 }
 

@@ -550,6 +550,7 @@ export class ResourcePlanUserStateService {
                         result.resUid = resource.resUid;
                         result.success = true;
                         result.resourceName = resource.resName;
+                        result.projUid = result.project.projUid
                         resultsForUnHideProjects.push(result);
                     })
                     console.log('before debug results', results);
