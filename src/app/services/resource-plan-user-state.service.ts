@@ -116,7 +116,7 @@ export class ResourcePlanUserStateService {
                 }
                 ).toArray()
                 .do(r => {
-                    console.log("RES PLANS READ ROM ASSIGNMENTS=" + JSON.stringify(r))
+                    console.log("Existing Resource Plans Read from OData=" + JSON.stringify(r))
                 })
         })
 
@@ -124,21 +124,99 @@ export class ResourcePlanUserStateService {
 
 
     }
-    // getResorcePlansFiltered(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean)
-    // {
-    //     return combineLatest(
-    //         this.getResPlans(resMgrUid, fromDate,toDate ,timescale,workunits,showTimesheetData),
-    //         this.getWorkspaceResourcesForResourceManager(resMgrUid)
-    //     )
-    //         .pipe(
-    //             //scan((acc: Product[], value: Product) => [...acc, value]),
-    //             tap(data => console.log('CombineLatest Observable: ', JSON.stringify(data))),
-    //             catchError(err => {
-    //                 console.error(err);
-    //                 return throwError(err);
-    //             })
-    //         );
-    // }
+
+    getProjectIdsFromTimesheetLines(resources: IResource[]): Observable<IResPlan[]> {
+         
+        let baseUrl = `${this.config.projectServerUrl}/_api/Projectdata/TimesheetLines`;
+        let select = "$select=ProjectId,ProjectName";
+        
+        let headers = new HttpHeaders();
+        headers = headers.set('accept', 'application/json;odata=verbose')
+        let options = {
+            headers
+        };
+        let resourceProjectsMap: IResPlan[] = []
+        resources.forEach(resource => {
+            resourceProjectsMap.push(new ResPlan(resource))
+        })
+            ;
+        //console.log('=======================hitting project server for assigments')
+        return Observable.from(resources).flatMap(t => {
+            let filter = `$filter=TimesheetOwnerId eq guid'${t.resUid}' and PeriodEndDate gt datetime'2020-04-01'`
+            let url = baseUrl + '?' + filter + '&' + select;
+          
+            // get unique project Uids from PS where the current resource has access to
+            //and project has resource plan assignments
+
+            //Project Active Status != "Cancelled" OR "Complete"
+
+            return this.http.get(url, options)
+                .switchMap((data: Response) => data["d"].results)
+                .map(p => new Project(p["ProjectId"], p["ProjectName"], false, []))
+                .distinct(x => x.projUid)
+                .toArray()
+                .flatMap(projects => {
+                    resourceProjectsMap.find(r => r.resource.resUid.toUpperCase() == t.resUid.toUpperCase()).projects = projects;
+                    return resourceProjectsMap;
+                }
+                ).toArray()
+                .do(r => {
+                    console.log("Saved Timesheet Lines from OData" + JSON.stringify(r))
+                })
+        })
+
+        //.do(t => console.log('projects user has access on=' + JSON.stringify(t)))
+
+
+    }
+
+    getProjectIdsFromProjectAssignments (resources: IResource[]): Observable<IResPlan[]> {
+         
+        let baseUrl = `${this.config.projectServerUrl}/_api/Projectdata/Assignments`;
+        let select = "$select=ProjectId,ProjectName";
+        
+        let headers = new HttpHeaders();
+        headers = headers.set('accept', 'application/json;odata=verbose')
+        let options = {
+            headers
+        };
+        let resourceProjectsMap: IResPlan[] = []
+        resources.forEach(resource => {
+            resourceProjectsMap.push(new ResPlan(resource))
+        })
+            ;
+        //console.log('=======================hitting project server for assigments')
+        return Observable.from(resources).flatMap(t => {
+            let filter = `$filter=ResourceId eq guid'${t.resUid}' `
+            let url = baseUrl + '?' + filter + '&' + select;
+          
+            // get unique project Uids from PS where the current resource has access to
+            //and project has resource plan assignments
+
+            //Project Active Status != "Cancelled" OR "Complete"
+
+            return this.http.get(url, options)
+                .switchMap((data: Response) => data["d"].results)
+                .map(p => new Project(p["ProjectId"], p["ProjectName"], false, []))
+                .distinct(x => x.projUid)
+                .toArray()
+                .flatMap(projects => {
+                    resourceProjectsMap.find(r => r.resource.resUid.toUpperCase() == t.resUid.toUpperCase()).projects = projects;
+                    return resourceProjectsMap;
+                }
+                ).toArray()
+                .do(r => {
+                    console.log("Project Assignments read from OData Query" + JSON.stringify(r))
+                })
+        })
+
+        //.do(t => console.log('projects user has access on=' + JSON.stringify(t)))
+
+
+    }
+
+
+    
     getResPlans(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
         //let uniqueProjectsForResMgr = this.getUniqueProjectsForResManager(resMgrUid);
         let resourcesForResMgr = this.getWorkspaceResourcesForResourceManager(resMgrUid)
@@ -187,6 +265,62 @@ export class ResourcePlanUserStateService {
             return response["d"].GetContextWebInformation.FormDigestValue
         })
 
+    }
+
+    public AddResourcePlansForProjectsWithTimeLines(resMgrUid : string, resources: IResource[],fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits) : Observable<Result[]>
+    {
+        //first get resource plans here where assignment Type = 101
+       return  Observable.from(resources).flatMap(resource=>{
+            let projectsFromAssignments = this.getProjectIdsFromAssignmentsForResources([resource]).map(rp=>{
+                if(rp)
+                {
+                   return rp[0].projects.map(p=>p.projUid.toUpperCase());
+                }
+                else 
+                {
+                    return [];
+                }
+               });
+
+            let projectsWithTimeLines = this.getProjectIdsFromTimesheetLines([resource]).map(rp=>{
+                if(rp)
+                {
+                   return rp[0].projects;
+                }
+                else 
+                {
+                    return [];
+                }
+               });
+
+            let projectsWithProjectAssignments = this.getProjectIdsFromProjectAssignments([resource]).map(rp=>{
+                if(rp)
+                {
+                   return rp[0].projects;
+                }
+                else 
+                {
+                    return [];
+                }
+               });  
+
+
+            
+            //add resource plans for Projects (projectsWithTimeLines - projectsFromAssignments)
+               let boo = projectsWithProjectAssignments
+
+
+            let projectsToAdd$ = projectsWithTimeLines.map(pt=>{
+                debugger;
+                return pt.filter(x => projectsFromAssignments.map(pa=>pa.includes(x.projUid)))
+            });
+
+            return projectsToAdd$.flatMap(projToAdd=>
+                {
+                 
+                    return this.addProjects(resMgrUid,projToAdd,resource,fromDate,toDate,timeScale,workScale);  //call API
+                })
+        })
     }
     public AddResourceToManager(resMgrUid: string, resourcePlans: IResPlan[]): Observable<Result> {
         let existingResources: IResource[];
@@ -513,7 +647,7 @@ export class ResourcePlanUserStateService {
                  return [];
              }
             })
-         
+        
         
          let projectsToAdd$ =projectsWithResPlans.map(pa=>{
              if(pa){

@@ -258,7 +258,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             value["totals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString(), this.workunits) + this.getWorkUnitChar(this._appSvc.queryParams.workunits);
 
         }
-        fg.patchValue({totals :value["totals"] },{ emitEvent: false });
+        fg.patchValue({ totals: value["totals"] }, { emitEvent: false });
         //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
 
     }
@@ -288,25 +288,23 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             value["timesheetTotals"][i]['intervalValue'] = new IntervalPipe().transform(sum.toString(), this.workunits) + this.getWorkUnitChar(this._appSvc.queryParams.workunits);
 
         }
-        fg.patchValue({timesheetTotals :value["timesheetTotals"] }, { emitEvent: false });
+        fg.patchValue({ timesheetTotals: value["timesheetTotals"] }, { emitEvent: false });
         //console.log('Totals... ' + JSON.stringify(value) + "      stop....")
 
     }
-    formatTimesheetTotals(value:string)
-    {
-        if(value && value.toUpperCase() != "NA"){
-        if(this.workunits == WorkUnits.hours)
-        {
-          return parseFloat(value).toFixed(0);
+    formatTimesheetTotals(value: string) {
+        if (value && value.toUpperCase() != "NA") {
+            if (this.workunits == WorkUnits.hours) {
+                return parseFloat(value).toFixed(0);
+            }
+            else if (this.workunits == WorkUnits.days) {
+                return parseFloat(value).toFixed(1);
+            }
+            else {
+                return parseFloat(value).toFixed(0);
+            }
         }
-        else if(this.workunits == WorkUnits.days){
-            return parseFloat(value).toFixed(1);
-        }
-        else{
-            return parseFloat(value).toFixed(0);
-        }
-    }
-    return value;
+        return value;
 
     }
     getWorkUnitChar(workUnits: WorkUnits): string {
@@ -588,7 +586,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     addSelectedResources() {
-        ;
         //console.log("add resource fired" + JSON.stringify(this._resModalSvc.selectedResources));
         ///EMIT HERE
         let selectedResources = this._resModalSvc.selectedResources;
@@ -596,28 +593,30 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().subscribe(resMgr => {
 
             console.log('selected resources=' + JSON.stringify(this._resModalSvc.selectedResources))
-            this.getResPlansFromResSub = this._resPlanUserStateSvc.getResPlansFromResources(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData)
-                .subscribe(plans => {
-                    this.addResToMgrSub = this._resPlanUserStateSvc.AddResourceToManager(resMgr, plans).subscribe(r => {
-                        if (r.success == true) {
-                            console.log('added resplans=' + JSON.stringify(plans))
-                            this.setIntervalLength((<IResPlan[]>plans).map(t => t.projects).reduce((a, b) => a.concat(b)))
-                            //filter resplan on the resource who got updated in SP list successfully
-                            this.buildResPlans(plans)
-                            this._resModalSvc.selectedResources = [];
-                            this._appSvc.loading(false);
-                            this.updateTimeSheetDataForResources();
-                        }
-                        else {
-                            this._resModalSvc.selectedResources = [];
-                            this._appSvc.loading(false);
-                        }
-                    }, (error) => {
-                        console.log(error); this._appSvc.loading(false);
+            this._resPlanUserStateSvc.AddResourcePlansForProjectsWithTimeLines(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits).subscribe(results => {
+                this.getResPlansFromResSub = this._resPlanUserStateSvc.getResPlansFromResources(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData)
+                    .subscribe(plans => {
+                        this.addResToMgrSub = this._resPlanUserStateSvc.AddResourceToManager(resMgr, plans).subscribe(r => {
+                            if (r.success == true) {
+                                console.log('added resplans=' + JSON.stringify(plans))
+                                this.setIntervalLength((<IResPlan[]>plans).map(t => t.projects).reduce((a, b) => a.concat(b)))
+                                //filter resplan on the resource who got updated in SP list successfully
+                                this.buildResPlans(plans)
+                                this._resModalSvc.selectedResources = [];
+                                this._appSvc.loading(false);
+                                this.updateTimeSheetDataForResources();
+                            }
+                            else {
+                                this._resModalSvc.selectedResources = [];
+                                this._appSvc.loading(false);
+                            }
+                        }, (error) => {
+                            console.log(error); this._appSvc.loading(false);
+                        })
+                            , (error) => { console.log(error); this._appSvc.loading(false); }
                     })
-                        , (error) => { console.log(error); this._appSvc.loading(false); }
-                })
-        }, (error) => { console.log(error); this._appSvc.loading(false); })
+            }, (error) => { console.log(error); this._appSvc.loading(false); })
+        })
     }
 
     updateTimeSheetDataForResources() {
