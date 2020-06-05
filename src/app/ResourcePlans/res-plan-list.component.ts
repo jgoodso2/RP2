@@ -684,8 +684,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                                     let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
                                     //need to filter engagePmAllocation for
 
+                                   let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
 
-                                    
                                     //for each project in resPlan Projects if corresponding project in pmAllocationProjects has resName = projectOwnerName and PM ALlocation does not equal "" 
                                         //then fill intervals with pmAllocation interval value (function needed)
 
@@ -695,9 +695,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
                                 debugger
                               //  this._resPlanUserStateSvc.addResourceNameToProjects( resPlans[0].projects, resPlans) //what's the point of this??
-                                this.buildSelectedProjects(resPlans,engagePmAllocation)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
+                                this.buildSelectedProjects(resPlans,usableProjectsWithPMAllocations)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
                                 this.header && this.header.setIntervals(resPlans);
-                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,engagePmAllocation) //CHECK THIS VALUE THOUGH
+                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,usableProjectsWithPMAllocations) //CHECK THIS VALUE THOUGH
                                 this.calculateTotals(this.currentFormGroup);
                                 debugger;
                             });
@@ -705,10 +705,10 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     }
 
                     this._appSvc.loading(false);
-                    //this.setPmAllocationProjects([]);
+                   
 
                 })
-        }, (error) => { console.log(error); this._appSvc.loading(false); })
+        }, (error) => { console.log(error); this._appSvc.loading(false); console.log('Gonzo - ryan gonzalez');  this.setPmAllocationProjects([]); })
     }
     // worksunitsChanged(value: number) {
     //     ;
@@ -769,6 +769,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
        let foundProject = projectsWithDetails.find(project => (project.projName === projectToCheck.projName  && project.resName === resName && (project.pmAllocation !== "" || project.pmAllocation !== undefined)))// && project.resName = resName
        if ( foundProject) {
            debugger;
+           console.log('maria taylor', foundProject)
          let projectWithPMAllocationIntervals =  this.insertPMAllocationIntervalValue(foundProject,projectToCheck)
          return projectWithPMAllocationIntervals;
        }
@@ -783,10 +784,12 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             interval.intervalValue = detailedProject.pmAllocation;
             newIntervalsWithPmAllocation.push(interval);
         })
+        newIntervalsWithPmAllocation.shift();
         //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
         let projectWithPMAllocationIntervals = projectToAddPMAllocation;
         projectWithPMAllocationIntervals.intervals = newIntervalsWithPmAllocation
         debugger
+        console.log('extra extra??', projectWithPMAllocationIntervals)
         return projectWithPMAllocationIntervals;
 
     }
