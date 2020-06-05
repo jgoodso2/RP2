@@ -539,7 +539,7 @@ export class ResourcePlanUserStateService {
              return this.addProjects(resMgrUid,projToAdd,resource,fromDate,toDate,timeScale,workScale).flatMap(results=>{
              
                  console.log('get it done: weird', results) //this is the good spot right here
-                    debugger;
+                 
                 
                  this.unHideProjects(resMgrUid,projects,resource).subscribe();
                  return projectsToUnHide$.flatMap(projectForunHideProjects=>{
@@ -556,15 +556,17 @@ export class ResourcePlanUserStateService {
                     console.log('before debug results', results);
                     
                     results = results.concat(resultsForUnHideProjects)
-                    debugger;
+                    
                     return results;
                  }).toArray()
              })
         })
-        let modifiedResults$ = results$.flatMap( (results) => { console.log('ha these results man', results); return this.usePMAllocationDefaults(results);}).toArray();
+       // let modifiedResults$ = results$.flatMap( (results) => { console.log('ha these results man', results); return this.usePMAllocationDefaults(results);}).toArray();
          //results = this.usePMAllocationDefaults(results);
 
-        return modifiedResults$;
+       // return modifiedResults$;
+       debugger
+       return results$;
     }
     //Result returns error or success
     addProjects(resMgrUid: string, projects: IProject[], resource: IResource, fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
@@ -588,7 +590,7 @@ export class ResourcePlanUserStateService {
         let newResults = [];
         let filteredResults = results.filter((result) => result.resUid != undefined )
         console.log('single-filtered', filteredResults);
-        
+        debugger
         let defaultResults = filteredResults.map( (result) => {
             console.log('weird single result', result);
             
@@ -604,12 +606,38 @@ export class ResourcePlanUserStateService {
             //if array has lentgh then for each result take PM allocation and spread through interval array.
             //applyPMAllocation RETURNS modified result
         //
-        debugger;
+        
         console.log('better now', defaultResults);
         console.log('post malone', newResults);
         
         // return defaultResults;
+        debugger;
         return newResults;
+     }
+
+     addResourceNameToProjects(projects: IProject[], successfulResult: any[] ): IProject[] { //successfulREesult has the correct PM Allocation
+       let projectsWithResourceNames: IProject[] = []
+       projects.forEach((project, index) => {
+           debugger
+         let usableAllocation = (successfulResult[index].pmAllocation === undefined || typeof successfulResult[index].pmAllocation  === 'undefined') ? "0" : successfulResult[index].pmAllocation;
+         project.resName = successfulResult[0].resourceName
+         project.pmAllocation = usableAllocation;
+         projectsWithResourceNames.push(project);
+       })
+       console.log(projectsWithResourceNames)
+       return projectsWithResourceNames;
+     }
+
+     fillPMAllocationIntervals(projects: IProject[]): IProject[] {
+        let projectsWithIntervals: IProject[] = []
+        projects.forEach((project) => {
+            if (project.pmAllocation !== ""){ project.intervals.map((interval) => {
+                interval.intervalValue = project.pmAllocation;
+            } )}
+            projectsWithIntervals.push(project);
+        })
+        console.log(projectsWithIntervals)
+        return projectsWithIntervals;
      }
 
      applyProjectManagerAllocation(result: Result): Result {
@@ -620,16 +648,16 @@ export class ResourcePlanUserStateService {
             console.log('changed PMALLOCATION', result);
             
         }
-        debugger;
+        
         return  result; //[result, this.pmCheck(result)];
     }
 
      pmCheck(result: Result): Boolean {
         console.log('passed in weird into PMCHECK', result);
-        if (result.project.owner === result.resourceName) { console.log('truthy value on weird owner');debugger; return true;}
+        if (result.project.owner === result.resourceName) { console.log('truthy value on weird owner');; return true;}
         else {
               console.log('nope muahaha');
-              debugger;
+            
                return false;
         }
      

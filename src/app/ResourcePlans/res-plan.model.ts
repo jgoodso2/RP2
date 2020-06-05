@@ -44,6 +44,7 @@ export interface IProject {
   intervals?: IInterval[];
   timesheetData?: IInterval[];
   pmAllocation?: string;
+  resName?: string;
 }
 export interface IInterval {
 
