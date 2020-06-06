@@ -433,7 +433,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
     buildtimesheetInterval(interval: IInterval): FormGroup {
-        debugger;
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
@@ -593,7 +592,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().subscribe(resMgr => {
 
             console.log('selected resources=' + JSON.stringify(this._resModalSvc.selectedResources))
-            this._resPlanUserStateSvc.AddResourcePlansForProjectsWithTimeLines(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits).subscribe(results => {
                 this.getResPlansFromResSub = this._resPlanUserStateSvc.getResPlansFromResources(resMgr, this._resModalSvc.selectedResources, this.fromDate, this.toDate, this.timescale, this.workunits, this.showTimesheetData)
                     .subscribe(plans => {
                         this.addResToMgrSub = this._resPlanUserStateSvc.AddResourceToManager(resMgr, plans).subscribe(r => {
@@ -616,7 +614,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                             , (error) => { console.log(error); this._appSvc.loading(false); }
                     })
             }, (error) => { console.log(error); this._appSvc.loading(false); })
-        })
     }
 
     updateTimeSheetDataForResources() {
@@ -639,7 +636,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project);
                     //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
-                    debugger;
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
                             Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
@@ -1002,7 +998,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     intervalChanged(input: any, ctrl: AbstractControl) {
-        debugger;
         if (!ctrl.errors) {
             if ((event.currentTarget as HTMLInputElement).value && (event.currentTarget as HTMLInputElement).value.trim() != '')
                 (event.currentTarget as HTMLInputElement).value = new CellWorkUnitsPipe().transform((event.currentTarget as HTMLInputElement).value, this.workunits);

@@ -52,12 +52,9 @@ export class ResourcePlansResolverService implements Resolve<IResPlan[]> {
     this._appState.queryParams.timescale = timescale
     this._appState.queryParams.workunits = workunits 
     this._appState.queryParams.showTimesheetData = showTimesheetData
-    debugger;
     return this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr=>{
-      debugger;
     return this._resPlanUserStateSvc.getResourcePlansFiltered(resMgr,fromDate, toDate, timescale, workunits,showTimesheetData)
       .map(resPlans => {
-        debugger;
         if (resPlans) {
           console.log('Resplans from resolver: ')
           return resPlans
