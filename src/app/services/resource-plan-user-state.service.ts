@@ -97,7 +97,7 @@ export class ResourcePlanUserStateService {
         //console.log('=======================hitting project server for assigments')
         return Observable.from(resources).flatMap(resource => {
             //let filter = `$filter=ResourceName eq '${t.resName.replace("'","''")}' and AssignmentType eq 101`
-            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101 or AssignmentType eq 0`
+            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101 or (AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}')`
             let url = baseUrl + '?' + filter + '&' + select;
 
             // get unique project Uids from PS where the current resource has access to
@@ -112,11 +112,12 @@ export class ResourcePlanUserStateService {
                     proj.assignmentType = p["AssignmentType"];
                     return proj;
                 })
-                .distinct(x => x.projUid)
+                //.distinct(x => x.projUid)
                 .toArray()
                 .flatMap(projects => {
                     //all assignments including type 101,0
                     let projectsWithAssignments = projects.map(p => p.projUid);
+                    debugger;
                     //projects with assignment type 101
                     let projectsWithResourcePlan = projects.filter(p => p.assignmentType == 101).map(p => p.projUid);
                     //get projects with assignment type 0 and not already having a resource plan
@@ -175,7 +176,7 @@ export class ResourcePlanUserStateService {
             ;
         //console.log('=======================hitting project server for assigments')
         return Observable.from(resources).flatMap(t => {
-            let filter = `$filter=TimesheetOwnerId eq guid'${t.resUid}' and PeriodEndDate gt datetime'2020-04-01'`
+            let filter = `$filter=TimesheetOwnerId eq guid'${t.resUid}' and PeriodStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
             let url = baseUrl + '?' + filter + '&' + select;
 
             // get unique project Uids from PS where the current resource has access to
@@ -675,9 +676,18 @@ export class ResourcePlanUserStateService {
 
         //old code
         let ob = Observable.from(projects).flatMap(p => {
-            // return r.filter(project=>{
-            //     let val = true;
+            let retryCount = 0;
             return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
+            .delay(2000).flatMap(res=>{
+              if(res.error && retryCount < 4)
+              {
+                retryCount++;
+                return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
+              }
+              else{
+                  return Observable.of(res);
+              }
+            })
             // })
         }).toArray()
 
@@ -713,7 +723,8 @@ export class ResourcePlanUserStateService {
             adapterPath, body, options
 
         ).map(r => {
-            return r as Result
+            let result =  r as Result;
+            return result;
         })
         // return this.http.post(adapterPath,body,options).flatMap(r=>
         //     {
