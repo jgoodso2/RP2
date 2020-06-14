@@ -97,7 +97,8 @@ export class ResourcePlanUserStateService {
         //console.log('=======================hitting project server for assigments')
         return Observable.from(resources).flatMap(resource => {
             //let filter = `$filter=ResourceName eq '${t.resName.replace("'","''")}' and AssignmentType eq 101`
-            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101 or (AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}')`
+            //let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101 or (AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}')`
+            let filter = `$filter=(ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate%20gt%20datetime%27${moment().subtract(30, 'days').format('YYYY-MM-DD')}%27) or (ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101)`
             let url = baseUrl + '?' + filter + '&' + select;
 
             // get unique project Uids from PS where the current resource has access to
@@ -117,7 +118,6 @@ export class ResourcePlanUserStateService {
                 .flatMap(projects => {
                     //all assignments including type 101,0
                     let projectsWithAssignments = projects.map(p => p.projUid);
-                    debugger;
                     //projects with assignment type 101
                     let projectsWithResourcePlan = projects.filter(p => p.assignmentType == 101).map(p => p.projUid);
                     //get projects with assignment type 0 and not already having a resource plan
@@ -373,7 +373,6 @@ export class ResourcePlanUserStateService {
             return this.getResPlan(resources, `${this.config.projectServerUrl}`, project, fromDate, toDate, timescale, workunits)
 
         }).toArray().map(r => { 
-            debugger;
             return r;
         })
 
@@ -678,11 +677,11 @@ export class ResourcePlanUserStateService {
         let ob = Observable.from(projects).flatMap(p => {
             let retryCount = 0;
             return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
-            .delay(2000).flatMap(res=>{
+            .flatMap(res=>{
               if(res.error && retryCount < 4)
               {
                 retryCount++;
-                return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
+                this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
               }
               else{
                   return Observable.of(res);

@@ -391,7 +391,6 @@ var contentPreProcessor = {
         var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         if (emailRegex.test(str)) {
             //var emailPM = 'eMailPlaceholder';
-            debugger;
             var emailPM = str; 
             var subject = '_eMailsubject_'; 
             var body = '_eMailBody_';
