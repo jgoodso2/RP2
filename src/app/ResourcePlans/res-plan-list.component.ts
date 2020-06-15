@@ -29,6 +29,7 @@ import { ExportExcelService } from '../services/export-excel.service';
 import { elementAt } from 'rxjs/operators/elementAt';
 import { Subscription } from 'rxjs/Subscription'
 import { Subscriber } from 'rxjs/Subscriber'
+import { isMoment } from 'moment';
 
 
 declare const $: any
@@ -56,6 +57,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     errorMessage: string;
     _intervalCount: number = 0;
     projectsWithDetails: IProject[] = [];
+    resultsAreIn: Result[] = [];
     resPlanUserState: IResPlan[];
     fromDate: Date;
     toDate: Date;
@@ -69,6 +71,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     resourceAddedSub: Subscription;
     resourceDeletedSub: Subscription;
     resourceHiddenSub: Subscription;
+    utilizePMAllocationSub: Subscription;
     resourceActualsShowHide: Subscription;
     appExitSub: Subscription;
     exportPrintSub: Subscription;
@@ -89,6 +92,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     saveResPlansSub: Subscription
     delResPlansSub: Subscription
 
+
     get resPlans(): FormArray {  //this getter should return all instances.
         return <FormArray>this.mainForm.get('resPlans');
     }
@@ -106,6 +110,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         , private router: Router,
         private _resourcePlanSvc: ResourcePlanService
         , private _resPlanUserStateSvc: ResourcePlanUserStateService
+        , private _projectService: ProjectService
         , private menuService: MenuService
         , private _exportExcelService: ExportExcelService
         , private _resModalSvc: ResourcesModalCommunicatorService
@@ -126,6 +131,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.valuesSavedSub = this._appSvc.save$.subscribe(() => this.savePlans(this.fromDate, this.toDate, this.timescale, this.workunits))
         this.resourceAddedSub = this._appSvc.addResources$.subscribe(() => this.addResources())
         this.resourceDeletedSub = this._appSvc.delete$.subscribe(() => this.openDeleteResPlanDialog())
+        this.utilizePMAllocationSub = this._appSvc.pmAllocation$.subscribe(() => this.openPMAllocationDialog()) 
         this.resourceHiddenSub = this._appSvc.hide$.subscribe(() => this.deleteResPlans(this.fromDate, this.toDate, this.timescale, this.workunits, true))
         this.resourceActualsShowHide = this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
         this.appExitSub = this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
@@ -331,6 +337,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     buildResPlans(plans: IResPlan[]) {
+        console.log('running buildResPlans')
         if (plans) {
             //let resPlansGrp :FormGroup[] = [];
             //console.log('add resources ==========================================' + JSON.stringify(plans));
@@ -404,7 +411,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
-            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform(interval.intervalValue, this.workunits), this.workunits), //beers
+            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform('0', this.workunits), this.workunits), //beers
             Validators.pattern(this.getIntervalValidationPattern())],
             intervalStart: interval.start,
             intervalEnd: interval.end
@@ -515,6 +522,18 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
 
+    openPMAllocationDialog() {
+        //form dirty:
+
+        //form not dirty:
+        let dialogRef = this.openDialog({ title: "Are You Sure?", content: "This action will permanently add default PM Allocations to the selected project(s)." })
+        this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
+            this.confirmDialogResult = result;
+            if (result == "yes")
+                this.pmAllocationProtocol();
+        });
+    }
+
     addResPlan(): void {
         this.resPlans.push(this.buildResPlan(new ResPlan()));
     }
@@ -548,7 +567,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         });
     }
     toggleResPlanSelection(_resPlan: FormGroup, selected: boolean) {
-
+       
         _resPlan.controls['selected'].setValue(selected, { emitEvent: false });
         (_resPlan.controls['projects'] as FormArray).controls.forEach(element => {
             (element as FormGroup).controls['selected'].setValue(selected, { emitEvent: false })
@@ -557,6 +576,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
     }
     toggleProjectSelection(_resPlan: FormGroup, _proj: FormGroup, selected: boolean) {
+        console.log('congrats you have been selected', _resPlan, _proj);
+        
         _proj.controls["selected"].setValue(selected, { emitEvent: false });
         this.DeselectGroupOnUncheck(_resPlan, _proj, selected)
     }
@@ -649,17 +670,17 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                    //let successResults =  results as IProject[]
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
-                    let superSuccessfulProjects: IProject[] = []
-                    let successfullProjectsObjects = results.filter(r => r.success == true)//.map(t => t.project)
+                  //  let superSuccessfulProjects: IProject[] = []
+                   // let successfullProjectsObjects = results.filter(r => r.success == true)//.map(t => t.project)
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project)
-                    superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results).map(t => t.project));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
-                    console.log(superSuccessfulProjects, "leggo my egg");
+                    //superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results).map(t => t.project));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
+                   // console.log(superSuccessfulProjects, "leggo my egg");
                     console.log('what are pm allocation here in successful projects?', successfullProjects)
-                    let modifiedSuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
-                    let modifiedSuccessfulProjects2 = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
-                    let againModedsuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
-                    console.log('what are mod successful projects',modifiedSuccessfulProjects);
-                    console.log('what are againmoded successful projects',againModedsuccessfulProjects);
+                    // let modifiedSuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
+                    // let modifiedSuccessfulProjects2 = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
+                    // let againModedsuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
+                    // console.log('what are mod successful projects',modifiedSuccessfulProjects);
+                    // console.log('what are againmoded successful projects',againModedsuccessfulProjects);
                     debugger;
                     //go through supersuccessful projects and change intervals if pm.Allocation is present in project
 
@@ -668,23 +689,23 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     //.map(t => t.project);
                     //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
-                   this.setPmAllocationProjects(modifiedSuccessfulProjects)
-                   let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
+                  //this.setPmAllocationProjects(modifiedSuccessfulProjects)
+                  // let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
                    debugger
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
-                            Observable.of([new ResPlan(resource, modifiedSuccessfulProjects)]), fromDate, toDate, timescale, workunits
+                            Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
                             , showTimesheetData).subscribe(resPlans => {
                              
                                 console.log(resPlans, 'circles') //i have resourceName and projects, but not projectOwner need to do operations here actually...wow!
                                     
                                     //get all resPlanProjects in a particular order (function needed)
-                                    let orderProjects = resPlans[0].projects.sort();
-                                    let gotProjects = this.getPmAllocationProjects();
-                                    let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
+                                   // let orderProjects = resPlans[0].projects.sort();
+                                  //  let gotProjects = this.getPmAllocationProjects();
+                                   // let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
                                     //need to filter engagePmAllocation for
 
-                                   let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
+                                  // let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
 
                                     //for each project in resPlan Projects if corresponding project in pmAllocationProjects has resName = projectOwnerName and PM ALlocation does not equal "" 
                                         //then fill intervals with pmAllocation interval value (function needed)
@@ -695,9 +716,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
                                 debugger
                               //  this._resPlanUserStateSvc.addResourceNameToProjects( resPlans[0].projects, resPlans) //what's the point of this??
-                                this.buildSelectedProjects(resPlans,usableProjectsWithPMAllocations)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
+                                this.buildSelectedProjects(resPlans,successfullProjects)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
                                 this.header && this.header.setIntervals(resPlans);
-                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,usableProjectsWithPMAllocations) //CHECK THIS VALUE THOUGH
+                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,successfullProjects) //CHECK THIS VALUE THOUGH
                                 this.calculateTotals(this.currentFormGroup);
                                 debugger;
                             });
@@ -752,8 +773,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     orderSuccessfulProjects(projects) {
        return projects.sort(projects)
     }
-
-    engagePMAllocation(projects: IProject[], resName: string): IProject[] {
+    engagePMAllocation(projects: IProject[], resName: string): IProject[] { 
+       
        let projectsWithPmAllocations = []
         projects.forEach((project) => {
             debugger
@@ -770,14 +791,14 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
        if ( foundProject) {
            debugger;
            console.log('maria taylor', foundProject)
-         let projectWithPMAllocationIntervals =  this.insertPMAllocationIntervalValue(foundProject,projectToCheck)
+         let projectWithPMAllocationIntervals =  this.insertPMAllocationIntervalValueForAddedProject(foundProject,projectToCheck)
          return projectWithPMAllocationIntervals;
        }
        return projectToCheck;
     }
 
 
-    insertPMAllocationIntervalValue(detailedProject: IProject, projectToAddPMAllocation: IProject) {
+    insertPMAllocationIntervalValueForAddedProject(detailedProject: IProject, projectToAddPMAllocation: IProject) {
         let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
         let newIntervalsWithPmAllocation: Interval[] = []
         copyOfIntervals.forEach(interval => {
@@ -794,6 +815,289 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
 
+    pmAllocationProtocol(): any {
+        let updatedResourcePlans = [];
+        let resourcePlans = this.getSelectedProjects();
+        resourcePlans.forEach((resPlan,index) => {
+            if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
+                resPlan.projects.forEach( (project) => {
+                    let projectData =  this.getPMAllocationDetails(project.projName).subscribe( (projectData) => {
+
+                        if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true ) {
+                            console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
+                            debugger;
+                           let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,projectData)
+                           project.intervals = updatedProject.intervals; //return a project.  then change project project.intervals = newProject.intervals and always add to list.
+                           updatedResourcePlans.push(resPlan)
+                        }
+
+
+                       // console.log('cmon eileen', updatedResourcePlans.filter(resplans => resplans.projects.length > 0));
+        
+                        let resPlansToSave = updatedResourcePlans.filter(resplans => resplans.projects.length > 0);
+                
+                      //  console.log('nightmoves', resPlansToSave);
+                        // eileen.forEach( (resPlan => {
+                
+                        // }))
+                        console.log('garbage in ', updatedResourcePlans);
+                       const waity = ms => new Promise(resolve => setTimeout(resolve, ms));
+                        $.when(this.katrinaProtocol(updatedResourcePlans))
+                        .done(() =>  {  console.log('finish him');this._resPlanUserStateSvc.saveResPlans(resPlansToSave,this.fromDate,this.toDate,this.timescale, this.workunits);})/*  this.savePlans(project.startDate, project.finishDate, this.timescale, this.workunits) */
+                      //  .then( () => this.savePlans(this.fromDate, this.toDate, this.timescale, this.workunits));
+                      //  .then(() => this.onSaveComplete(this.resultsAreIn.filter( result => result.success)))
+                        
+                         .then(() => this.resultsAreIn = [] )
+                       
+                        
+                      // this.katrinaProtocol(resPlansToSave);
+
+
+                     })
+
+                    console.log('what is project data?? null possiblly?', projectData);
+                })
+            }
+         //   console.log('should be every resPlan I thought...', resPlan);
+          //  console.log('garbage in ', updatedResourcePlans);
+            //updatedResourcePlans.push(resPlan) 
+        })
+        //add PM Allocations to list of selected Projects: addPMALlocationsToProjects(selectedProjects) forEach project make project GET, and add pm allocation to project return enhanced Projects
+            //forEachEnhancedProject: this.insertPMAllocationInvervalValue(project, project)
+    
+        // HOPEFULLY THIS WORKS AT WITS END ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+       /*  this._resPlanUserStateSvc.saveResPlans(resPlansToSave, this.fromDate, this.toDate, this.timescale, this.workunits)
+                .subscribe(
+                    (results: Result[]) => this.onSaveComplete(results),
+                    (error: any) => {
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);
+                    }); */
+        }
+       // return updatedResourcePlans;
+
+    pmAllocationPrerequisiteCheck(resPlan: IResPlan) {
+        console.log('inside PMAllocationPrequisite Check',resPlan);
+        if(resPlan.projects.length > 0) {
+            console.log('resplan projects length is greater than 0');
+            if(resPlan.projects.find(project => project.startDate && project.finishDate !== null) !== undefined) {
+                console.log('getting serious');
+                return true;
+            }
+        }
+        console.log('not getting serious...broken up');
+        return false;
+    }
+
+    startAndFinishDatesValid(project: IProject): Boolean {
+        if(project.startDate !== null && project.finishDate !== null) {
+            return true;
+        }
+        return false;
+    }
+
+    projectManagerResourceNameEqual(projectManager,appResourceName): Boolean {
+        console.log('projectManagerNameEqual?? resourceName??')
+        if(projectManager == appResourceName) {
+            console.log('projmanager does equal resource name')
+            return true;
+        }
+        console.log('project manager name does not equal resourcename');
+        return false;
+    }
+
+    pmAllocationExistsInProject(projectData){
+        console.log('bulldogs');
+        let pmAllocation = projectData[0];
+        if(pmAllocation !== null) {
+            return true;
+        }
+        return false;
+    }
+
+    
+    getPMAllocationDetails(projectName): any {
+       return this._projectService.getPMAllocationDetails(projectName)
+    }
+
+    insertPMAllocationIntervalValueforSelectedProject(projectToAddPMAllocation: IProject, projectData: any[]): IProject {
+        console.log('ronez be quiet insertPMAloe', projectToAddPMAllocation, 'these invervals?', projectToAddPMAllocation.intervals);
+        let updatedIntervals: IInterval[] = [];
+        let intervalsForDurationOfProject = this.exbuildIntervals(projectToAddPMAllocation, projectData); //need to build better intervals to align with months.
+        intervalsForDurationOfProject.forEach( (interval,index) => {
+
+            let pmAllocation = projectData[0];
+            let slicePosition = projectData[0].indexOf('.');
+            interval.intervalName = `Interval${index}`;
+            interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`
+            
+            updatedIntervals.push(interval);
+        })
+      
+        let updatedProjectWithIntervals = projectToAddPMAllocation;
+        updatedProjectWithIntervals.intervals = updatedIntervals;
+        console.log(updatedProjectWithIntervals, 'K be quiet')
+        debugger;
+        return updatedProjectWithIntervals;
+       /*  INITIAL THOUGHTS::::::
+       let intervalRange =  this.getPMAllocationIntervalRange(projectToAddPMAllocation,projectData)
+       if(this.projectDurationOutOfRange(intervalRange)) {
+           return projectToAddPMAllocation;
+       }
+       let intervalStartIndex = intervalRange[0];
+       let intervalEndIndex = intervalRange[1];
+       if (intervalStartIndex === undefined && intervalEndIndex !== undefined) {
+           //fill PM Allocation from beginning of interval
+       }
+       INITIAL THOUGHTS OVER :::::::::: */
+
+       //: return array (start index, end index) of project.intervals
+        //make copy of intervals
+        //new intervals 
+        //traverse intervals of copy 
+// FOR REFERENCE THE OTHER ONE IS LIKE SO::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        // let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
+        // let newIntervalsWithPmAllocation: Interval[] = []
+        // copyOfIntervals.forEach(interval => {
+        //     interval.intervalValue = detailedProject.pmAllocation;
+        //     newIntervalsWithPmAllocation.push(interval);
+        // })
+        // newIntervalsWithPmAllocation.shift();
+        // //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
+        // let projectWithPMAllocationIntervals = projectToAddPMAllocation;
+        // projectWithPMAllocationIntervals.intervals = newIntervalsWithPmAllocation
+        // debugger
+     
+    }
+
+    buildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
+       console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
+       let projectDurationIntervals: IInterval[] = [];
+       let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
+       let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
+       projectDurationIntervals = this._resPlanUserStateSvc.buildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+       console.log('looking for forrester intervals', projectDurationIntervals);
+       return projectDurationIntervals;
+    }
+
+    exbuildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
+        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.exbuildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
+        let projectDurationIntervals: IInterval[] = [];
+        let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
+        let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
+        projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+        console.log('looking for forrester intervals', projectDurationIntervals);
+        return projectDurationIntervals;
+     }
+
+    katrinaProtocol(resPlans: IResPlan[]): void { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
+        console.log('inside katrina protocol...only ones that need saving hopefully', resPlans);
+      
+       
+         resPlans.forEach( (resPlan) => { debugger;
+            resPlan.projects.forEach( (project) => {
+                debugger;
+                console.log('katrina protocol before results are in');
+                console.log('pertinent details',this.timescale, this.workunits);
+                this._appSvc.loading(true); // this.PmAllocationStartDate(project)
+                this._resPlanUserStateSvc.saveResPlans([resPlan],project.startDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
+                .subscribe( (data) => {
+                    console.log('results are in', data);
+                   this.resultsAreIn.push(data[0]);
+                    //this.onSaveComplete(data);
+                   
+                    }
+                    , (error) => { 
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);}
+                )     
+            
+            })
+            
+        })
+        this._appSvc.loading(false);
+       
+    
+   }
+    
+
+    PmAllocationStartDate(project: IProject) {
+        let todayDate = this._resPlanUserStateSvc.getCurrentDate();
+        let projectStartDate = this._resPlanUserStateSvc.transformToDate(project.startDate);
+        console.log("the meaning of time: projectstartdate,typeof,projectstartdatetransofrmedtostring", project.startDate, typeof(project.startDate), this._resPlanUserStateSvc.getDateFormatString(project.startDate));
+        if(projectStartDate < todayDate) {
+            console.log('use today date because todays date is more current than project start date: start date, today dates', project.startDate, todayDate)
+            return this._resPlanUserStateSvc.getModifiedStartDate(todayDate);
+        }
+        console.log('use project start date bc project has  not started as of etalready: startdate, today date', projectStartDate, todayDate);
+        return  this._resPlanUserStateSvc.getModifiedStartDate(projectStartDate);
+    }
+
+    PmAllocationEndDate(project: IProject) {
+        let todayDate = this._resPlanUserStateSvc.getCurrentDate();
+        let projectEndDate = this._resPlanUserStateSvc.transformToDate(project.finishDate);
+        console.log("the meaning of time: projectenddate,typeof,projectenddatetransofrmedtostring", project.finishDate, typeof(project.finishDate), this._resPlanUserStateSvc.getDateFormatString(project.finishDate));
+        // if(project.finishDate < todayDate) {
+        //     console.log('use today date because todays date is more current than project end date: end date, today dates', project.finishDate, todayDate)
+        //     return this._resPlanUserStateSvc.getModifiedEndDate(todayDate);
+        // }
+        console.log('use project end date bc project has  not ended as of etalready: enddate, today date', projectEndDate, todayDate);
+        return  this._resPlanUserStateSvc.getModifiedEndDate(projectEndDate);
+    }
+
+    getPMAllocationIntervalRange(projectToAddPMAllocation: IProject, projectData): any[] {
+        let indexStart =  projectToAddPMAllocation.intervals.findIndex(interval => interval.start == projectToAddPMAllocation.startDate);
+        let indexEnd =  projectToAddPMAllocation.intervals.findIndex(interval => interval.end == projectToAddPMAllocation.finishDate)
+
+        //this.transformDateForm(projectData)
+        return [indexStart,indexEnd];
+    }
+
+    projectDurationOutOfRange(intervalRange:any[]) {
+        let startIndex = intervalRange[0];
+        let endIndex = intervalRange[1];
+        if (startIndex === undefined && endIndex === undefined) {
+            console.log('note - the project duration out of interval range')
+            return true;
+        }
+        return false;
+    }
+
+    // transformDateForm(projectData: any[]): any[] {
+        
+    //     return [];
+    // }
+    
+
+
+
+    getSelectedProjects(): IResPlan[] {
+        if (this.mainForm.valid) {
+
+
+            let resourceplans = this.fb.array(this.resPlans.controls
+                .filter(item =>
+                    (item.value.selected || item.value.projects.map(p => p.selected == true).length > 0) // res Plan marked for delete or atleast one project in ResPlan marked for delete
+                )).controls
+                .map(t => {
+                    var _resPlan: IResPlan;
+                    var _projects: [IProject];
+                    var projects = Object.assign([], _projects, this.fb.array(((t as FormGroup).controls['projects'] as FormArray).controls.filter(s => s.value.selected == true)).value)
+                    let resPlan = new ResPlan();
+                    resPlan.resource = new Resource(t.value.resUid, t.value.resName);
+                    resPlan.projects = projects;
+                    resPlan["selected"] = (t as FormGroup).controls['selected'].value;
+                    console.log(JSON.stringify(resPlan))
+                    //resPlan["selected"] = _resPlan["selected"]
+                    return resPlan;
+                });
+
+
+            console.log("blocked resPlans" + JSON.stringify(resourceplans));
+            console.log('choosen ones? in getSelectedProjects', resourceplans); // this is us.resourceplans for each resource plan.projects (shuffle through projects and do stuff.)
+            return resourceplans;
+    }
+
 
 
     //https://stackoverflow.com/questions/24241462/how-to-search-for-multiple-indexes-of-same-values-in-javascript-array?noredirect=1&lq=1  need for later when doing the select part and multiple projects??
@@ -806,6 +1110,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 //     indizes.push(i);
 // }
     //
+    }
 
     savePlans(fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits): void {
         ;
@@ -845,6 +1150,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
             console.log("dirty resPlans" + JSON.stringify(resourceplans))
+            debugger;
             this._appSvc.loading(true);
             this.saveResPlansSub = this._resPlanUserStateSvc.saveResPlans(resourceplans, fromDate, toDate, timescale, workunits)
                 .subscribe(
@@ -883,7 +1189,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 });
 
 
-            console.log("dirty resPlans" + JSON.stringify(resourceplans))
+            console.log("blocked resPlans" + JSON.stringify(resourceplans));
+            console.log('choosen ones? in deleteResPlans', resourceplans); // this is us.resourceplans for each resource plan.projects (shuffle through projects and do stuff.)
             this._appSvc.loading(true);
             if (hideOnly == true) {
                 this._appSvc.loading(true);
@@ -962,6 +1269,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
     onSaveComplete(results: Result[]): void {
+        console.log('onSaveComplete() results = ...', results);
         // Reset the form to clear the flags
         //this.mainForm.reset();  
         this.updateErrors(results);
@@ -987,6 +1295,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
     AnyResPlanSelectedForDeleteOrHide(): boolean {
+        console.log('Goodson...anyResPlanSelectedForDeleteOrHide()')
         let selected: boolean = false;
         this.resPlans.controls.forEach(resPlan => {
             if ((resPlan as FormGroup).controls['selected'].value == true) {
@@ -998,6 +1307,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 }
             });
         });
+        console.log('the choosen ones:', selected);
         return selected;
     }
 
@@ -1012,14 +1322,19 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
     deleteResourcePlans(resPlans: IResPlan[]) {
         ;
+        console.log('delete resPlan')
         resPlans.forEach(resPlan => {
             //entire res plan selected for delete
             if (resPlan["selected"] == true) {
+                console.log('entire resplan conditional')
                 let resPlanCtrlIndex = this.resPlans.controls.findIndex(t => ((t as FormGroup).controls['resUid'].value as string).toUpperCase() == resPlan.resource.resUid.toUpperCase());
                 this.resPlans.removeAt(resPlanCtrlIndex);
             }
             // one or more projects selected to delete
             else {
+                console.log('one o rmore projects selected to delete conditional')
+                let selectedProjects = resPlan.projects.filter(p => p["selected"] == true);
+                console.log('werk',selectedProjects);
                 let deletedProjectUids = resPlan.projects.filter(p => p["selected"] == true).map(p => p.projUid.toUpperCase())
                 let resPlanCtrl = this.resPlans.controls.find(t => ((t as FormGroup).controls['resUid'].value as string).toUpperCase() == resPlan.resource.resUid.toUpperCase()) as FormGroup;
                 // let allProjects = resPlanCtrl.value['projects'];

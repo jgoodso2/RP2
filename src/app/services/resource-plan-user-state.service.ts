@@ -337,8 +337,32 @@ export class ResourcePlanUserStateService {
         return NowMoment.format('YYYY-MM-DD');
     }
 
-    buildIntervals(_startDate: Date, _endDate: Date, _timeScale: Timescale): IInterval[] {
+    exgetDateFormatString(date: Date): string {
+        var NowMoment = moment(date)
+        return NowMoment.format('MM/DD/YYYY');
+    }
 
+
+    getCurrentDate() {
+        return moment().toDate();
+    }
+
+    getModifiedStartDate(date: Date) {
+       return moment(date).startOf('month').toDate();
+    }
+    
+    getModifiedEndDate(date: Date) {
+       return moment(date).endOf('month').toDate();
+    }
+
+    transformToDate(date: Date) {
+        return moment(date).toDate();
+    }
+
+   
+    buildIntervals(_startDate: Date, _endDate: Date, _timeScale: Timescale): IInterval[] {
+        console.log('times up', _startDate,_endDate );
+        
         let intervals: Interval[] = []
         let firstInterval = new Interval()
         if (_timeScale == Timescale.weeks) {
@@ -458,6 +482,132 @@ export class ResourcePlanUserStateService {
         }
         return intervals;
     }
+
+
+    exbuildIntervals(_startDate: Date, _endDate: Date, _timeScale: Timescale): IInterval[] {
+        console.log('times up', _startDate,_endDate );
+        
+        let intervals: Interval[] = []
+        let firstInterval = new Interval()
+        if (_timeScale == Timescale.weeks) {
+            if (moment(_startDate).day() === 0) {  //sunday
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
+            }
+            else {
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).add(1, 'day').isoWeekday(7).format('MM-DD-YYYY'))
+                // console.log(firstInterval)
+            }
+
+
+            let lastInterval = new Interval()
+            if (moment(_endDate).day() === 1) {   //monday
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+            else {
+                lastInterval.start = moment(_endDate).subtract(1, 'day').isoWeekday(1).toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+
+            intervals.push(firstInterval)
+
+            let weeksToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'weeks')
+
+            for (var i = 0; i < weeksToGenerate; i++) {
+                let interval = new Interval()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'weeks').toDate()
+                intervals.push(interval)
+            }
+
+            if (lastInterval.start > intervals[weeksToGenerate].end) {
+                intervals.push(lastInterval)
+            }
+        }
+
+        if (_timeScale == Timescale.calendarMonths) { //ex
+            ;
+            if (moment(_startDate).endOf('month').date() === moment(_startDate).date()) {  //end of month
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
+            }
+            else {
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).endOf('month').format('MM-DD-YYYY'))
+                console.log(firstInterval)
+            }
+
+
+            let lastInterval = new Interval()
+            if (moment(_endDate).date() === 1) {   //beginning of the month
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+            else {
+                lastInterval.start = moment(_endDate).startOf('month').toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+
+            intervals.push(firstInterval)
+
+            let monthsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'month')
+
+            for (var i = 0; i < monthsToGenerate; i++) {
+                let interval = new Interval()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(interval.start).endOf('month').toDate()
+                intervals.push(interval)
+            }
+
+            if (lastInterval.start > intervals[monthsToGenerate].end) {
+                intervals.push(lastInterval)
+            }
+        }
+
+        if (_timeScale == Timescale.years) {
+            ;
+            if (moment(_startDate).endOf('year').month() === moment(_startDate).month()) {  //end of month
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
+            }
+            else {
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).endOf('year').format('MM-DD-YYYY'))
+                console.log(firstInterval)
+            }
+
+
+            let lastInterval = new Interval()
+            if (moment(_endDate).month() === 0) {   //beginning of the month
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+            else {
+                lastInterval.start = moment(_endDate).startOf('year').toDate()
+                lastInterval.end = moment(_endDate).toDate()
+            }
+
+            intervals.push(firstInterval)
+
+            let yearsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'year')
+
+            for (var i = 0; i < yearsToGenerate; i++) {
+                let interval = new Interval()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'years').toDate()
+                intervals.push(interval)
+            }
+
+            if (lastInterval.start > intervals[yearsToGenerate].end) {
+                intervals.push(lastInterval)
+            }
+        }
+        return intervals;
+    }
+
+    
     getResPlan(resources: IResource[], projectUrl: string = `${this.config.projectServerUrl}/`, project: IProject, start: Date, end: Date,
         timescale: Timescale, workunits: WorkUnits)
         : Observable<IResPlan> {
@@ -726,6 +876,9 @@ export class ResourcePlanUserStateService {
 
 
     saveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+        console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
+        console.log('seriously wrong format??',this.getDateFormatString(fromDate));
+        debugger;
         var success;
         //TODO
         let headers = new HttpHeaders();
@@ -734,14 +887,16 @@ export class ResourcePlanUserStateService {
         let adapterPath = `${this.config.adapterUrl}`
         // let body = new URLSearchParams();
 
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${JSON.stringify(resPlan)}&fromDate=${this.getDateFormatString(fromDate)}&toDate=${this.getDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${JSON.stringify(resPlan)}&fromDate=${this.exgetDateFormatString(fromDate)}&toDate=${this.exgetDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };
-
+        console.log('nice body', body);
+        debugger;
         return this.http.post(
             adapterPath, body, options
         ).map(r => {
+            console.log('loser result', r);
             return r as Result[];
         })
     }
