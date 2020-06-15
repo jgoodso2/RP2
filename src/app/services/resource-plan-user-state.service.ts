@@ -367,38 +367,38 @@ export class ResourcePlanUserStateService {
         let firstInterval = new Interval()
         if (_timeScale == Timescale.weeks) {
             if (moment(_startDate).day() === 0) {  //sunday
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = moment(_startDate).toDate()
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
             }
             else {
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = new Date(moment(_startDate).add(1, 'day').isoWeekday(7).format('MM-DD-YYYY'))
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).add(1, 'day').isoWeekday(7).format('MM-DD-YYYY'))
                 // console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).day() === 1) {   //monday
-                lastInterval.intervalStart = moment(_endDate).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
             else {
-                lastInterval.intervalStart = moment(_endDate).subtract(1, 'day').isoWeekday(1).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).subtract(1, 'day').isoWeekday(1).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
 
             intervals.push(firstInterval)
 
-            let weeksToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'weeks')
+            let weeksToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'weeks')
 
             for (var i = 0; i < weeksToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = moment(intervals[i].intervalEnd).add(1, 'days').toDate()
-                interval.intervalEnd = moment(intervals[i].intervalEnd).add(1, 'weeks').toDate()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'weeks').toDate()
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[weeksToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[weeksToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -406,38 +406,38 @@ export class ResourcePlanUserStateService {
         if (_timeScale == Timescale.calendarMonths) {
             ;
             if (moment(_startDate).endOf('month').date() === moment(_startDate).date()) {  //end of month
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = moment(_startDate).toDate()
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
             }
             else {
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = new Date(moment(_startDate).endOf('month').add(1, 'days').format('MM-DD-YYYY'))
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).endOf('month').add(1, 'days').format('MM-DD-YYYY'))
                 console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).date() === 1) {   //beginning of the month
-                lastInterval.intervalStart = moment(_endDate).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
             else {
-                lastInterval.intervalStart = moment(_endDate).startOf('month').toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).startOf('month').toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
 
             intervals.push(firstInterval)
 
-            let monthsToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'month')
+            let monthsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'month')
 
             for (var i = 0; i < monthsToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = moment(intervals[i].intervalEnd).add(1, 'days').toDate()
-                interval.intervalEnd = moment(interval.intervalStart).endOf('month').add(1, 'days').toDate()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(interval.start).endOf('month').add(1, 'days').toDate()
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[monthsToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[monthsToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -445,38 +445,38 @@ export class ResourcePlanUserStateService {
         if (_timeScale == Timescale.years) {
             ;
             if (moment(_startDate).endOf('year').month() === moment(_startDate).month()) {  //end of month
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = moment(_startDate).toDate()
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
             }
             else {
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = new Date(moment(_startDate).endOf('year').format('MM-DD-YYYY'))
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).endOf('year').format('MM-DD-YYYY'))
                 console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).month() === 0) {   //beginning of the month
-                lastInterval.intervalStart = moment(_endDate).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
             else {
-                lastInterval.intervalStart = moment(_endDate).startOf('year').toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).startOf('year').toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
 
             intervals.push(firstInterval)
 
-            let yearsToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'year')
+            let yearsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'year')
 
             for (var i = 0; i < yearsToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = moment(intervals[i].intervalEnd).add(1, 'days').toDate()
-                interval.intervalEnd = moment(intervals[i].intervalEnd).add(1, 'years').toDate()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'years').toDate()
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[yearsToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[yearsToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -491,38 +491,38 @@ export class ResourcePlanUserStateService {
         let firstInterval = new Interval()
         if (_timeScale == Timescale.weeks) {
             if (moment(_startDate).day() === 0) {  //sunday
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = moment(_startDate).toDate()
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = moment(_startDate).toDate()
             }
             else {
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = new Date(moment(_startDate).add(1, 'day').isoWeekday(7).format('MM-DD-YYYY'))
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).add(1, 'day').isoWeekday(7).format('MM-DD-YYYY'))
                 // console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).day() === 1) {   //monday
-                lastInterval.intervalStart = moment(_endDate).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
             else {
-                lastInterval.intervalStart = moment(_endDate).subtract(1, 'day').isoWeekday(1).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).subtract(1, 'day').isoWeekday(1).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
 
             intervals.push(firstInterval)
 
-            let weeksToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'weeks')
+            let weeksToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'weeks')
 
             for (var i = 0; i < weeksToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = moment(intervals[i].intervalEnd).add(1, 'days').toDate()
-                interval.intervalEnd = moment(intervals[i].intervalEnd).add(1, 'weeks').toDate()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'weeks').toDate()
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[weeksToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[weeksToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -530,38 +530,38 @@ export class ResourcePlanUserStateService {
         if (_timeScale == Timescale.calendarMonths) { //ex
             ;
             if (moment(_startDate).endOf('month').date() === moment(_startDate).date()) {  //end of month
-                firstInterval.intervalStart = new Date ( moment(_startDate).format('l'))
-                firstInterval.intervalEnd = new Date (moment(_startDate).format('l'))
+                firstInterval.start = new Date ( moment(_startDate).format('l'))
+                firstInterval.end = new Date (moment(_startDate).format('l'))
             }
             else {
-                firstInterval.intervalStart = new Date(moment(_startDate).format('l'));
-                firstInterval.intervalEnd = new Date(moment(_startDate).endOf('month').format('l'))
+                firstInterval.start = new Date(moment(_startDate).format('l'));
+                firstInterval.end = new Date(moment(_startDate).endOf('month').format('l'))
                 console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).date() === 1) {   //beginning of the month
-                lastInterval.intervalStart = new Date (moment(_endDate).format('l'))
-                lastInterval.intervalEnd = new Date (moment(_endDate).format('l'))
+                lastInterval.start = new Date (moment(_endDate).format('l'))
+                lastInterval.end = new Date (moment(_endDate).format('l'))
             }
             else {
-                lastInterval.intervalStart = new Date(moment(_endDate).startOf('month').format('l'))
-                lastInterval.intervalEnd = new Date( moment(_endDate).format('l'))
+                lastInterval.start = new Date(moment(_endDate).startOf('month').format('l'))
+                lastInterval.end = new Date( moment(_endDate).format('l'))
             }
 
             intervals.push(firstInterval)
 
-            let monthsToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'month')
+            let monthsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'month')
 
             for (var i = 0; i < monthsToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = new Date(moment(intervals[i].intervalEnd).add(1, 'days').format('l'))
-                interval.intervalEnd = new Date (moment(interval.intervalStart).endOf('month').format('l'))
+                interval.start = new Date(moment(intervals[i].end).add(1, 'days').format('l'))
+                interval.end = new Date (moment(interval.start).endOf('month').format('l'))
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[monthsToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[monthsToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -569,38 +569,38 @@ export class ResourcePlanUserStateService {
         if (_timeScale == Timescale.years) {
             ;
             if (moment(_startDate).endOf('year').month() === moment(_startDate).month()) {  //end of month
-                firstInterval.intervalStart = new Date(moment(_startDate).format('l'))
-                firstInterval.intervalEnd = new Date(moment(_startDate).format('l'))
+                firstInterval.start = new Date(moment(_startDate).format('l'))
+                firstInterval.end = new Date(moment(_startDate).format('l'))
             }
             else {
-                firstInterval.intervalStart = moment(_startDate).toDate()
-                firstInterval.intervalEnd = new Date(moment(_startDate).endOf('year').format('l'))
+                firstInterval.start = moment(_startDate).toDate()
+                firstInterval.end = new Date(moment(_startDate).endOf('year').format('l'))
                 console.log(firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).month() === 0) {   //beginning of the month
-                lastInterval.intervalStart = moment(_endDate).toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
             else {
-                lastInterval.intervalStart = moment(_endDate).startOf('year').toDate()
-                lastInterval.intervalEnd = moment(_endDate).toDate()
+                lastInterval.start = moment(_endDate).startOf('year').toDate()
+                lastInterval.end = moment(_endDate).toDate()
             }
 
             intervals.push(firstInterval)
 
-            let yearsToGenerate = moment(lastInterval.intervalEnd).diff(moment(firstInterval.intervalStart), 'year')
+            let yearsToGenerate = moment(lastInterval.end).diff(moment(firstInterval.start), 'year')
 
             for (var i = 0; i < yearsToGenerate; i++) {
                 let interval = new Interval()
-                interval.intervalStart = moment(intervals[i].intervalEnd).add(1, 'days').toDate()
-                interval.intervalEnd = moment(intervals[i].intervalEnd).add(1, 'years').toDate()
+                interval.start = moment(intervals[i].end).add(1, 'days').toDate()
+                interval.end = moment(intervals[i].end).add(1, 'years').toDate()
                 intervals.push(interval)
             }
 
-            if (lastInterval.intervalStart > intervals[yearsToGenerate].intervalEnd) {
+            if (lastInterval.start > intervals[yearsToGenerate].end) {
                 intervals.push(lastInterval)
             }
         }
@@ -1123,10 +1123,10 @@ export class ResourcePlanUserStateService {
                 project.timesheetData = [];
 
                 project.intervals.forEach(interval => {
-                    let timesheetInterval = moment(interval.intervalStart).toDate();
+                    let timesheetInterval = moment(interval.start).toDate();
                     let actualTotal = 0, capacityTotal = 0;
 
-                    while (timesheetInterval < moment(interval.intervalEnd).toDate()) {
+                    while (timesheetInterval < moment(interval.end).toDate()) {
                         //if project has timesheet data
                         if (timesheetData.hasOwnProperty(this.getDateFormatString(timesheetInterval))) {
                             //if interval date has timesheet data
@@ -1156,10 +1156,10 @@ export class ResourcePlanUserStateService {
                         }
                     }
                     if (timesheetTotal < 0) {
-                        project.timesheetData.push(new Interval(interval.intervalName, 'NA', interval.intervalStart, interval.intervalEnd))
+                        project.timesheetData.push(new Interval(interval.intervalName, 'NA', interval.start, interval.end))
                     }
                     else {
-                        project.timesheetData.push(new Interval(interval.intervalName, timesheetTotal.toString(), interval.intervalStart, interval.intervalEnd))
+                        project.timesheetData.push(new Interval(interval.intervalName, timesheetTotal.toString(), interval.start, interval.end))
                     }
                 })
             })

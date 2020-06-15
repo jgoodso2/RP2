@@ -451,7 +451,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
             intervalValue: interval.intervalValue,
             intervalStart: interval.start,
-            intervalEnd: interval.end
+            end: interval.end
 
         });
     }
@@ -1046,8 +1046,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     getPMAllocationIntervalRange(projectToAddPMAllocation: IProject, projectData): any[] {
         let indexStart =  projectToAddPMAllocation.intervals.findIndex(interval => interval.start == projectToAddPMAllocation.startDate);
-        let indexEnd =  projectToAddPMAllocation.intervals.findIndex(interval => interval.intervalEnd == projectToAddPMAllocation.finishDate)
-intervalEnd
+        let indexEnd =  projectToAddPMAllocation.intervals.findIndex(interval => interval.end == projectToAddPMAllocation.finishDate)
+
         //this.transformDateForm(projectData)
         return [indexStart,indexEnd];
     }
