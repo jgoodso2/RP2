@@ -339,7 +339,7 @@ export class ResourcePlanUserStateService {
 
     exgetDateFormatString(date: Date): string {
         var NowMoment = moment(date)
-        return NowMoment.format('MM/DD/YYYY');
+        return NowMoment.format('l');
     }
 
 
@@ -877,8 +877,8 @@ export class ResourcePlanUserStateService {
 
     saveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
         console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
-        console.log('seriously wrong format??',this.getDateFormatString(fromDate));
-        debugger;
+        console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
+        
         var success;
         //TODO
         let headers = new HttpHeaders();

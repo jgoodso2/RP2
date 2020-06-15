@@ -981,7 +981,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     exbuildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
-        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.exbuildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
+        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
         let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
