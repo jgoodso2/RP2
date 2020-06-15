@@ -842,8 +842,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         // }))
                         console.log('garbage in ', updatedResourcePlans);
                        const waity = ms => new Promise(resolve => setTimeout(resolve, ms));
-                        $.when(this.katrinaProtocol(updatedResourcePlans))
-                        .done(() =>  {  console.log('finish him');this._resPlanUserStateSvc.saveResPlans(resPlansToSave,this.fromDate,this.toDate,this.timescale, this.workunits);})/*  this.savePlans(project.startDate, project.finishDate, this.timescale, this.workunits) */
+                        $.when(this.katrinaProtocol(resPlansToSave))
+                        .done(() =>  {  console.log('finish him');this._resPlanUserStateSvc.exsaveResPlans(resPlansToSave,this.fromDate,this.toDate,this.timescale, this.workunits);})/*  this.savePlans(project.startDate, project.finishDate, this.timescale, this.workunits) */
                       //  .then( () => this.savePlans(this.fromDate, this.toDate, this.timescale, this.workunits));
                       //  .then(() => this.onSaveComplete(this.resultsAreIn.filter( result => result.success)))
                         
@@ -930,7 +930,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             let slicePosition = projectData[0].indexOf('.');
             interval.intervalName = `Interval${index}`;
             interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`
-            
             updatedIntervals.push(interval);
         })
       
@@ -1000,7 +999,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 console.log('katrina protocol before results are in');
                 console.log('pertinent details',this.timescale, this.workunits);
                 this._appSvc.loading(true); // this.PmAllocationStartDate(project)
-                this._resPlanUserStateSvc.saveResPlans([resPlan],project.startDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
+                this._resPlanUserStateSvc.exsaveResPlans([resPlan],project.startDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
                 .subscribe( (data) => {
                     console.log('results are in', data);
                    this.resultsAreIn.push(data[0]);
@@ -1047,8 +1046,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     getPMAllocationIntervalRange(projectToAddPMAllocation: IProject, projectData): any[] {
         let indexStart =  projectToAddPMAllocation.intervals.findIndex(interval => interval.start == projectToAddPMAllocation.startDate);
-        let indexEnd =  projectToAddPMAllocation.intervals.findIndex(interval => interval.end == projectToAddPMAllocation.finishDate)
-
+        let indexEnd =  projectToAddPMAllocation.intervals.findIndex(interval => interval.intervalEnd == projectToAddPMAllocation.finishDate)
+intervalEnd
         //this.transformDateForm(projectData)
         return [indexStart,indexEnd];
     }

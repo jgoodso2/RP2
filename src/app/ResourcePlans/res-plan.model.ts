@@ -50,8 +50,8 @@ export interface IInterval {
 
   intervalName: string;
   intervalValue: string;
-  start: Date
-  end: Date
+  start: Date;
+  end: Date;
 }
 
 export interface IQueryParams {
