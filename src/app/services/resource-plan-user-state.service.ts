@@ -355,7 +355,7 @@ export class ResourcePlanUserStateService {
        return moment(date).endOf('month').toDate();
     }
 
-    transformToDate(date: Date) {
+    transformToDate(date: any) {
         return moment(date).toDate();
     }
 
@@ -876,8 +876,6 @@ export class ResourcePlanUserStateService {
 
 
     saveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
-        console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
-        console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
       
         var success;
         //TODO
@@ -910,6 +908,7 @@ export class ResourcePlanUserStateService {
                 })
             })
         })
+        
         console.log('what is change?', changedFormatResPlan);
         return changedFormatResPlan;
     }
@@ -919,7 +918,8 @@ export class ResourcePlanUserStateService {
         console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
         console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
         console.log('what is dat?', this.transformResPlanDatesToString(resPlan));
-        toDate = this.getLastestDate(resPlan);
+        toDate = this.getLastestDate(resPlan); //earliest date is always today.
+        fromDate = this.getEarliestDate(resPlan);
        let  transformedResPlan = this.transformResPlanDatesToString(resPlan);
         var success;
         //TODO
@@ -928,12 +928,20 @@ export class ResourcePlanUserStateService {
 
         let adapterPath = `${this.config.adapterUrl}`
         // let body = new URLSearchParams();
-
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${JSON.stringify(resPlan)}&fromDate=${this.exgetDateFormatString(fromDate)}&toDate=${this.exgetDateFormatString(toDate)}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        let resPlanForBody = JSON.stringify(resPlan);
+        const regexStart = /(start")/gm;
+        const regexEnd = /(end")/gm;
+        let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart');
+        resPlanForBody = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd');
+        let fromDateString = this.exgetDateFormatString(fromDate);
+        let toDateString = this.exgetDateFormatString(toDate);
+        console.log('from date as string and to date as string:', fromDateString, toDateString);
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBody}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };
         console.log('nice body', body);
+        console.log('original resPlan looking for start:', resPlan)
         debugger;
         return this.http.post(
             adapterPath, body, options
@@ -947,8 +955,10 @@ export class ResourcePlanUserStateService {
         let lateDate = this.getCurrentDate();
         resPlan.forEach( (resPlan) => {
           resPlan.projects.forEach((project) => {
+            
                 let lastInterval = project.intervals[project.intervals.length -1]
-                if (lastInterval.end > lateDate) {lateDate = lastInterval.end}
+                if (this.transformToDate(lastInterval.end) > lateDate) {lateDate = lastInterval.end}
+                debugger;
             })
          
               
@@ -957,6 +967,23 @@ export class ResourcePlanUserStateService {
          console.log('late date:', lateDate);
          return lateDate;
 
+    }
+
+    getEarliestDate(resPlan) {
+        let today = this.getCurrentDate();
+        let earliestDate:Date;
+        resPlan.forEach( (resPlan) => {
+          resPlan.projects.forEach((project) => {
+             
+                let firstInterval = project.intervals[0]
+                if (this.transformToDate(firstInterval.start) > today) {console.log('start date is in future, use future date'); earliestDate = firstInterval.start; return firstInterval.start;}
+            })
+         
+              
+    
+         })
+         console.log('earliest date:', earliestDate);
+         return today;
     }
 
    

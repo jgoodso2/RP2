@@ -30,6 +30,7 @@ import { elementAt } from 'rxjs/operators/elementAt';
 import { Subscription } from 'rxjs/Subscription'
 import { Subscriber } from 'rxjs/Subscriber'
 import { isMoment } from 'moment';
+import { element } from 'protractor';
 
 
 declare const $: any
@@ -58,6 +59,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     _intervalCount: number = 0;
     projectsWithDetails: IProject[] = [];
     resultsAreIn: Result[] = [];
+    savableResPlans: ResPlan[] = [];
     resPlanUserState: IResPlan[];
     fromDate: Date;
     toDate: Date;
@@ -530,7 +532,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
             this.confirmDialogResult = result;
             if (result == "yes")
-                this.pmAllocationProtocol();
+                $.when(this.pmAllocationProtocol())
+                .then(() => {console.log('here in .then', this.savableResPlans);this.katrinaProtocol(this.savableResPlans);});
         });
     }
 
@@ -823,31 +826,27 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 resPlan.projects.forEach( (project) => {
                     let projectData =  this.getPMAllocationDetails(project.projName).subscribe( (projectData) => {
 
-                        if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true ) {
+                        if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
                             debugger;
                            let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,projectData)
                            project.intervals = updatedProject.intervals; //return a project.  then change project project.intervals = newProject.intervals and always add to list.
-                           updatedResourcePlans.push(resPlan)
+                          let replacementIndex =  updatedResourcePlans.findIndex( element => element.resource.resUid == resPlan.resource.resUid);
+                           if (replacementIndex === -1 ) { updatedResourcePlans.push(resPlan);} if (replacementIndex !== -1) { updatedResourcePlans[replacementIndex] = resPlan; }
+                          
                         }
 
 
                        // console.log('cmon eileen', updatedResourcePlans.filter(resplans => resplans.projects.length > 0));
         
-                        let resPlansToSave = updatedResourcePlans.filter(resplans => resplans.projects.length > 0);
-                
+                        let resPlansToSave: ResPlan[] = updatedResourcePlans.filter(resplans => resplans.projects.length > 0);
+                        this.savableResPlans = resPlansToSave;
                       //  console.log('nightmoves', resPlansToSave);
                         // eileen.forEach( (resPlan => {
                 
                         // }))
                         console.log('garbage in ', updatedResourcePlans);
-                       const waity = ms => new Promise(resolve => setTimeout(resolve, ms));
-                        $.when(this.katrinaProtocol(resPlansToSave))
-                        .done(() =>  {  console.log('finish him');this._resPlanUserStateSvc.exsaveResPlans(resPlansToSave,this.fromDate,this.toDate,this.timescale, this.workunits);})/*  this.savePlans(project.startDate, project.finishDate, this.timescale, this.workunits) */
-                      //  .then( () => this.savePlans(this.fromDate, this.toDate, this.timescale, this.workunits));
-                      //  .then(() => this.onSaveComplete(this.resultsAreIn.filter( result => result.success)))
-                        
-                         .then(() => this.resultsAreIn = [] )
+                       
                        
                         
                       // this.katrinaProtocol(resPlansToSave);
@@ -856,7 +855,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                      })
 
                     console.log('what is project data?? null possiblly?', projectData);
-                })
+                })//after this.
+                      
             }
          //   console.log('should be every resPlan I thought...', resPlan);
           //  console.log('garbage in ', updatedResourcePlans);
@@ -873,8 +873,17 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
                     }); */
+                  
         }
        // return updatedResourcePlans;
+
+    projectIsOngoing(project) {
+        if(this._resPlanUserStateSvc.transformToDate(project.finishDate) < this._resPlanUserStateSvc.getCurrentDate()) {
+            return false;
+        }
+        return true;
+    }    
+
 
     pmAllocationPrerequisiteCheck(resPlan: IResPlan) {
         console.log('inside PMAllocationPrequisite Check',resPlan);
@@ -997,6 +1006,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             resPlan.projects.forEach( (project) => {
                 debugger;
                 console.log('katrina protocol before results are in');
+                
                 console.log('pertinent details',this.timescale, this.workunits);
                 this._appSvc.loading(true); // this.PmAllocationStartDate(project)
                 this._resPlanUserStateSvc.exsaveResPlans([resPlan],project.startDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
@@ -1021,6 +1031,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     
 
     PmAllocationStartDate(project: IProject) {
+        debugger;
         let todayDate = this._resPlanUserStateSvc.getCurrentDate();
         let projectStartDate = this._resPlanUserStateSvc.transformToDate(project.startDate);
         console.log("the meaning of time: projectstartdate,typeof,projectstartdatetransofrmedtostring", project.startDate, typeof(project.startDate), this._resPlanUserStateSvc.getDateFormatString(project.startDate));

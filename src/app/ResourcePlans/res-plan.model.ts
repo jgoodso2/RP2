@@ -50,7 +50,7 @@ export interface IInterval {
 
   intervalName: string;
   intervalValue: string;
-  start: Date;
+  start: Date;  
   end: Date;
 }
 
