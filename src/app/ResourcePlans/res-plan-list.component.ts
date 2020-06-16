@@ -376,7 +376,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         var project = this.fb.group(
             {
                 projUid: _project.projUid,
-                projName: _project.projName + projectSUffix,
+                projName: projectSUffix + _project.projName,
                 readOnly: _project.readOnly,
                 error: null,
                 readOnlyReason: this.fb.control(_project.readOnlyReason),
