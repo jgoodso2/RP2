@@ -12,8 +12,10 @@ import * as moment from 'moment'
 
 
 import { IResPlan, ResPlan, IProject, Project, IHiddenProject, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result, IResPlanUserWorkSpaceItem } from '../resourcePlans/res-plan.model'
-import { combineLatest } from 'rxjs/operators';
+import { combineLatest, concatMap, retry, map , retryWhen, tap} from 'rxjs/operators';
 import { ResourcePlanFilteredService } from './resource-plan-filtered.service';
+import { error } from 'protractor';
+
 declare var $: any;
 
 @Injectable()
@@ -93,18 +95,23 @@ export class ResourcePlanUserStateService {
         resources.forEach(resource => {
             resourceProjectsMap.push(new ResPlan(resource))
         })
-            ;
-        //console.log('=======================hitting project server for assigments')
-        return Observable.from(resources).flatMap(resource => {
-            //let filter = `$filter=ResourceName eq '${t.resName.replace("'","''")}' and AssignmentType eq 101`
-            //let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101 or (AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}')`
-            let filter = `$filter=(ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate%20gt%20datetime%27${moment().subtract(30, 'days').format('YYYY-MM-DD')}%27) or (ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101)`
+        
+        let projectsHunderedAndOne$ =   Observable.from(resources).flatMap(resource => {
+            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101`;
             let url = baseUrl + '?' + filter + '&' + select;
 
-            // get unique project Uids from PS where the current resource has access to
-            //and project has resource plan assignments
+            return this.http.get(url, options)
+                .switchMap((data: Response) => data["d"].results)
+                .map(p => {
+                    let proj = new Project(p["ProjectId"], p["ProjectName"], false, []);
+                    proj.assignmentType = p["AssignmentType"];
+                    return proj;
+                });
+        });
 
-            //Project Active Status != "Cancelled" OR "Complete"
+        let projectsType0$ =  Observable.from(resources).flatMap(resource => {
+            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
+            let url = baseUrl + '?' + filter + '&' + select;
 
             return this.http.get(url, options)
                 .switchMap((data: Response) => data["d"].results)
@@ -113,9 +120,13 @@ export class ResourcePlanUserStateService {
                     proj.assignmentType = p["AssignmentType"];
                     return proj;
                 })
-                //.distinct(x => x.projUid)
-                .toArray()
-                .flatMap(projects => {
+        });
+       
+        let combinedProjects$ =  projectsHunderedAndOne$.concat(projectsType0$).toArray();
+
+        return Observable.from(resources).flatMap(resource=>{
+            return combinedProjects$ 
+                .concatMap(projects => {
                     //all assignments including type 101,0
                     let projectsWithAssignments = projects.map(p => p.projUid);
                     //projects with assignment type 101
@@ -134,7 +145,7 @@ export class ResourcePlanUserStateService {
                             return [];
                         }
                     });
-                    return projectsWithTimeLines.flatMap(pt => {
+                    return projectsWithTimeLines.concatMap(pt => {
                         //concat timesheet line projects to the projects to add list
                         projectsToAdd = projectsToAdd.concat(pt);
                         //get unique project uids
@@ -143,6 +154,7 @@ export class ResourcePlanUserStateService {
                         //concat all newly added projects(assignment type 0 and timesheet lines) to the list returned back to caller
                         projects = projects.concat(projectsToAdd) 
                         console.log(`Adding projects ${JSON.stringify(projectsToAdd)}`);
+                        //adapter cal for add project
                         return this.addProjects(resMgrUid, projectsToAdd, resource, fromDate, toDate, timeScale, workUnits).flatMap(p => {
                             p.forEach(result=>{
                                 if(result.success == true){
@@ -159,8 +171,8 @@ export class ResourcePlanUserStateService {
                 .do(r => {
                     console.log("Existing Resource Plans Read from OData=" + JSON.stringify(r))
                 })
-        })
-
+    
+            })
         //.do(t => console.log('projects user has access on=' + JSON.stringify(t)))
 
 
@@ -681,23 +693,13 @@ export class ResourcePlanUserStateService {
 
 
         //old code
-        let ob = Observable.from(projects).flatMap(p => {
-            let retryCount = 0;
-            let addProject$ =  this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale);
-            addProject$.retry(3).
-            retryWhen((res: Observable<Result>) =>{ 
-              return res.flatMap(error=>{
-                  if(error.success == false)
-                  {
-                      throw error;
-                  }
-                  return res;
-              })
-            })
-            return addProject$;
-            // })
-        }).toArray()
-
+        let ob = Observable.from(projects).pipe(
+            concatMap(p => {
+                let retryCount = 0;
+                return this.addProject(resMgrUid, p, resource, this.getDateFormatString(fromDate), this.getDateFormatString(toDate), timeScale, workScale)
+                // })
+            })).toArray()
+        
         return ob;
     }
 
@@ -729,10 +731,26 @@ export class ResourcePlanUserStateService {
         return this.http.post(
             adapterPath, body, options
 
-        ).map(r => {
-            let result =  r as Result;
-            return result;
-        })
+        ).pipe(
+            map(r => {
+                let result =  r as Result;
+                if(result.error) {
+                   throw Observable.throwError(result);
+                }
+                
+                return result;
+            }),
+            retry(3),
+            retryWhen(result=>{
+                return result.map((res :any)=>{
+                    if(res.error)
+                    {
+                        throw Observable.throwError(res);
+                    }
+                    return Observable.of(res as Result);
+                })
+            })
+        )
         // return this.http.post(adapterPath,body,options).flatMap(r=>
         //     {
         //         return Observable.of(project);
