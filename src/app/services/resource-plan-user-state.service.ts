@@ -936,7 +936,7 @@ export class ResourcePlanUserStateService {
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBodyFinal}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${JSON.stringify(resPlanForBodyFinal)}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };

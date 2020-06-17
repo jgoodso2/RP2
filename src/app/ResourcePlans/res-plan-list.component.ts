@@ -533,10 +533,10 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             this.confirmDialogResult = result;
             if (result == "yes") {
                 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-                $.when(this.pmAllocationProtocol())
-               
-                .then((sResPlans) => wait(4000))
-                .then((sResPlans) => {console.log('here in .then', sResPlans,this.savableResPlans);this.katrinaProtocol(this.savableResPlans);});
+                this.pmAllocationProtocol();
+                this.katrinaProtocol(this.savableResPlans);
+
+                 
             }
         });
     }
@@ -822,7 +822,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
 
-    async pmAllocationProtocol(): Promise<any> {
+     pmAllocationProtocol(): any {
         let updatedResourcePlans = [];
         let resourcePlans = this.getSelectedProjects();
         resourcePlans.forEach((resPlan,index) => {
@@ -850,6 +850,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 
                         // }))
                         console.log('garbage in: updatedResourcePlans, savableResPlans ', updatedResourcePlans, this.savableResPlans);
+                        console.log('[kat meow?]',this.savableResPlans)
+                         this.katrinaProtocol(this.savableResPlans)
                        
                        
                         
@@ -878,16 +880,17 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this._appSvc.loading(false);
                     }); */
                     debugger;
-                    console.log('[kat meow?]',this.savableResPlans)
-                    this.katrinaProtocol(this.savableResPlans)
+                    
                    
         }
        // return updatedResourcePlans;
 
     projectIsOngoing(project) {
         if(this._resPlanUserStateSvc.transformToDate(project.finishDate) < this._resPlanUserStateSvc.getCurrentDate()) {
+            console.log('does not count', project);
             return false;
         }
+        console.log('good if it goes');
         return true;
     }    
 
@@ -1005,9 +1008,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return projectDurationIntervals;
      }
 
-    async katrinaProtocol(resPlans: IResPlan[]): Promise<any> { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
+     katrinaProtocol(resPlans: IResPlan[]):any { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
         console.log('inside katrina protocol...only ones that need saving hopefully', resPlans);
-        await this.pmAllocationProtocol();
+        
         debugger;
         let  maxDate = this.toDate;
         resPlans.forEach((resPlan) => {
