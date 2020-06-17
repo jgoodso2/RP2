@@ -526,14 +526,18 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     openPMAllocationDialog() {
         //form dirty:
-
+        
         //form not dirty:
         let dialogRef = this.openDialog({ title: "Are You Sure?", content: "This action will permanently add default PM Allocations to the selected project(s)." })
         this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
             this.confirmDialogResult = result;
-            if (result == "yes")
+            if (result == "yes") {
+                const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                 $.when(this.pmAllocationProtocol())
-                .then(() => {console.log('here in .then', this.savableResPlans);this.katrinaProtocol(this.savableResPlans);});
+               
+                .then((sResPlans) => wait(4000))
+                .then((sResPlans) => {console.log('here in .then', sResPlans,this.savableResPlans);this.katrinaProtocol(this.savableResPlans);});
+            }
         });
     }
 
@@ -818,7 +822,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
 
-    pmAllocationProtocol(): any {
+    async pmAllocationProtocol(): Promise<any> {
         let updatedResourcePlans = [];
         let resourcePlans = this.getSelectedProjects();
         resourcePlans.forEach((resPlan,index) => {
@@ -845,7 +849,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         // eileen.forEach( (resPlan => {
                 
                         // }))
-                        console.log('garbage in ', updatedResourcePlans);
+                        console.log('garbage in: updatedResourcePlans, savableResPlans ', updatedResourcePlans, this.savableResPlans);
                        
                        
                         
@@ -853,7 +857,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
                      })
-
+            
                     console.log('what is project data?? null possiblly?', projectData);
                 })//after this.
                       
@@ -873,7 +877,10 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
                     }); */
-                  
+                    debugger;
+                    console.log('[kat meow?]',this.savableResPlans)
+                    this.katrinaProtocol(this.savableResPlans)
+                   
         }
        // return updatedResourcePlans;
 
@@ -998,20 +1005,28 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return projectDurationIntervals;
      }
 
-    katrinaProtocol(resPlans: IResPlan[]): void { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
+    async katrinaProtocol(resPlans: IResPlan[]): Promise<any> { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
         console.log('inside katrina protocol...only ones that need saving hopefully', resPlans);
-      
-       
-         resPlans.forEach( (resPlan) => { debugger;
+        await this.pmAllocationProtocol();
+        debugger;
+        let  maxDate = this.toDate;
+        resPlans.forEach((resPlan) => {
             resPlan.projects.forEach( (project) => {
-                debugger;
-                console.log('katrina protocol before results are in');
-                
-                console.log('pertinent details',this.timescale, this.workunits);
+                console.log('baby shark',project.intervals[project.intervals.length - 1].end);
+                if (project.intervals[project.intervals.length - 1].end > maxDate) {maxDate = project.intervals[project.intervals.length - 1].end }
+            })
+        })
+
+        debugger;
+       console.log('maxDate', maxDate)
+         resPlans.forEach( (resPlan) => { debugger;
+            
+              
+                console.log('pertinent details...',this.fromDate, maxDate,this.timescale, this.workunits);
                 this._appSvc.loading(true); // this.PmAllocationStartDate(project)
-                this._resPlanUserStateSvc.exsaveResPlans([resPlan],project.startDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
+                this._resPlanUserStateSvc.exsaveResPlans([resPlan],this.fromDate, maxDate, this.timescale, this.workunits) //do we need a day timescale??
                 .subscribe( (data) => {
-                    console.log('results are in', data);
+                    console.log('post-subscribe data returned', data);
                    this.resultsAreIn.push(data[0]);
                     //this.onSaveComplete(data);
                    
@@ -1023,9 +1038,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             
             })
             
-        })
+     
         this._appSvc.loading(false);
-       
     
    }
     
@@ -1380,7 +1394,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         .then(() => wait(25))
                         .then(() => this.menuService.normalizeView())
                         .catch('failed');
-
                 }
             });
 

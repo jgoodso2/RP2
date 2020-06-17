@@ -932,11 +932,11 @@ export class ResourcePlanUserStateService {
         const regexStart = /(start")/gm;
         const regexEnd = /(end")/gm;
         let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart');
-        resPlanForBody = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd');
+        let resPlanForBodyFinal = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd');
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBody}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBodyFinal}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };
@@ -947,8 +947,10 @@ export class ResourcePlanUserStateService {
             adapterPath, body, options
         ).map(r => {
             console.log('loser result', r);
+            debugger;
             return r as Result[];
         })
+        
     }
 
     getLastestDate(resPlan) {
