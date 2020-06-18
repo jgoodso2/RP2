@@ -59,6 +59,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     errorMessage: string;
     _intervalCount: number = 0;
     runItBack: number = 0;
+    
     projectsWithDetails: IProject[] = [];
     resultsAreIn: Result[] = [];
     savableResPlans: ResPlan[] = [];
@@ -809,12 +810,14 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     insertPMAllocationIntervalValueForAddedProject(detailedProject: IProject, projectToAddPMAllocation: IProject) {
         let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
+        console.log(copyOfIntervals)
         let newIntervalsWithPmAllocation: Interval[] = []
         copyOfIntervals.forEach(interval => {
             interval.intervalValue = detailedProject.pmAllocation;
             newIntervalsWithPmAllocation.push(interval);
         })
         newIntervalsWithPmAllocation.shift();
+
         //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
         let projectWithPMAllocationIntervals = projectToAddPMAllocation;
         projectWithPMAllocationIntervals.intervals = newIntervalsWithPmAllocation
@@ -823,6 +826,28 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return projectWithPMAllocationIntervals;
 
     }
+/* EXHIBIT A
+  const projectDuration = [ 1,2,3,4,5 ];
+const sequences = [1,2,3,4,5,6,7,8,9,10,11,12];
+
+console.log('project duration length =', projectDuration.length);
+console.log('project duration last interval value =', projectDuration[projectDuration.length -1]);
+console.log('sequences length =', sequences.length)
+
+if (sequences.length > projectDuration.length) { 
+  let seqdifference = sequences.length - projectDuration.length
+  console.log('need to adjust for intervals...');
+  console.log(sequences[0], sequences[sequences.length -1], sequences[sequences.length -2])
+  console.log('simple as dat',[...projectDuration,...sequences.slice(-seqdifference)]);
+}
+
+  
+  
+
+*/
+
+  
+  
 
      pmAllocationProtocol(): any {
         let updatedResourcePlans = [];
@@ -955,10 +980,37 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         })
       
         let updatedProjectWithIntervals = projectToAddPMAllocation;
+        if(projectToAddPMAllocation.intervals.length > updatedIntervals.length) {
+            let seqDiff = projectToAddPMAllocation.intervals.length - updatedIntervals.length;
+            console.log('need to adjust for intervals....');
+            updatedIntervals = [...updatedIntervals,...projectToAddPMAllocation.intervals.slice(-seqDiff)];
+            console.log('now we are cooking with oil', updatedIntervals)
+        }
+
+
         updatedProjectWithIntervals.intervals = updatedIntervals;
         console.log(updatedProjectWithIntervals, 'K be quiet')
         debugger;
         return updatedProjectWithIntervals;
+
+
+      /*   const projectDuration = [ 1,2,3,4,5 ];
+        const sequences = [1,2,3,4,5,6,7,8,9,10,11,12];
+        
+        console.log('project duration length =', projectDuration.length);
+        console.log('project duration last interval value =', projectDuration[projectDuration.length -1]);
+        console.log('sequences length =', sequences.length)
+        
+        if (sequences.length > projectDuration.length) { 
+          let seqdifference = sequences.length - projectDuration.length
+          console.log('need to adjust for intervals...');
+          console.log(sequences[0], sequences[sequences.length -1], sequences[sequences.length -2])
+          console.log('simple as dat',[...projectDuration,...sequences.slice(-seqdifference)]); */
+
+
+
+
+
        /*  INITIAL THOUGHTS::::::
        let intervalRange =  this.getPMAllocationIntervalRange(projectToAddPMAllocation,projectData)
        if(this.projectDurationOutOfRange(intervalRange)) {
@@ -1017,6 +1069,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         //let filteredResPlans = this.filterOutStableProjects(resPlans);
         debugger;
         let  maxDate = this.toDate;
+    
         resPlans.forEach((resPlan) => {
             resPlan.projects.forEach( (project) => {
                 console.log('baby shark',project.intervals[project.intervals.length - 1].end);
@@ -1032,14 +1085,16 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
       resPlans.forEach( (resPlan) => { debugger;
             
                 
-                console.log('pertinent details...',this.fromDate, maxDate,this.timescale, this.workunits);
+                console.log('pertinent details...from,maxdate,timescale,workunits,intervalcount',this.fromDate, maxDate,this.timescale, this.workunits,this._intervalCount);
                 this._appSvc.loading(true); // this.PmAllocationStartDate(project)
                 debugger;
                 resPlan.projects.forEach( (project) => {
                     if (project.intervals[0].end !== undefined) {
+                        console.log('interval checking...projectIntervalLength vs. intervalCount', project.intervals.length, this._intervalCount);
                         let modResPlan = resPlan;
                         modResPlan.projects = [project];
-                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
+                        let sequenceDate = this.determineMaxDate(this.toDate,project.finishDate)
+                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, sequenceDate, this.timescale, this.workunits) //do we need a day timescale??
                         .subscribe( (data) => {
                             console.log('post-subscribe data returned', data);
                            this.resultsAreIn.push(data[0]);
@@ -1058,7 +1113,17 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             })
      
         this._appSvc.loading(false);
+        this.onSaveComplete(this.resultsAreIn);
     
+   }
+
+   determineMaxDate(toDate: Date, projectFinishDate: Date): Date {
+       if(toDate > projectFinishDate) {
+           console.log('in determineMaxDate()...to date is max...')
+           return toDate;
+       }
+       console.log('project finish date is max in determineMaxDate')
+       return projectFinishDate;
    }
 
    filterOutStableProjects(resPlans: ResPlan[]): ResPlan[] {

@@ -894,7 +894,6 @@ export class ResourcePlanUserStateService {
         return this.http.post(
             adapterPath, body, options
         ).map(r => {
-            console.log('loser result', r);
             return r as Result[];
         })
     }
@@ -919,7 +918,7 @@ export class ResourcePlanUserStateService {
         console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
         console.log('what is dat?', this.transformResPlanDatesToString(resPlan));
         toDate = this.getLastestDate(resPlan); //earliest date is always today.
-        fromDate = this.getEarliestDate(resPlan);
+        let fromDated = this.getEarliestDate(resPlan);
        let  transformedResPlan = this.transformResPlanDatesToString(resPlan);
         var success;
         //TODO
