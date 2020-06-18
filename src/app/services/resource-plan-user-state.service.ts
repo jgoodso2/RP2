@@ -931,8 +931,8 @@ export class ResourcePlanUserStateService {
         let resPlanForBody = JSON.stringify(resPlan);
         const regexStart = /(start")/gm;
         const regexEnd = /(end")/gm;
-        let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart');
-        let resPlanForBodyFinal = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd');
+        let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart"');
+        let resPlanForBodyFinal = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd"');
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);
@@ -940,7 +940,7 @@ export class ResourcePlanUserStateService {
         let options = {
             headers
         };
-        console.log('nice body', body);
+        console.log('nice body', resPlanForBodyFinal);
         console.log('original resPlan looking for start:', resPlan)
         debugger;
         return this.http.post(

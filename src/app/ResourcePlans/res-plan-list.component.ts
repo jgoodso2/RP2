@@ -45,6 +45,7 @@ declare const window: Window;
 
 
 export class ResPlanListComponent implements OnInit, OnDestroy {
+    
 
     @ViewChild('modalProjects', { static: false }) modalProjects: SimpleModalComponent;
     @ViewChild('modalResources', { static: false }) modalResources: SimpleModalComponent;
@@ -57,6 +58,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     currentFormGroup: FormGroup;
     errorMessage: string;
     _intervalCount: number = 0;
+    runItBack: number = 0;
     projectsWithDetails: IProject[] = [];
     resultsAreIn: Result[] = [];
     savableResPlans: ResPlan[] = [];
@@ -534,7 +536,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             if (result == "yes") {
                 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                 this.pmAllocationProtocol();
-                this.katrinaProtocol(this.savableResPlans);
+               // this.katrinaProtocol(this.savableResPlans);
 
                  
             }
@@ -827,7 +829,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         let resourcePlans = this.getSelectedProjects();
         resourcePlans.forEach((resPlan,index) => {
             if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
-                resPlan.projects.forEach( (project) => {
+                resPlan.projects.forEach( (project,index) => {
                     let projectData =  this.getPMAllocationDetails(project.projName).subscribe( (projectData) => {
 
                         if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true && this.projectIsOngoing(project) ) {
@@ -840,7 +842,6 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                           
                         }
 
-
                        // console.log('cmon eileen', updatedResourcePlans.filter(resplans => resplans.projects.length > 0));
         
                         let resPlansToSave: ResPlan[] = updatedResourcePlans.filter(resplans => resplans.projects.length > 0);
@@ -849,9 +850,10 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         // eileen.forEach( (resPlan => {
                 
                         // }))
-                        console.log('garbage in: updatedResourcePlans, savableResPlans ', updatedResourcePlans, this.savableResPlans);
+                        console.log('garbage in: updatedResourcePlans, savableResPlans, resPlansToSave', updatedResourcePlans, this.savableResPlans, resPlansToSave);
                         console.log('[kat meow?]',this.savableResPlans)
-                         this.katrinaProtocol(this.savableResPlans)
+                        debugger;
+                         this.katrinaProtocol(resPlansToSave)
                        
                        
                         
@@ -879,7 +881,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
                     }); */
-                    debugger;
+      
                     
                    
         }
@@ -1008,42 +1010,83 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return projectDurationIntervals;
      }
 
-     katrinaProtocol(resPlans: IResPlan[]):any { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
-        console.log('inside katrina protocol...only ones that need saving hopefully', resPlans);
-        
+     katrinaProtocol(resPlans: ResPlan[]):any { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
+        console.log('inside katrina protocol...only ones that need saving hopefully', resPlans, this.savableResPlans);
+        debugger;
+       // if (resPlans.length = 0)   {return [];}
+        //let filteredResPlans = this.filterOutStableProjects(resPlans);
         debugger;
         let  maxDate = this.toDate;
         resPlans.forEach((resPlan) => {
             resPlan.projects.forEach( (project) => {
                 console.log('baby shark',project.intervals[project.intervals.length - 1].end);
-                if (project.intervals[project.intervals.length - 1].end > maxDate) {maxDate = project.intervals[project.intervals.length - 1].end }
+                if(project.intervals[project.intervals.length - 1].end !== undefined) {
+                    if (project.intervals[project.intervals.length - 1].end > maxDate) {maxDate = project.intervals[project.intervals.length - 1].end }
+                }    
+                   
             })
         })
 
-        debugger;
-       console.log('maxDate', maxDate)
-         resPlans.forEach( (resPlan) => { debugger;
+    //     debugger;
+    //    console.log('maxDate', maxDate)
+      resPlans.forEach( (resPlan) => { debugger;
             
-              
+                
                 console.log('pertinent details...',this.fromDate, maxDate,this.timescale, this.workunits);
                 this._appSvc.loading(true); // this.PmAllocationStartDate(project)
-                this._resPlanUserStateSvc.exsaveResPlans([resPlan],this.fromDate, maxDate, this.timescale, this.workunits) //do we need a day timescale??
-                .subscribe( (data) => {
-                    console.log('post-subscribe data returned', data);
-                   this.resultsAreIn.push(data[0]);
-                    //this.onSaveComplete(data);
-                   
+                debugger;
+                resPlan.projects.forEach( (project) => {
+                    if (project.intervals[0].end !== undefined) {
+                        let modResPlan = resPlan;
+                        modResPlan.projects = [project];
+                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, project.finishDate, this.timescale, this.workunits) //do we need a day timescale??
+                        .subscribe( (data) => {
+                            console.log('post-subscribe data returned', data);
+                           this.resultsAreIn.push(data[0]);
+                            //this.onSaveComplete(data);
+                           
+                            }
+                            , (error) => { 
+                                this.errorMessage = <any>error
+                                this._appSvc.loading(false);}
+                        );  
                     }
-                    , (error) => { 
-                        this.errorMessage = <any>error
-                        this._appSvc.loading(false);}
-                )     
-            
+               
+                })//end projects for each
+                
+           
             })
-            
      
         this._appSvc.loading(false);
     
+   }
+
+   filterOutStableProjects(resPlans: ResPlan[]): ResPlan[] {
+       debugger;
+       console.log('coffee filter: what are resplans?', resPlans, this.savableResPlans)
+       let filteredResPlans: ResPlan[] = [];
+       if (resPlans.length > 0) {
+        resPlans.forEach((resPlan) => {
+            resPlan.projects =  this.checkProjectsForUpdates(resPlan)
+            filteredResPlans.push(resPlan);
+       })
+       console.log('venus', filteredResPlans);
+       return filteredResPlans;
+       }
+       if(this.runItBack < 6) {
+        this.runItBack++;
+        this.pmAllocationProtocol();
+       }
+       
+       return [];
+      
+   }
+
+   checkProjectsForUpdates(resPlan: ResPlan): IProject[] {
+       debugger;
+       let validProjects: IProject[] = resPlan.projects.filter(project => project.intervals[0].start !== undefined );
+       console.log('serena', validProjects);
+       return validProjects;
    }
     
 
