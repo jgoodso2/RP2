@@ -47,6 +47,8 @@ declare const window: Window;
 export class ResPlanListComponent implements OnInit, OnDestroy {
     
 
+    maxIntervalProject: IProject[];
+    maxToDate: any;
     @ViewChild('modalProjects', { static: false }) modalProjects: SimpleModalComponent;
     @ViewChild('modalResources', { static: false }) modalResources: SimpleModalComponent;
     @ViewChild('header', { static: false }) header: ResPlanHeaderRowComponent;
@@ -860,7 +862,11 @@ if (sequences.length > projectDuration.length) {
                         if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
                             debugger;
-                           let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,projectData)
+                            let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
+                            this.maxToDate = maxResPlanDate; 
+                            console.log('winner', this.maxToDate);
+                            let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,projectData, this.maxIntervalProject)
+                   
                            project.intervals = updatedProject.intervals; //return a project.  then change project project.intervals = newProject.intervals and always add to list.
                           let replacementIndex =  updatedResourcePlans.findIndex( element => element.resource.resUid == resPlan.resource.resUid);
                            if (replacementIndex === -1 ) { updatedResourcePlans.push(resPlan);} if (replacementIndex !== -1) { updatedResourcePlans[replacementIndex] = resPlan; }
@@ -870,7 +876,7 @@ if (sequences.length > projectDuration.length) {
                        // console.log('cmon eileen', updatedResourcePlans.filter(resplans => resplans.projects.length > 0));
         
                         let resPlansToSave: ResPlan[] = updatedResourcePlans.filter(resplans => resplans.projects.length > 0);
-                        this.savableResPlans = resPlansToSave;
+                        this.savableResPlans = updatedResourcePlans;
                       //  console.log('nightmoves', resPlansToSave);
                         // eileen.forEach( (resPlan => {
                 
@@ -878,7 +884,7 @@ if (sequences.length > projectDuration.length) {
                         console.log('garbage in: updatedResourcePlans, savableResPlans, resPlansToSave', updatedResourcePlans, this.savableResPlans, resPlansToSave);
                         console.log('[kat meow?]',this.savableResPlans)
                         debugger;
-                         this.katrinaProtocol(resPlansToSave)
+                         this.katrinaProtocol(updatedResourcePlans)
                        
                        
                         
@@ -907,10 +913,60 @@ if (sequences.length > projectDuration.length) {
                         this._appSvc.loading(false);
                     }); */
       
-                    
+         console.log('you a dog');           
                    
+       }
+
+        ikeProtocol() {
+            console.log('you a beast')
+            debugger;
+            this._appSvc.loading(true);
+            this.saveResPlansSub = this._resPlanUserStateSvc.saveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
+                .subscribe(
+                    (results: Result[]) => this.onSaveComplete(results),
+                    (error: any) => {
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);
+                    });
         }
        // return updatedResourcePlans;
+
+       determineResPlanMaxDate(resourcePlans: IResPlan[]): Date {
+        
+        let allProjectsOnResourcePlans: any = [resourcePlans[0].projects[0]];
+        let allPotentialToDates: any[] = [this.toDate];
+        console.log('all podates',allPotentialToDates);
+        let  resPlanMaxDate: Date;
+        resourcePlans.forEach( (resourcePlan) => {
+         resourcePlan.projects.forEach( (project) => {
+             if (project.finishDate !== null || project.finishDate !== undefined) {
+                 let finishDate = this._resPlanUserStateSvc.transformToDate(project.finishDate)
+                 //if (finishDate > this.toDate) { 
+                     console.log('why error out here',allPotentialToDates,allProjectsOnResourcePlans)
+                     allPotentialToDates.push(finishDate);
+                     allProjectsOnResourcePlans.push(project);
+                // }
+             }
+         })
+       })
+        
+        let sortedDates =this.maxDateSort(allPotentialToDates);
+        console.log('you get in the mood sortedDates = ',sortedDates, sortedDates[0]);
+         resPlanMaxDate = sortedDates[sortedDates.length - 1];
+         this.maxIntervalProject = allProjectsOnResourcePlans[0];
+         let maxIntervalProjectIndex = allProjectsOnResourcePlans.findIndex((project) => this._resPlanUserStateSvc.exgetDateFormatString(this._resPlanUserStateSvc.transformToDate(project.finishDate)) == this._resPlanUserStateSvc.exgetDateFormatString(resPlanMaxDate));
+         if (maxIntervalProjectIndex !== -1) {
+             this.maxIntervalProject = allProjectsOnResourcePlans[maxIntervalProjectIndex];
+         }
+         console.log('maximus:  index, project, and date...', maxIntervalProjectIndex, this.maxIntervalProject, resPlanMaxDate)
+         debugger;
+         return resPlanMaxDate
+     }
+
+     maxDateSort(allPotentialDates: any[]) {
+        let ComparableDates: Date[] = allPotentialDates.map((dateOfDifferingType) => this._resPlanUserStateSvc.transformToDate( dateOfDifferingType));
+        return ComparableDates.sort((b,a)=>b.getTime()-a.getTime());
+    }
 
     projectIsOngoing(project) {
         if(this._resPlanUserStateSvc.transformToDate(project.finishDate) < this._resPlanUserStateSvc.getCurrentDate()) {
@@ -966,7 +1022,7 @@ if (sequences.length > projectDuration.length) {
        return this._projectService.getPMAllocationDetails(projectName)
     }
 
-    insertPMAllocationIntervalValueforSelectedProject(projectToAddPMAllocation: IProject, projectData: any[]): IProject {
+    insertPMAllocationIntervalValueforSelectedProject(projectToAddPMAllocation: IProject, projectData: any[],maxIntervalProject: any): IProject {
         console.log('ronez be quiet insertPMAloe', projectToAddPMAllocation, 'these invervals?', projectToAddPMAllocation.intervals);
         let updatedIntervals: IInterval[] = [];
         let intervalsForDurationOfProject = this.exbuildIntervals(projectToAddPMAllocation, projectData); //need to build better intervals to align with months.
@@ -975,23 +1031,26 @@ if (sequences.length > projectDuration.length) {
             let pmAllocation = projectData[0];
             let slicePosition = projectData[0].indexOf('.');
             interval.intervalName = `Interval${index}`;
-            interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`
+            interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`;
+            // interval.intervalValue = `${pmAllocation.slice(0,slicePosition)}`;
             updatedIntervals.push(interval);
         })
       
         let updatedProjectWithIntervals = projectToAddPMAllocation;
-        if(projectToAddPMAllocation.intervals.length > updatedIntervals.length) {
-            let seqDiff = projectToAddPMAllocation.intervals.length - updatedIntervals.length;
+
+        if(maxIntervalProject.intervals.length > updatedIntervals.length) {
+            let seqDiff = maxIntervalProject.intervals.length - updatedIntervals.length;
             console.log('need to adjust for intervals....');
-            updatedIntervals = [...updatedIntervals,...projectToAddPMAllocation.intervals.slice(-seqDiff)];
+            let replacementIntervals = projectToAddPMAllocation.intervals.slice(-seqDiff);
+            replacementIntervals.map( (interval) => this.useDefaultInterval(interval))
+            updatedIntervals = [...updatedIntervals,...replacementIntervals];
             console.log('now we are cooking with oil', updatedIntervals)
         }
-
 
         updatedProjectWithIntervals.intervals = updatedIntervals;
         console.log(updatedProjectWithIntervals, 'K be quiet')
         debugger;
-        return updatedProjectWithIntervals;
+        return updatedProjectWithIntervals;    
 
 
       /*   const projectDuration = [ 1,2,3,4,5 ];
@@ -1042,6 +1101,16 @@ if (sequences.length > projectDuration.length) {
      
     }
 
+    useDefaultInterval(interval: any) {
+        let copyOfOfInterval = Object.assign({}, interval);
+        copyOfOfInterval.intervalValue = "0";
+        console.log('copy of Interval', copyOfOfInterval);
+        return copyOfOfInterval
+    }
+    
+
+
+
     buildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
        let projectDurationIntervals: IInterval[] = [];
@@ -1065,7 +1134,7 @@ if (sequences.length > projectDuration.length) {
      katrinaProtocol(resPlans: ResPlan[]):any { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
         console.log('inside katrina protocol...only ones that need saving hopefully', resPlans, this.savableResPlans);
         debugger;
-       // if (resPlans.length = 0)   {return [];}
+    //    if (resPlans.length = 0)   {return [];}
         //let filteredResPlans = this.filterOutStableProjects(resPlans);
         debugger;
         let  maxDate = this.toDate;
@@ -1094,11 +1163,11 @@ if (sequences.length > projectDuration.length) {
                         let modResPlan = resPlan;
                         modResPlan.projects = [project];
                         let sequenceDate = this.determineMaxDate(this.toDate,project.finishDate)
-                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, sequenceDate, this.timescale, this.workunits) //do we need a day timescale??
-                        .subscribe( (data) => {
-                            console.log('post-subscribe data returned', data);
-                           this.resultsAreIn.push(data[0]);
-                            //this.onSaveComplete(data);
+                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, this.maxToDate, this.timescale, this.workunits) //do we need a day timescale??
+                        .subscribe( (Result) => {
+                            console.log('post-subscribe data returned', Result);
+                           //this.resultsAreIn.push(Result[0]);
+                            this.onSaveComplete(Result);
                            
                             }
                             , (error) => { 
@@ -1112,8 +1181,9 @@ if (sequences.length > projectDuration.length) {
            
             })
      
-        this._appSvc.loading(false);
-        this.onSaveComplete(this.resultsAreIn);
+       // this._appSvc.loading(false);
+        //this.onSaveComplete(this.resultsAreIn);
+        console.log('how many times is Ike going tow')
     
    }
 
