@@ -857,7 +857,7 @@ if (sequences.length > projectDuration.length) {
         resourcePlans.forEach((resPlan,index) => {
             if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
                 resPlan.projects.forEach( (project,index) => {
-                    let projectData =  this.getPMAllocationDetails(project.projName).subscribe( (projectData) => {
+                    let projectData =  this.getPMAllocationDetails(project.projName).toPromise().then( (projectData) => {
 
                         if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
@@ -884,12 +884,9 @@ if (sequences.length > projectDuration.length) {
                         console.log('garbage in: updatedResourcePlans, savableResPlans, resPlansToSave', updatedResourcePlans, this.savableResPlans, resPlansToSave);
                         console.log('[kat meow?]',this.savableResPlans)
                         debugger;
-                         this.katrinaProtocol(updatedResourcePlans)
-                       
-                       
+                         this.katrinaProtocol(updatedResourcePlans)                       
                         
                       // this.katrinaProtocol(resPlansToSave);
-
 
                      })
             
@@ -899,7 +896,7 @@ if (sequences.length > projectDuration.length) {
             }
          //   console.log('should be every resPlan I thought...', resPlan);
           //  console.log('garbage in ', updatedResourcePlans);
-            //updatedResourcePlans.push(resPlan) 
+            updatedResourcePlans.push(resPlan) 
         })
         //add PM Allocations to list of selected Projects: addPMALlocationsToProjects(selectedProjects) forEach project make project GET, and add pm allocation to project return enhanced Projects
             //forEachEnhancedProject: this.insertPMAllocationInvervalValue(project, project)
