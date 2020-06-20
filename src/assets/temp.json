@@ -3,26 +3,6 @@
         "results": [
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'7827d4bc-9aa5-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'7827d4bc-9aa5-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 4,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd8ca735f-56aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd8ca735f-56aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 4,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
                     "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'311612a4-57aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'311612a4-57aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
@@ -33,113 +13,83 @@
             },
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'ac26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'ac26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'75a8c831-42ae-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'75a8c831-42ae-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
                 },
                 "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'5b29be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'5b29be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'576cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'576cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'3077324a-54a6-ea11-80c8-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'3077324a-54a6-ea11-80c8-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "6173277e-9040-ea11-80bc-00155d4a8803",
                 "AssignmentType": 0,
-                "ProjectName": "Project 2"
+                "ProjectName": "Project 1"
             },
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'eb26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'eb26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'6173277e-9040-ea11-80bc-00155d4a8803')",
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd3231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd3231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
                 },
-                "ProjectId": "6173277e-9040-ea11-80bc-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 2"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1fcf5b12-9ba5-ea11-80c8-00155d4a8803',ProjectId=guid'57f2dea6-9040-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1fcf5b12-9ba5-ea11-80c8-00155d4a8803',ProjectId=guid'57f2dea6-9040-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "57f2dea6-9040-ea11-80bc-00155d4a8803",
-                "AssignmentType": 4,
-                "ProjectName": "Project 3"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1a190a86-9aa5-ea11-80c8-00155d4a8803',ProjectId=guid'2ec3e692-e091-ea11-80c7-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1a190a86-9aa5-ea11-80c8-00155d4a8803',ProjectId=guid'2ec3e692-e091-ea11-80c7-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "2ec3e692-e091-ea11-80c7-00155d4a8803",
-                "AssignmentType": 4,
-                "ProjectName": "Project 4"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'3199cab6-5baa-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'3199cab6-5baa-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "726d80f4-5aaa-ea11-80c8-00155d4a8803",
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
                 "AssignmentType": 0,
-                "ProjectName": "Project 5"
+                "ProjectName": "Project 1"
             },
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'cd26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'cd26be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd7231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd7231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
                 },
-                "ProjectId": "726d80f4-5aaa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 5"
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
             },
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'8928be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'8928be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'db231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'db231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
                 },
-                "ProjectId": "726d80f4-5aaa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 5"
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
             },
             {
                 "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'816cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'816cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'726d80f4-5aaa-ea11-80c8-00155d4a8803')",
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'df231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'df231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
                     "type": "ReportingData.Assignment"
                 },
-                "ProjectId": "726d80f4-5aaa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 5"
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
+            },
+            {
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1e458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1e458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
+            },
+            {
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'22458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'22458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
+            },
+            {
+                "__metadata": {
+                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'26458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'26458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
+                    "type": "ReportingData.Assignment"
+                },
+                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "AssignmentType": 0,
+                "ProjectName": "Project 1"
             },
             {
                 "__metadata": {
@@ -150,56 +100,6 @@
                 "ProjectId": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
                 "AssignmentType": 0,
                 "ProjectName": "Project 6"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd326be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd326be7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 6"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'e62abe7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'e62abe7d-79ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 6"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'6c6cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'6c6cefe3-82ad-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 101,
-                "ProjectName": "Project 6"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'582f96a6-cb4d-ea11-80bd-00155d4a8803',ProjectId=guid'0000cf75-fb12-4ffc-a404-aec4f3258a9c')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'582f96a6-cb4d-ea11-80bd-00155d4a8803',ProjectId=guid'0000cf75-fb12-4ffc-a404-aec4f3258a9c')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "0000cf75-fb12-4ffc-a404-aec4f3258a9c",
-                "AssignmentType": 102,
-                "ProjectName": "Timesheet Administrative Work Items"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'aa217899-d04d-ea11-80bd-00155d4a8803',ProjectId=guid'0000cf75-fb12-4ffc-a404-aec4f3258a9c')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'aa217899-d04d-ea11-80bd-00155d4a8803',ProjectId=guid'0000cf75-fb12-4ffc-a404-aec4f3258a9c')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "0000cf75-fb12-4ffc-a404-aec4f3258a9c",
-                "AssignmentType": 102,
-                "ProjectName": "Timesheet Administrative Work Items"
             }
         ]
     }

@@ -12,7 +12,7 @@ import * as moment from 'moment'
 
 
 import { IResPlan, ResPlan, IProject, Project, IHiddenProject, WorkUnits, Timescale, IInterval, Interval, IResource, Resource, Config, Result, IResPlanUserWorkSpaceItem } from '../resourcePlans/res-plan.model'
-import { combineLatest, concatMap, retry, map , retryWhen, tap} from 'rxjs/operators';
+import { combineLatest, concatMap, retry, map , retryWhen, tap, mergeMap} from 'rxjs/operators';
 import { ResourcePlanFilteredService } from './resource-plan-filtered.service';
 import { error } from 'protractor';
 
@@ -284,10 +284,10 @@ export class ResourcePlanUserStateService {
 
 
 
-        return resourcesForResMgr.flatMap(resources => {
+        return resourcesForResMgr.concatMap(resources => {
+          return uniqueProjectsResMgrHasAccessOn.concatMap(p=>{
 
-
-            return this.getResPlansFromProjects(resMgrUid, resources, uniqueProjectsResMgrHasAccessOn, fromDate, toDate, timescale, workunits, showTimesheetData)
+            return this.getResPlansFromProjects(resMgrUid, resources, Observable.of(p), fromDate, toDate, timescale, workunits, showTimesheetData)
             // .do(t => {
             //     //console.log('resource plans read from add resource =' + JSON.stringify(t))
             // })
@@ -296,7 +296,7 @@ export class ResourcePlanUserStateService {
             //     //console.log('projects passed in =' + JSON.stringify(t))
             // })
         })
-
+    })
     }
 
     ///Add Resource Plan use case
@@ -386,14 +386,16 @@ export class ResourcePlanUserStateService {
     getResPlansFromProjects(resUid: string, resources: IResource[], resPlans: Observable<IResPlan[]>, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
 
         let emptyResPlans = Observable.of(resources.map(r => new ResPlan(r, [])))
-        var uniqueProjects = resPlans.flatMap(r => Observable.from(r).flatMap(r => r.projects)).distinct(x => x.projUid);
+        var uniqueProjects = resPlans.flatMap(r => Observable.from(r).flatMap(r => r.projects)).distinct(x => x.projUid).toArray();
 
-        return uniqueProjects.flatMap((project: IProject) => {
+        return uniqueProjects.concatMap((projects: IProject[]) => {
+            return Observable.from(projects).flatMap(project=>
+            {
             return this.getResPlan(resources, `${this.config.projectServerUrl}`, project, fromDate, toDate, timescale, workunits)
-
-        }).toArray().map(r => { 
+            })
+        }).map(r => { 
             return r;
-        })
+        }).toArray()
 
 
             .concat(emptyResPlans)
@@ -728,24 +730,24 @@ export class ResourcePlanUserStateService {
         let adapterPath = `${this.config.adapterUrl}`
 
         console.log("====================================Hitting Adapter Get Res Plan for project = " + project.projName)
-        return this.http.post(
+        let post$ = this.http.post(
             adapterPath, body, options
 
         ).pipe(
-            map(r => {
+            mergeMap(r => {
                 let result =  r as Result;
                 if(result.error) {
                    throw Observable.throwError(result);
                 }
                 
-                return result;
+                return Observable.of(result);
             }),
             retry(3),
             retryWhen(result=>{
-                return result.map((res :any)=>{
+                return result.flatMap((res :any)=>{
                     if(res.error)
                     {
-                        throw Observable.throwError(res);
+                        return post$.error(res);
                     }
                     return Observable.of(res as Result);
                 })
@@ -755,6 +757,7 @@ export class ResourcePlanUserStateService {
         //     {
         //         return Observable.of(project);
         //     })
+        return post$;
     }
 
 
