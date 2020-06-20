@@ -47,8 +47,8 @@ declare const window: Window;
 export class ResPlanListComponent implements OnInit, OnDestroy {
     
 
-    maxIntervalProject: IProject[];
-    maxToDate: any;
+    
+
     @ViewChild('modalProjects', { static: false }) modalProjects: SimpleModalComponent;
     @ViewChild('modalResources', { static: false }) modalResources: SimpleModalComponent;
     @ViewChild('header', { static: false }) header: ResPlanHeaderRowComponent;
@@ -65,6 +65,13 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     projectsWithDetails: IProject[] = [];
     resultsAreIn: Result[] = [];
     savableResPlans: ResPlan[] = [];
+    projectsWithPMAllocationsList: any[];
+    PMAllocationCandidates: any[] = [];
+    maxIntervalProject: IProject[];
+    maxToDate: any;
+
+
+
     resPlanUserState: IResPlan[];
     fromDate: Date;
     toDate: Date;
@@ -531,6 +538,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     openPMAllocationDialog() {
         //form dirty:
+        //curt
         
         //form not dirty:
         let dialogRef = this.openDialog({ title: "Are You Sure?", content: "This action will permanently add default PM Allocations to the selected project(s)." })
@@ -538,7 +546,21 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             this.confirmDialogResult = result;
             if (result == "yes") {
                 const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-                this.pmAllocationProtocol();
+                this.setPMAllocationCandidates().subscribe( (data) => {
+                       console.log('what is data post set pm allocation candidates in subscribe', data, this.PMAllocationCandidates);
+                       this.getProjectPMAllocations(this.PMAllocationCandidates)
+                       
+                       .subscribe( (data) => {
+                        console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
+                         this.projectsWithPMAllocationsList = data;
+                         console.log(this.projectsWithPMAllocationsList)
+                        this.pmAllocationProtocol();
+                    })//end ge projectpmallocation.subscribe()
+             } )//end setpmallocationcandidates.subscribe
+          
+
+               
+               
                // this.katrinaProtocol(this.savableResPlans);
 
                  
@@ -847,25 +869,56 @@ if (sequences.length > projectDuration.length) {
   
 
 */
+    setPMAllocationCandidates(): Observable<any[]> {
+     
+        let resourcePlans = this.getSelectedProjects();
+        let localCandidates: any[] = [];
+        resourcePlans.forEach( (resourcePlan) => {
+            resourcePlan.projects.forEach( (project) => {
+                this.PMAllocationCandidates.push(project);
+                localCandidates.push(project)
+            })
 
+        })
+        console.log(this.PMAllocationCandidates);
+        debugger;
+        return Observable.from(localCandidates);
+     
+}
+
+    getProjectPMAllocations(projects): Observable<any> {
+        debugger;
+        let localCandidates = this.PMAllocationCandidates
+       
+        return this._projectService.getProjectPMAllocations(projects);
+    }
   
   
 
      pmAllocationProtocol(): any {
+         // list of projects = [project,pmAllocation,ProjectManager]
+         console.log('why hello pmALlocation protocol')
+         //bryson
+         debugger;
         let updatedResourcePlans = [];
         let resourcePlans = this.getSelectedProjects();
         resourcePlans.forEach((resPlan,index) => {
             if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
                 resPlan.projects.forEach( (project,index) => {
-                    let projectData =  this.getPMAllocationDetails(project.projName).toPromise().then( (projectData) => {
+                    //let projectData =  this.getPMAllocationDetails(project.projName).toPromise().then( (projectData) => {
+                        let referenceProject = this.projectsWithPMAllocationsList.find((projectInList) => projectInList[0].projUid == project.projUid);
+                        debugger;
+                        console.log(referenceProject);
 
-                        if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(projectData[1],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(projectData) == true && this.projectIsOngoing(project) ) {
+
+                        if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(referenceProject[2],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(referenceProject) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
                             debugger;
                             let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
                             this.maxToDate = maxResPlanDate; 
                             console.log('winner', this.maxToDate);
-                            let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,projectData, this.maxIntervalProject)
+                            debugger
+                            let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,referenceProject, this.maxIntervalProject)
                    
                            project.intervals = updatedProject.intervals; //return a project.  then change project project.intervals = newProject.intervals and always add to list.
                           let replacementIndex =  updatedResourcePlans.findIndex( element => element.resource.resUid == resPlan.resource.resUid);
@@ -890,10 +943,10 @@ if (sequences.length > projectDuration.length) {
 
                      })
             
-                    console.log('what is project data?? null possiblly?', projectData);
-                })//after this.
+                 
+                }//after this.
                       
-            }
+            
          //   console.log('should be every resPlan I thought...', resPlan);
           //  console.log('garbage in ', updatedResourcePlans);
             updatedResourcePlans.push(resPlan) 
@@ -1005,9 +1058,9 @@ if (sequences.length > projectDuration.length) {
         return false;
     }
 
-    pmAllocationExistsInProject(projectData){
-        console.log('bulldogs');
-        let pmAllocation = projectData[0];
+    pmAllocationExistsInProject(referenceProject: any){
+        console.log('referenceProjectbulldogs');
+        let pmAllocation = referenceProject[1];
         if(pmAllocation !== null) {
             return true;
         }
@@ -1019,14 +1072,14 @@ if (sequences.length > projectDuration.length) {
        return this._projectService.getPMAllocationDetails(projectName)
     }
 
-    insertPMAllocationIntervalValueforSelectedProject(projectToAddPMAllocation: IProject, projectData: any[],maxIntervalProject: any): IProject {
+    insertPMAllocationIntervalValueforSelectedProject(projectToAddPMAllocation: IProject, referenceProject: any, maxIntervalProject: any): IProject {
         console.log('ronez be quiet insertPMAloe', projectToAddPMAllocation, 'these invervals?', projectToAddPMAllocation.intervals);
         let updatedIntervals: IInterval[] = [];
-        let intervalsForDurationOfProject = this.exbuildIntervals(projectToAddPMAllocation, projectData); //need to build better intervals to align with months.
+        let intervalsForDurationOfProject = this.exbuildIntervals(projectToAddPMAllocation, referenceProject); //need to build better intervals to align with months.
         intervalsForDurationOfProject.forEach( (interval,index) => {
-
-            let pmAllocation = projectData[0];
-            let slicePosition = projectData[0].indexOf('.');
+             
+            let pmAllocation = referenceProject[1]; //referenceProject = [{IProject}, PMAllocation, ProjectManagerName]
+            let slicePosition = referenceProject[1].indexOf('.');
             interval.intervalName = `Interval${index}`;
             interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`;
             // interval.intervalValue = `${pmAllocation.slice(0,slicePosition)}`;
@@ -1108,7 +1161,7 @@ if (sequences.length > projectDuration.length) {
 
 
 
-    buildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
+    buildIntervals(projectToAddPMAllocation: IProject, referenceProject: any[]) {
        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
        let projectDurationIntervals: IInterval[] = [];
        let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
@@ -1118,7 +1171,7 @@ if (sequences.length > projectDuration.length) {
        return projectDurationIntervals;
     }
 
-    exbuildIntervals(projectToAddPMAllocation: IProject, projectData: any[]) {
+    exbuildIntervals(projectToAddPMAllocation: IProject, referenceProject: any[]) {
         console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);

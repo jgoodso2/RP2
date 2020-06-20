@@ -13,6 +13,7 @@ declare var $: any;
 @Injectable()
 export class ProjectService {
 
+ 
     private url: string = 'api/dataservice/';
     public projects: IProject[];
     config: Config;
@@ -70,13 +71,13 @@ export class ProjectService {
             .catch(this.handleError);
     }
 
-    getPMAllocationDetails(projectName: string): Observable<any[]> {
+    getPMAllocationDetails(project: IProject): Observable<any[]> {
         let headers = new HttpHeaders();
         headers = headers.set('Accept', 'application/json;odata=verbose').set('Content-Type', 'application/x-www-form-urlencoded')
         let options = {
             headers
         };
-        let encodedProjectName = encodeURI(projectName);
+        let encodedProjectName = encodeURI(project.projName);
         console.log('good name', encodedProjectName)
         return this.http.get(`https://perviewqa.app.parallon.com/PWA/_api/ProjectData/Projects?$filter=ProjectName%20eq%20%27${encodedProjectName}%27&$select=ProjectName,PMAllocation,ProjectEarlyStart,ProjectFinishDate,ProjectOwnerName`,options)
             .map(data => {
@@ -87,7 +88,7 @@ export class ProjectService {
                 let projectOwnerName = data["d"]["results"][0]["ProjectOwnerName"]; 
                 //let startDate = data["d"]["results"][0]["ProjectOwnerName"]; 
                 data["d"]["results"][0]["ProjectOwnerName"]; 
-                let PMAllocationDetails = [pmAllocation, projectOwnerName];
+                let PMAllocationDetails = [project, pmAllocation, projectOwnerName];
                 return PMAllocationDetails;
             })
         //need to finesse   //https://perviewqa.app.parallon.com/PWA/_api/ProjectData/Projects?$filter=ProjectId%3Dd977d729-0a5f-ea11-8147-0050568f78ef$select=ProjectName,PMAllocation,ProjectStartDate,ProjectFinishDate  
@@ -96,4 +97,26 @@ export class ProjectService {
         //how to use encoding that I will need: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURI  //simply put: encodeURI('Project Name') then use templating. 
        
     }
+
+    getProjectPMAllocations(projects: IProject[]): Observable<any> {
+        debugger;
+        console.log('inside getProjectPMAllocations, projects = ', projects)
+        let observables: Observable<any>[] = []
+        for (let i = 0; i < projects.length; i++) {
+            observables.push(this.getPMAllocationDetails(projects[i]))
+        }
+              return Observable.forkJoin(observables);
+           /*  (dataArray */ /* (dataArray) => { */
+                // All observables in `observables` array have resolved and `dataArray` is an array of result of each observable
+            /*     console.log('dataArray0 array=', dataArray.map(x => x[0]));
+                console.log('dataArray[0], dataArray[1], DA00 da01', dataArray[0],dataArray[1], dataArray[0][0], dataArray[0],[1]);
+
+                debugger;
+                return dataArray;
+            });
+            debugger;
+            return allProjectPMAllocations;
+            */
+    }
+
 }
