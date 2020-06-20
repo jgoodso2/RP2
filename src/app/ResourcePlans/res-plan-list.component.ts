@@ -549,12 +549,16 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 this.setPMAllocationCandidates().subscribe( (data) => {
                        console.log('what is data post set pm allocation candidates in subscribe', data, this.PMAllocationCandidates);
                        this.getProjectPMAllocations(this.PMAllocationCandidates)
-                       
                        .subscribe( (data) => {
-                        console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
-                         this.projectsWithPMAllocationsList = data;
-                         console.log(this.projectsWithPMAllocationsList)
-                        this.pmAllocationProtocol();
+                            console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
+                            this.projectsWithPMAllocationsList = data;
+                            console.log(this.projectsWithPMAllocationsList)
+                            this.pmAllocationProtocol();
+                            debugger;
+                            console.log('about to run ike protocol in this.openPMAllocationDialog for first time I invoke')
+                            this.ikeProtocol();
+                            console.log('this is the end of the road before race me');
+                            this.raceMe();
                     })//end ge projectpmallocation.subscribe()
              } )//end setpmallocationcandidates.subscribe
           
@@ -566,6 +570,11 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                  
             }
         });
+    }
+
+    raceMe(): void {
+        console.log('async purgatory, this is a test to see if this runs before the completion of pm allocation protocol, which would explain a lot...mainly that I need to make pm allocation protocol a observable to make this work.');
+        debugger;
     }
 
     addResPlan(): void {
@@ -897,11 +906,16 @@ if (sequences.length > projectDuration.length) {
 
      pmAllocationProtocol(): any {
          // list of projects = [project,pmAllocation,ProjectManager]
+       
          console.log('why hello pmALlocation protocol')
          //bryson
          debugger;
         let updatedResourcePlans = [];
         let resourcePlans = this.getSelectedProjects();
+        let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
+        this.maxToDate = maxResPlanDate; 
+        console.log('winner', this.maxToDate);
+        
         resourcePlans.forEach((resPlan,index) => {
             if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
                 resPlan.projects.forEach( (project,index) => {
@@ -914,9 +928,7 @@ if (sequences.length > projectDuration.length) {
                         if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(referenceProject[2],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(referenceProject) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
                             debugger;
-                            let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
-                            this.maxToDate = maxResPlanDate; 
-                            console.log('winner', this.maxToDate);
+                            
                             debugger
                             let updatedProject =  this.insertPMAllocationIntervalValueforSelectedProject(project,referenceProject, this.maxIntervalProject)
                    
@@ -935,10 +947,10 @@ if (sequences.length > projectDuration.length) {
                 
                         // }))
                         console.log('garbage in: updatedResourcePlans, savableResPlans, resPlansToSave', updatedResourcePlans, this.savableResPlans, resPlansToSave);
-                        console.log('[kat meow?]',this.savableResPlans)
+                       
                         debugger;
-                         this.katrinaProtocol(updatedResourcePlans)                       
-                        
+                        // this.katrinaProtocol(updatedResourcePlans)                       
+                     
                       // this.katrinaProtocol(resPlansToSave);
 
                      })
@@ -949,7 +961,8 @@ if (sequences.length > projectDuration.length) {
             
          //   console.log('should be every resPlan I thought...', resPlan);
           //  console.log('garbage in ', updatedResourcePlans);
-            updatedResourcePlans.push(resPlan) 
+            updatedResourcePlans.push(resPlan);
+            
         })
         //add PM Allocations to list of selected Projects: addPMALlocationsToProjects(selectedProjects) forEach project make project GET, and add pm allocation to project return enhanced Projects
             //forEachEnhancedProject: this.insertPMAllocationInvervalValue(project, project)
@@ -962,18 +975,20 @@ if (sequences.length > projectDuration.length) {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
                     }); */
-      
-         console.log('you a dog');           
+         debugger;
+         console.log('you a dog');   
+         console.log('[kat meow?]',this.savableResPlans); 
                    
        }
 
         ikeProtocol() {
+            debugger;
             console.log('you a beast')
             debugger;
             this._appSvc.loading(true);
-            this.saveResPlansSub = this._resPlanUserStateSvc.saveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
+            this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
                 .subscribe(
-                    (results: Result[]) => this.onSaveComplete(results),
+                    (results: Result[]) =>{ debugger; console.log('are you homa running', results   ); this.onSaveComplete(results)} ,
                     (error: any) => {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
@@ -1213,7 +1228,7 @@ if (sequences.length > projectDuration.length) {
                         let modResPlan = resPlan;
                         modResPlan.projects = [project];
                         let sequenceDate = this.determineMaxDate(this.toDate,project.finishDate)
-                        this._resPlanUserStateSvc.exsaveResPlans([modResPlan],this.fromDate, this.maxToDate, this.timescale, this.workunits) //do we need a day timescale??
+                        this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans,this.fromDate, this.maxToDate, this.timescale, this.workunits) //do we need a day timescale??
                         .subscribe( (Result) => {
                             console.log('post-subscribe data returned', Result);
                            //this.resultsAreIn.push(Result[0]);

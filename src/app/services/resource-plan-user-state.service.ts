@@ -917,7 +917,6 @@ export class ResourcePlanUserStateService {
         console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
         console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
         console.log('what is dat?', this.transformResPlanDatesToString(resPlan));
-        toDate = this.getLastestDate(resPlan); //earliest date is always today.
         let fromDated = this.getEarliestDate(resPlan);
        let  transformedResPlan = this.transformResPlanDatesToString(resPlan);
         var success;
@@ -935,7 +934,7 @@ export class ResourcePlanUserStateService {
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${JSON.stringify(resPlanForBodyFinal)}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBodyFinal}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };
