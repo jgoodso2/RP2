@@ -553,10 +553,13 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                             console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
                             this.projectsWithPMAllocationsList = data;
                             console.log(this.projectsWithPMAllocationsList)
-                            this.pmAllocationProtocol();
+                         
+                            this.pmAllocationProtocol().subscribe(
+                                (data) => {    wait(4000);this.ikeProtocol();}
+                            );
                             debugger;
                             console.log('about to run ike protocol in this.openPMAllocationDialog for first time I invoke')
-                            this.ikeProtocol();
+                            // this.ikeProtocol();
                             console.log('this is the end of the road before race me');
                             this.raceMe();
                     })//end ge projectpmallocation.subscribe()
@@ -904,7 +907,7 @@ if (sequences.length > projectDuration.length) {
   
   
 
-     pmAllocationProtocol(): any {
+     pmAllocationProtocol(): Observable <any[]> {
          // list of projects = [project,pmAllocation,ProjectManager]
        
          console.log('why hello pmALlocation protocol')
@@ -935,7 +938,7 @@ if (sequences.length > projectDuration.length) {
                            project.intervals = updatedProject.intervals; //return a project.  then change project project.intervals = newProject.intervals and always add to list.
                           let replacementIndex =  updatedResourcePlans.findIndex( element => element.resource.resUid == resPlan.resource.resUid);
                            if (replacementIndex === -1 ) { updatedResourcePlans.push(resPlan);} if (replacementIndex !== -1) { updatedResourcePlans[replacementIndex] = resPlan; }
-                          
+                          debugger;
                         }
 
                        // console.log('cmon eileen', updatedResourcePlans.filter(resplans => resplans.projects.length > 0));
@@ -954,14 +957,14 @@ if (sequences.length > projectDuration.length) {
                       // this.katrinaProtocol(resPlansToSave);
 
                      })
-            
-                 
-                }//after this.
+                     
+           
+            }//after this.
                       
             
          //   console.log('should be every resPlan I thought...', resPlan);
           //  console.log('garbage in ', updatedResourcePlans);
-            updatedResourcePlans.push(resPlan);
+          
             
         })
         //add PM Allocations to list of selected Projects: addPMALlocationsToProjects(selectedProjects) forEach project make project GET, and add pm allocation to project return enhanced Projects
@@ -978,21 +981,19 @@ if (sequences.length > projectDuration.length) {
          debugger;
          console.log('you a dog');   
          console.log('[kat meow?]',this.savableResPlans); 
-                   
+        return Observable.from(updatedResourcePlans);
        }
 
         ikeProtocol() {
             debugger;
             console.log('you a beast')
-            debugger;
+            
             this._appSvc.loading(true);
-            this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
+                 this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
                 .subscribe(
-                    (results: Result[]) =>{ debugger; console.log('are you homa running', results   ); this.onSaveComplete(results)} ,
-                    (error: any) => {
-                        this.errorMessage = <any>error
-                        this._appSvc.loading(false);
-                    });
+                   (results: Result[]) => { debugger; console.log('are you homa running', results   ); this.onSaveComplete(results)} 
+                   
+                );
         }
        // return updatedResourcePlans;
 
