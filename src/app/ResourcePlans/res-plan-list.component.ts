@@ -1191,7 +1191,7 @@ if (sequences.length > projectDuration.length) {
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
         let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
-        projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+        projectDurationIntervals = this._resPlanUserStateSvc.buildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
         console.log('looking for forrester intervals', projectDurationIntervals);
         return projectDurationIntervals;
      }
