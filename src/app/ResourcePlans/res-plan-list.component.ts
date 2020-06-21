@@ -49,6 +49,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     
 
+   
+    
+  
     @ViewChild('modalProjects', { static: false }) modalProjects: SimpleModalComponent;
     @ViewChild('modalResources', { static: false }) modalResources: SimpleModalComponent;
     @ViewChild('header', { static: false }) header: ResPlanHeaderRowComponent;
@@ -60,7 +63,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     currentFormGroup: FormGroup;
     errorMessage: string;
     _intervalCount: number = 0;
-    runItBack: number = 0;
+  
     
     projectsWithDetails: IProject[] = [];
     resultsAreIn: Result[] = [];
@@ -69,6 +72,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     PMAllocationCandidates: any[] = [];
     maxIntervalProject: IProject[];
     maxToDate: any;
+    pmAllocationCounter: number = 0;
+    numberOfSelectedProjects: number;
+    runItBack: number = 0;
 
 
 
@@ -568,7 +574,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
                
                
-               // this.katrinaProtocol(this.savableResPlans);
+           
 
                  
             }
@@ -911,6 +917,8 @@ if (sequences.length > projectDuration.length) {
          // list of projects = [project,pmAllocation,ProjectManager]
        
          console.log('why hello pmALlocation protocol')
+         this.pmAllocationCounter++
+         this.numberOfSelectedProjects = this.PMAllocationCandidates.length;
          //bryson
          debugger;
         let updatedResourcePlans = [];
@@ -952,7 +960,7 @@ if (sequences.length > projectDuration.length) {
                         console.log('garbage in: updatedResourcePlans, savableResPlans, resPlansToSave', updatedResourcePlans, this.savableResPlans, resPlansToSave);
                        
                         debugger;
-                        // this.katrinaProtocol(updatedResourcePlans)                       
+                                       
                      
                       // this.katrinaProtocol(resPlansToSave);
 
@@ -985,15 +993,28 @@ if (sequences.length > projectDuration.length) {
        }
 
         ikeProtocol() {
+         
+            let readyStatus:Boolean = this.ikeProtocolCheck();
             debugger;
-            console.log('you a beast')
-            
             this._appSvc.loading(true);
-                 this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits)
+            let readyForSave = this.ikeProtocolCheck();
+            this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits,readyStatus)
                 .subscribe(
-                   (results: Result[]) => { debugger; console.log('are you homa running', results   ); this.onSaveComplete(results)} 
-                   
-                );
+                    (results: Result[]) =>{ debugger; console.log('ready status is: + results',readyStatus, '+' ,  results   );
+                    //if results does not equal [] then on save complete otherwise do nothing.
+                    this.onSaveComplete(results)} ,
+                    (error: any) => {
+                        this.errorMessage = <any>error
+                        this._appSvc.loading(false);
+                    });
+        }
+
+        ikeProtocolCheck(): Boolean {
+            debugger;
+            if(this.pmAllocationCounter == this.numberOfSelectedProjects) {
+                return true;
+            }
+            return false;
         }
        // return updatedResourcePlans;
 
@@ -1197,61 +1218,7 @@ if (sequences.length > projectDuration.length) {
         return projectDurationIntervals;
      }
 
-     katrinaProtocol(resPlans: ResPlan[]):any { //for each resplan.projects (saveResPlan using project.start and finish dates as needed);
-        console.log('inside katrina protocol...only ones that need saving hopefully', resPlans, this.savableResPlans);
-        debugger;
-    //    if (resPlans.length = 0)   {return [];}
-        //let filteredResPlans = this.filterOutStableProjects(resPlans);
-        debugger;
-        let  maxDate = this.toDate;
-    
-        resPlans.forEach((resPlan) => {
-            resPlan.projects.forEach( (project) => {
-                console.log('baby shark',project.intervals[project.intervals.length - 1].end);
-                if(project.intervals[project.intervals.length - 1].end !== undefined) {
-                    if (project.intervals[project.intervals.length - 1].end > maxDate) {maxDate = project.intervals[project.intervals.length - 1].end }
-                }    
-                   
-            })
-        })
-
-    //     debugger;
-    //    console.log('maxDate', maxDate)
-      resPlans.forEach( (resPlan) => { debugger;
-            
-                
-                console.log('pertinent details...from,maxdate,timescale,workunits,intervalcount',this.fromDate, maxDate,this.timescale, this.workunits,this._intervalCount);
-                this._appSvc.loading(true); // this.PmAllocationStartDate(project)
-                debugger;
-                resPlan.projects.forEach( (project) => {
-                    if (project.intervals[0].end !== undefined) {
-                        console.log('interval checking...projectIntervalLength vs. intervalCount', project.intervals.length, this._intervalCount);
-                        let modResPlan = resPlan;
-                        modResPlan.projects = [project];
-                        let sequenceDate = this.determineMaxDate(this.toDate,project.finishDate)
-                        this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans,this.fromDate, this.maxToDate, this.timescale, this.workunits) //do we need a day timescale??
-                        .subscribe( (Result) => {
-                            console.log('post-subscribe data returned', Result);
-                           //this.resultsAreIn.push(Result[0]);
-                            this.onSaveComplete(Result);
-                           
-                            }
-                            , (error) => { 
-                                this.errorMessage = <any>error
-                                this._appSvc.loading(false);}
-                        );  
-                    }
-               
-                })//end projects for each
-                
-           
-            })
-     
-       // this._appSvc.loading(false);
-        //this.onSaveComplete(this.resultsAreIn);
-        console.log('how many times is Ike going tow')
-    
-   }
+ 
 
    determineMaxDate(toDate: Date, projectFinishDate: Date): Date {
        if(toDate > projectFinishDate) {

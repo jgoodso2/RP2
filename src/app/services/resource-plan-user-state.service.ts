@@ -18,6 +18,7 @@ declare var $: any;
 
 @Injectable()
 export class ResourcePlanUserStateService {
+    savePlansCounter: number;
     config: Config;
     constructor(private http: HttpClient, private _configSvc: ConfigService, private resourcePlanFilteredSvc:ResourcePlanFilteredService) {
         this.config = _configSvc.config;
@@ -913,10 +914,13 @@ export class ResourcePlanUserStateService {
     }
 
     
-    exsaveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits): Observable<Result[]> {
+    exsaveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits, readyToExecuteSave:Boolean): Observable<Result[]> {
         console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
         console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
         console.log('what is dat?', this.transformResPlanDatesToString(resPlan));
+        if(readyToExecuteSave == false) {
+            return Observable.from([]);
+        }
         let fromDated = this.getEarliestDate(resPlan);
        let  transformedResPlan = this.transformResPlanDatesToString(resPlan);
         var success;
