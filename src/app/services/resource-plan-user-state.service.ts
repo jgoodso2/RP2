@@ -936,7 +936,7 @@ export class ResourcePlanUserStateService {
         const regexPercent =  /(0%)/gm;
         let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart"');
         let resPlanBodyWithPercents = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd"');
-        let resPlanFinal = resPlanBodyWithPercents.replace(regexPercent,"'0'")
+        let resPlanFinal = resPlanBodyWithPercents.replace(regexPercent,"0")
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);

@@ -1002,7 +1002,7 @@ if (sequences.length > projectDuration.length) {
                 .subscribe(
                     (results: Result[]) =>{ debugger; console.log('ready status is: + results',readyStatus, '+' ,  results   );
                     //if results does not equal [] then on save complete otherwise do nothing.
-                    this.onSaveComplete(results)} ,
+                    this.onSaveComplete(results);} ,
                     (error: any) => {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
