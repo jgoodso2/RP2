@@ -536,8 +536,8 @@ export class ResourcePlanUserStateService {
             }
             else {
                 firstInterval.start = new Date(moment(_startDate).format('l'));
-                firstInterval.end = new Date(moment(_startDate).endOf('month').format('l'))       //Nwaelele certified
-                console.log('grenade!',firstInterval)
+                firstInterval.end = new Date(moment(_startDate).endOf('month').add(1,'hours').startOf('month').format('l'))       //Nwaelele certified (to revert use iraqi mission accomplished or this paste =  new Date(moment(_startDate).endOf('month').format('l')))
+                console.log('grenade first interval!',firstInterval)
             }
 
 
@@ -557,8 +557,8 @@ export class ResourcePlanUserStateService {
 
             for (var i = 0; i < monthsToGenerate; i++) {
                 let interval = new Interval()
-                interval.start = new Date(moment(intervals[i].end).add(1, 'days').format('l'))
-                interval.end = new Date (moment(interval.start).endOf('month').format('l'))
+                interval.start = new Date(moment(intervals[i].end).format('l'))
+                interval.end = new Date (moment(interval.start).add(1,'month').startOf('month').format('l'))
                 intervals.push(interval)
             }
 

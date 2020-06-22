@@ -427,11 +427,11 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     buildInterval(interval: IInterval, _project, resPlans: IResPlan[]): FormGroup {
     
-        console.log(interval, interval.intervalValue)
+        console.log('not sexy',interval, interval.intervalValue)
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
-            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform('0', this.workunits), this.workunits), //beers
+            intervalValue: [new CellWorkUnitsPipe().transform(new IntervalPipe().transform(interval.intervalValue, this.workunits), this.workunits), //beers
             Validators.pattern(this.getIntervalValidationPattern())],
             intervalStart: interval.start,
             intervalEnd: interval.end
@@ -715,34 +715,30 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 this.currentFormGroup.value["resName"]);
             this.addProjectsSub = this._resPlanUserStateSvc.addOrShowProjects(resMgr, this._modalSvc.selectedProjects, resource,
                 fromDate, toDate, timescale, workunits)
-                .subscribe(results => {
+                .subscribe( (results) => {
                     console.log('this is what i have been missing', results)
                  
-                    //let projects = this._modalSvc.selectedProjects;
-                   //let successResults =  results as IProject[]
+                    let projects = this._modalSvc.selectedProjects;
+                    
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
-                  //  let superSuccessfulProjects: IProject[] = []
-                   // let successfullProjectsObjects = results.filter(r => r.success == true)//.map(t => t.project)
+                    let superSuccessfulProjects: IProject[] = [];
+                    let successfullProjectsObjects = results.filter(r => r.success == true)//.map(t => t.project)
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project)
-                    //superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results).map(t => t.project));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
-                   // console.log(superSuccessfulProjects, "leggo my egg");
+                    superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results).map(t => t.project));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
+                    console.log(superSuccessfulProjects, "leggo my egg");
                     console.log('what are pm allocation here in successful projects?', successfullProjects)
-                    // let modifiedSuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
+                    let modifiedSuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
                     // let modifiedSuccessfulProjects2 = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
                     // let againModedsuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
                     // console.log('what are mod successful projects',modifiedSuccessfulProjects);
                     // console.log('what are againmoded successful projects',againModedsuccessfulProjects);
                     debugger;
                     //go through supersuccessful projects and change intervals if pm.Allocation is present in project
-
-                    
-                    
-                    //.map(t => t.project);
-                    //projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
+                    projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
                   //this.setPmAllocationProjects(modifiedSuccessfulProjects)
-                  // let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
+                   let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
                    debugger
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
@@ -752,12 +748,12 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                                 console.log(resPlans, 'circles') //i have resourceName and projects, but not projectOwner need to do operations here actually...wow!
                                     
                                     //get all resPlanProjects in a particular order (function needed)
-                                   // let orderProjects = resPlans[0].projects.sort();
-                                  //  let gotProjects = this.getPmAllocationProjects();
-                                   // let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
+                                   let orderProjects = resPlans[0].projects.sort();
+                                   let gotProjects = this.getPmAllocationProjects();
+                                   let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
                                     //need to filter engagePmAllocation for
 
-                                  // let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
+                                   let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
 
                                     //for each project in resPlan Projects if corresponding project in pmAllocationProjects has resName = projectOwnerName and PM ALlocation does not equal "" 
                                         //then fill intervals with pmAllocation interval value (function needed)
@@ -767,10 +763,11 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
                                 debugger
+                                console.log('useful shot lad.', resPlans, usableProjectsWithPMAllocations);
                               //  this._resPlanUserStateSvc.addResourceNameToProjects( resPlans[0].projects, resPlans) //what's the point of this??
-                                this.buildSelectedProjects(resPlans,successfullProjects)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
+                                this.buildSelectedProjects(resPlans,usableProjectsWithPMAllocations)//.filter(r=>r.projUid.toUpperCase))// before this onnly had projects....
                                 this.header && this.header.setIntervals(resPlans);
-                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,successfullProjects) //CHECK THIS VALUE THOUGH
+                                this.initTotals(this.currentFormGroup.get('totals') as FormArray,usableProjectsWithPMAllocations) //CHECK THIS VALUE THOUGH
                                 this.calculateTotals(this.currentFormGroup);
                                 debugger;
                             });
@@ -852,13 +849,15 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     insertPMAllocationIntervalValueForAddedProject(detailedProject: IProject, projectToAddPMAllocation: IProject) {
         let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
-        console.log(copyOfIntervals)
+        console.log('here is a copy of intervals...',copyOfIntervals)
         let newIntervalsWithPmAllocation: Interval[] = []
         copyOfIntervals.forEach(interval => {
-            interval.intervalValue = detailedProject.pmAllocation;
+             //let slicePosition = detailedProject.pmAllocation.indexOf('.');  
+             interval.intervalValue = `.${detailedProject.pmAllocation}`;//  `.${detailedProject.pmAllocation.slice(0,slicePosition)}`; 
             newIntervalsWithPmAllocation.push(interval);
         })
         newIntervalsWithPmAllocation.shift();
+        
 
         //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
         let projectWithPMAllocationIntervals = projectToAddPMAllocation;
@@ -1193,6 +1192,8 @@ if (sequences.length > projectDuration.length) {
         delete interval.start;
         delete interval.end;
         let copyOfOfInterval = Object.assign({}, interval);
+        delete copyOfOfInterval.start;
+        delete copyOfOfInterval.end;
         copyOfOfInterval.intervalValue = "0";
         console.log('copy of Interval = ', copyOfOfInterval,'interval = ', interval);
         debugger;
