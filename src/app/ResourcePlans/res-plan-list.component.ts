@@ -742,7 +742,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                    debugger
                     if (successfullProjects.length > 0) {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
-                            Observable.of([new ResPlan(resource, successfullProjects)]), fromDate, toDate, timescale, workunits
+                            Observable.of([new ResPlan(resource, modifiedSuccessfulProjects)]), fromDate, toDate, timescale, workunits
                             , showTimesheetData).subscribe(resPlans => {
                              
                                 console.log(resPlans, 'circles') //i have resourceName and projects, but not projectOwner need to do operations here actually...wow!
