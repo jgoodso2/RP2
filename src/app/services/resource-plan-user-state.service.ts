@@ -775,6 +775,7 @@ export class ResourcePlanUserStateService {
          project.pmAllocation = usableAllocation;
          projectsWithResourceNames.push(project);
        })
+       debugger;
        console.log(projectsWithResourceNames)
        return projectsWithResourceNames;
      }

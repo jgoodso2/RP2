@@ -75,6 +75,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     pmAllocationCounter: number = 0;
     numberOfSelectedProjects: number;
     runItBack: number = 0;
+    projectsSelecteForAddition: IProject[] = [];
 
 
 
@@ -718,7 +719,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 .subscribe( (results) => {
                     console.log('this is what i have been missing', results)
                  
-                    let projects = this._modalSvc.selectedProjects;
+                    this.projectsSelecteForAddition = this._modalSvc.selectedProjects;
                     
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
@@ -735,7 +736,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     // console.log('what are againmoded successful projects',againModedsuccessfulProjects);
                     debugger;
                     //go through supersuccessful projects and change intervals if pm.Allocation is present in project
-                    projects.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
+                    this.projectsSelecteForAddition.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
                   //this.setPmAllocationProjects(modifiedSuccessfulProjects)
                    let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
@@ -836,6 +837,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     }
 
     checkForPMAllocationCases(projectToCheck: IProject,projectsWithDetails: IProject[], resName:string): any {
+        debugger;
        let foundProject = projectsWithDetails.find(project => (project.projName === projectToCheck.projName  && project.resName === resName && (project.pmAllocation !== "" || project.pmAllocation !== undefined)))// && project.resName = resName
        if ( foundProject) {
            debugger;
@@ -848,18 +850,15 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
     insertPMAllocationIntervalValueForAddedProject(detailedProject: IProject, projectToAddPMAllocation: IProject) {
+        let referenceProject = this.projectsSelecteForAddition.find((project) => project.projUid == detailedProject.projUid);
         let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
-        console.log('here is a copy of intervals...',copyOfIntervals)
+        console.log('here is a copy of intervals...,detailedProject, projectoaddpmallocation',copyOfIntervals, detailedProject,projectToAddPMAllocation);
         let newIntervalsWithPmAllocation: Interval[] = []
-        copyOfIntervals.forEach(interval => {
-             //let slicePosition = detailedProject.pmAllocation.indexOf('.');  
-             interval.intervalValue = `.${detailedProject.pmAllocation}`;//  `.${detailedProject.pmAllocation.slice(0,slicePosition)}`; 
-            newIntervalsWithPmAllocation.push(interval);
-        })
+        newIntervalsWithPmAllocation = copyOfIntervals.map(interval => this.applyConditionalPMAllocationValue(detailedProject,referenceProject, interval)) //which project do i need to pass on....
+             //  `.${detailedProject.pmAllocation.slice(0,slicePosition)}`; 
+        console.log('is shift still needed?', newIntervalsWithPmAllocation)
         newIntervalsWithPmAllocation.shift();
-        
-
-        //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
+         //for each interval...set interval value to pmAllocation push into newIntervals...project.intervals = project.newIntervals.
         let projectWithPMAllocationIntervals = projectToAddPMAllocation;
         projectWithPMAllocationIntervals.intervals = newIntervalsWithPmAllocation
         debugger
@@ -867,6 +866,29 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return projectWithPMAllocationIntervals;
 
     }
+
+    applyConditionalPMAllocationValue(detailedProject,interval, referenceProject): Interval {
+        debugger;
+        console.log('interval,detailedproject,referenceproject', interval,detailedProject, referenceProject);
+        let _intervalStart = new Date(interval.start)
+        let _intervalEnd = new Date(interval.end) 
+        let _projStart = new Date(referenceProject.startDate)
+        let _projFinish = new Date(referenceProject.finishDate)
+    
+        if ((_intervalStart <= _projStart && _intervalEnd <= _projStart) || (_intervalStart > _projFinish ) )   {
+         interval.intervalValue = "0";
+         debugger;
+          return interval;
+        }
+        else {
+          interval.intervalValue = `.${detailedProject.pmAllocation}`;
+          debugger;
+          return interval;
+        }
+    
+    }
+
+
 /* EXHIBIT A
   const projectDuration = [ 1,2,3,4,5 ];
 const sequences = [1,2,3,4,5,6,7,8,9,10,11,12];
