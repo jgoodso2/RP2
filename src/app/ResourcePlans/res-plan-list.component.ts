@@ -1120,6 +1120,7 @@ if (sequences.length > projectDuration.length) {
             interval.intervalName = `Interval${index}`;
             interval.intervalValue = `.${pmAllocation.slice(0,slicePosition)}`;
             // interval.intervalValue = `${pmAllocation.slice(0,slicePosition)}`;
+            debugger;
             updatedIntervals.push(interval);
         })
       
@@ -1127,7 +1128,7 @@ if (sequences.length > projectDuration.length) {
 
         if(maxIntervalProject.intervals.length > updatedIntervals.length) {
             let seqDiff = maxIntervalProject.intervals.length - updatedIntervals.length;
-            console.log('need to adjust for intervals....');
+            console.log('need to adjust for intervals....projectToAddPMAllocation.intervals = ',projectToAddPMAllocation.intervals );
             let replacementIntervals = projectToAddPMAllocation.intervals.slice(-seqDiff);
             replacementIntervals.map( (interval) => this.useDefaultInterval(interval))
             updatedIntervals = [...updatedIntervals,...replacementIntervals];
@@ -1189,9 +1190,12 @@ if (sequences.length > projectDuration.length) {
     }
 
     useDefaultInterval(interval: any) {
+        delete interval.start;
+        delete interval.end;
         let copyOfOfInterval = Object.assign({}, interval);
         copyOfOfInterval.intervalValue = "0";
-        console.log('copy of Interval', copyOfOfInterval);
+        console.log('copy of Interval = ', copyOfOfInterval,'interval = ', interval);
+        debugger;
         return copyOfOfInterval
     }
     
@@ -1203,17 +1207,17 @@ if (sequences.length > projectDuration.length) {
        let projectDurationIntervals: IInterval[] = [];
        let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
        let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
-       projectDurationIntervals = this._resPlanUserStateSvc.buildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+       projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
        console.log('looking for forrester intervals', projectDurationIntervals);
        return projectDurationIntervals;
     }
 
     exbuildIntervals(projectToAddPMAllocation: IProject, referenceProject: any[]) {
-        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.buildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
+        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.exbuildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
         let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
-        projectDurationIntervals = this._resPlanUserStateSvc.buildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+        projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
         console.log('looking for forrester intervals', projectDurationIntervals);
         return projectDurationIntervals;
      }

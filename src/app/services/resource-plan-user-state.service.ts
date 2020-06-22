@@ -252,7 +252,7 @@ export class ResourcePlanUserStateService {
     }
 
     getResPlansFromProjects(resUid: string, resources: IResource[], resPlans: Observable<IResPlan[]>, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
-
+        console.log('grenade...this is in getResPlansFromProjects looking for start/finish dates',fromDate,toDate)
         let emptyResPlans = Observable.of(resources.map(r => new ResPlan(r, [])))
         var uniqueProjects = resPlans.flatMap(r => Observable.from(r).flatMap(r => r.projects)).distinct(x => x.projUid);
         console.log('these are the unique projects exactly: ', uniqueProjects);
@@ -298,7 +298,7 @@ export class ResourcePlanUserStateService {
                         readOnlyProjectsInRP.forEach(project => {
                             project.readOnly = true;
                             project.readOnlyReason = allReadOnlyProjects.find(x => x.projUid.toUpperCase() == project.projUid.toUpperCase()).readOnlyReason
-                            project.intervals = this.buildIntervals(fromDate, toDate, timescale);
+                            project.intervals = this.exbuildIntervals(fromDate, toDate, timescale);
                         });
                     }
                     //weed out stale publish projects
@@ -486,10 +486,10 @@ export class ResourcePlanUserStateService {
 
 
     exbuildIntervals(_startDate: Date, _endDate: Date, _timeScale: Timescale): IInterval[] {
-        console.log('times up', _startDate,_endDate );
+        console.log('times up: start date/end date', _startDate,_endDate );
         
         let intervals: Interval[] = []
-        let firstInterval = new Interval()
+        let firstInterval = new Interval() //=today
         if (_timeScale == Timescale.weeks) {
             if (moment(_startDate).day() === 0) {  //sunday
                 firstInterval.start = moment(_startDate).toDate()
@@ -530,20 +530,20 @@ export class ResourcePlanUserStateService {
 
         if (_timeScale == Timescale.calendarMonths) { //ex
             ;
-            if (moment(_startDate).endOf('month').date() === moment(_startDate).date()) {  //end of month
+            if (moment(_startDate).endOf('month').date() === moment(_startDate).date()) {  // if the start date is the last day of the monthend of month (Stephen Donna)
                 firstInterval.start = new Date ( moment(_startDate).format('l'))
                 firstInterval.end = new Date (moment(_startDate).format('l'))
             }
             else {
                 firstInterval.start = new Date(moment(_startDate).format('l'));
-                firstInterval.end = new Date(moment(_startDate).endOf('month').format('l'))
-                console.log(firstInterval)
+                firstInterval.end = new Date(moment(_startDate).endOf('month').format('l'))       //Nwaelele certified
+                console.log('grenade!',firstInterval)
             }
 
 
             let lastInterval = new Interval()
             if (moment(_endDate).date() === 1) {   //beginning of the month
-                lastInterval.start = new Date (moment(_endDate).format('l'))
+                lastInterval.start = new Date (moment(_endDate).format('l'))                        
                 lastInterval.end = new Date (moment(_endDate).format('l'))
             }
             else {
@@ -933,16 +933,18 @@ export class ResourcePlanUserStateService {
         let resPlanForBody = JSON.stringify(resPlan);
         const regexStart = /(start")/gm;
         const regexEnd = /(end")/gm;
+        const regexPercent =  /(0%)/gm;
         let resPlanForBodyWithStart = resPlanForBody.replace(regexStart, 'intervalStart"');
-        let resPlanForBodyFinal = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd"');
+        let resPlanBodyWithPercents = resPlanForBodyWithStart.replace(regexEnd, 'intervalEnd"');
+        let resPlanFinal = resPlanBodyWithPercents.replace(regexPercent,"'0'")
         let fromDateString = this.exgetDateFormatString(fromDate);
         let toDateString = this.exgetDateFormatString(toDate);
         console.log('from date as string and to date as string:', fromDateString, toDateString);
-        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanForBodyFinal}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
+        const body = `method=PwaupdateResourcePlanCommand&resourceplan=${resPlanFinal}&fromDate=${fromDateString}&toDate=${toDateString}&timeScale=${this.getTimeScaleString(timeScale)}&workScale=${WorkUnits[workScale]}`
         let options = {
             headers
         };
-        console.log('nice body', resPlanForBodyFinal);
+        console.log('nice body', resPlanFinal);
         console.log('original resPlan looking for start:', resPlan)
         debugger;
         return this.http.post(
