@@ -96,35 +96,37 @@ export class ResourcePlanUserStateService {
             resourceProjectsMap.push(new ResPlan(resource))
         })
         
-        let projectsHunderedAndOne$ =   Observable.from(resources).flatMap(resource => {
-            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101`;
-            let url = baseUrl + '?' + filter + '&' + select;
-
-            return this.http.get(url, options)
-                .switchMap((data: Response) => data["d"].results)
-                .map(p => {
-                    let proj = new Project(p["ProjectId"], p["ProjectName"], false, []);
-                    proj.assignmentType = p["AssignmentType"];
-                    return proj;
-                });
-        });
-
-        let projectsType0$ =  Observable.from(resources).flatMap(resource => {
-            let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
-            let url = baseUrl + '?' + filter + '&' + select;
-
-            return this.http.get(url, options)
-                .switchMap((data: Response) => data["d"].results)
-                .map(p => {
-                    let proj = new Project(p["ProjectId"], p["ProjectName"], false, []);
-                    proj.assignmentType = p["AssignmentType"];
-                    return proj;
-                })
-        });
-       
-        let combinedProjects$ =  projectsHunderedAndOne$.concat(projectsType0$).toArray();
+        
 
         return Observable.from(resources).flatMap(resource=>{
+            let projectsHunderedAndOne$ =   Observable.of(resource).flatMap(resource => {
+                let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 101`;
+                let url = baseUrl + '?' + filter + '&' + select;
+    
+                return this.http.get(url, options)
+                    .switchMap((data: Response) => data["d"].results)
+                    .map(p => {
+                        let proj = new Project(p["ProjectId"], p["ProjectName"], false, []);
+                        proj.assignmentType = p["AssignmentType"];
+                        return proj;
+                    });
+            });
+
+            let projectsType0$ =  Observable.of(resource).flatMap(resource => {
+                let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
+                let url = baseUrl + '?' + filter + '&' + select;
+    
+                return this.http.get(url, options)
+                    .switchMap((data: Response) => data["d"].results)
+                    .map(p => {
+                        let proj = new Project(p["ProjectId"], p["ProjectName"], false, []);
+                        proj.assignmentType = p["AssignmentType"];
+                        return proj;
+                    })
+            });
+
+            let combinedProjects$ =  projectsHunderedAndOne$.concat(projectsType0$).toArray();
+    
             return combinedProjects$ 
                 .concatMap(projects => {
                     //all assignments including type 101,0
@@ -133,6 +135,7 @@ export class ResourcePlanUserStateService {
                     let projectsWithResourcePlan = projects.filter(p => p.assignmentType == 101).map(p => p.projUid);
                     //get projects with assignment type 0 and not already having a resource plan
                     let projectsToAdd = projects.filter(p => p.assignmentType == 0 && projectsWithResourcePlan.indexOf(p.projUid) < 0);
+                    
                     //get projects from timesheet lines
                     let projectsWithTimeLines = this.getProjectIdsFromTimesheetLines([resource]).map(rp => {
                         if (rp) {
@@ -269,34 +272,12 @@ export class ResourcePlanUserStateService {
     }
 
 
-
+    // load page use case
     getResPlans(resMgrUid: string, fromDate: Date, toDate: Date, timescale: Timescale, workunits: WorkUnits, showTimesheetData: boolean): Observable<IResPlan[]> {
         //let uniqueProjectsForResMgr = this.getUniqueProjectsForResManager(resMgrUid);
-        let resourcesForResMgr = this.getWorkspaceResourcesForResourceManager(resMgrUid)
-
-
-        //let uniqueProjectsForAllResMgr = resourceForResMgr.flatMap(resources => this.getUniqueProjectsAcrossResMgrs(resMgrUid, resources));
-        let resProjMap: [IResPlan];
-        let uniqueProjectsResMgrHasAccessOn = resourcesForResMgr.flatMap(resources =>
-            this.getProjectIdsFromAssignmentsForResources(resources, resMgrUid, fromDate, toDate, timescale, workunits));
-        //let mergedProjects = uniqueProjectsForResMgr.merge(uniqueProjectsForAllResMgr)
-
-
-
-
-        return resourcesForResMgr.concatMap(resources => {
-          return uniqueProjectsResMgrHasAccessOn.concatMap(p=>{
-
-            return this.getResPlansFromProjects(resMgrUid, resources, Observable.of(p), fromDate, toDate, timescale, workunits, showTimesheetData)
-            // .do(t => {
-            //     //console.log('resource plans read from add resource =' + JSON.stringify(t))
-            // })
-
-            // .do(t => {
-            //     //console.log('projects passed in =' + JSON.stringify(t))
-            // })
+        return  this.getWorkspaceResourcesForResourceManager(resMgrUid).flatMap(resources=>{
+            return this.getResPlansFromResources(resMgrUid,resources,fromDate,toDate,timescale,workunits,showTimesheetData)
         })
-    })
     }
 
     ///Add Resource Plan use case
