@@ -750,7 +750,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
             let resourceplans = this.fb.array(this.resPlans.controls
                 .filter(item =>
-                    (item.value.selected == true || item.value.projects.map(p => p.selected == true).length > 0) // res Plan marked for delete or atleast one project in ResPlan marked for delete
+                    (item.value.selected == true || (item.value.projects.length > 0 && item.value.projects.filter(p => p.selected == true).length > 0)) // res Plan marked for delete or atleast one project in ResPlan marked for delete
                 )).controls
                 .map(t => {
                     var _resPlan: IResPlan;
@@ -801,7 +801,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     .map(
                         (results: Result[]) => {
                             this.updateErrors(results);
-                              results.forEach(r => {
+                            results.forEach(r => {
                                 if (r.success == true) {
                                     this.deleteResourcePlans(resourceplans)
                                     this._appSvc.loading(false);
@@ -872,12 +872,22 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         return selected;
     }
     deleteResourcePlans(resPlans: IResPlan[]) {
-        ;
         resPlans.forEach(resPlan => {
             //entire res plan selected for delete
             if (resPlan["selected"] == true) {
-                let resPlanCtrlIndex = this.resPlans.controls.findIndex(t => ((t as FormGroup).controls['resUid'].value as string).toUpperCase() == resPlan.resource.resUid.toUpperCase());
-                this.resPlans.removeAt(resPlanCtrlIndex);
+                this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().subscribe(resMgr => {
+                    this._appSvc.loading(true);
+                    this._resPlanUserStateSvc.deleteResourcesFromSharePointList(resMgr, [resPlan.resource]).subscribe(result=>{
+                        if(result.success){
+                        let resPlanCtrlIndex = this.resPlans.controls.findIndex(t => ((t as FormGroup).controls['resUid'].value as string).toUpperCase() == resPlan.resource.resUid.toUpperCase());
+                        if (resPlanCtrlIndex > -1) {
+                            this.resPlans.removeAt(resPlanCtrlIndex);
+                        }
+                        this._appSvc.loading(false);
+                    }
+                    })
+                   
+                });
             }
             // one or more projects selected to delete
             else {
@@ -887,7 +897,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 // let newProjects = allProjects.filter(a=> deletedProjectUids.indexOf(a["projUid"]) > -1);
                 deletedProjectUids.forEach(deletedProject => {
                     let index = (resPlanCtrl.controls['projects'] as FormArray).controls.findIndex(t => t.value.projUid.toUpperCase() == deletedProject.toUpperCase());
-                    (resPlanCtrl.controls['projects'] as FormArray).removeAt(index);
+                    if (index > -1) {
+                        (resPlanCtrl.controls['projects'] as FormArray).removeAt(index);
+                    }
                 })
 
             }

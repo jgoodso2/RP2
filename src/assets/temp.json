@@ -1,106 +1,301 @@
-{
-    "d": {
-        "results": [
+[
+    {
+        "resource": {
+            "resUid": "c8f44f6b-8f40-ea11-80bc-00155d4a8803",
+            "resName": "John Holiday",
+            "rbs": "",
+            "timesheetMgr": "",
+            "hiddenProjects": []
+        },
+        "projects": [],
+        "selected": false
+    },
+    {
+        "resource": {
+            "resUid": "c5f44f6b-8f40-ea11-80bc-00155d4a8803",
+            "resName": "Ted Pattison",
+            "rbs": "",
+            "timesheetMgr": "",
+            "hiddenProjects": []
+        },
+        "projects": [
             {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'311612a4-57aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'311612a4-57aa-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
+                "projUid": "fbad6848-8e40-ea11-80bc-00155d4a8803",
+                "projName": "Project 1",
+                "readOnly": false,
+                "error": null,
+                "readOnlyReason": null,
+                "intervals": [
+                    {
+                        "intervalName": "Interval0",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2020",
+                        "intervalEnd": "7/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval1",
+                        "intervalValue": "0%",
+                        "intervalStart": "7/1/2020",
+                        "intervalEnd": "8/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval2",
+                        "intervalValue": "0%",
+                        "intervalStart": "8/1/2020",
+                        "intervalEnd": "9/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval3",
+                        "intervalValue": "0%",
+                        "intervalStart": "9/1/2020",
+                        "intervalEnd": "10/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval4",
+                        "intervalValue": "0%",
+                        "intervalStart": "10/1/2020",
+                        "intervalEnd": "11/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval5",
+                        "intervalValue": "0%",
+                        "intervalStart": "11/1/2020",
+                        "intervalEnd": "12/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval6",
+                        "intervalValue": "0%",
+                        "intervalStart": "12/1/2020",
+                        "intervalEnd": "1/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval7",
+                        "intervalValue": "0%",
+                        "intervalStart": "1/1/2021",
+                        "intervalEnd": "2/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval8",
+                        "intervalValue": "0%",
+                        "intervalStart": "2/1/2021",
+                        "intervalEnd": "3/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval9",
+                        "intervalValue": "0%",
+                        "intervalStart": "3/1/2021",
+                        "intervalEnd": "4/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval10",
+                        "intervalValue": "0%",
+                        "intervalStart": "4/1/2021",
+                        "intervalEnd": "5/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval11",
+                        "intervalValue": "0%",
+                        "intervalStart": "5/1/2021",
+                        "intervalEnd": "6/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval12",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2021",
+                        "intervalEnd": "7/1/2021"
+                    }
+                ],
+                "timesheetData": [],
+                "selected": true,
+                "startDate": "1/26/2020",
+                "finishDate": "7/3/2020",
+                "autoGenerated": false
             },
             {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'75a8c831-42ae-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'75a8c831-42ae-ea11-80c8-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
+                "projUid": "6173277e-9040-ea11-80bc-00155d4a8803",
+                "projName": "*Project 2",
+                "readOnly": false,
+                "error": null,
+                "readOnlyReason": null,
+                "intervals": [
+                    {
+                        "intervalName": "Interval0",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2020",
+                        "intervalEnd": "7/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval1",
+                        "intervalValue": "0%",
+                        "intervalStart": "7/1/2020",
+                        "intervalEnd": "8/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval2",
+                        "intervalValue": "0%",
+                        "intervalStart": "8/1/2020",
+                        "intervalEnd": "9/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval3",
+                        "intervalValue": "0%",
+                        "intervalStart": "9/1/2020",
+                        "intervalEnd": "10/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval4",
+                        "intervalValue": "0%",
+                        "intervalStart": "10/1/2020",
+                        "intervalEnd": "11/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval5",
+                        "intervalValue": "0%",
+                        "intervalStart": "11/1/2020",
+                        "intervalEnd": "12/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval6",
+                        "intervalValue": "0%",
+                        "intervalStart": "12/1/2020",
+                        "intervalEnd": "1/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval7",
+                        "intervalValue": "0%",
+                        "intervalStart": "1/1/2021",
+                        "intervalEnd": "2/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval8",
+                        "intervalValue": "0%",
+                        "intervalStart": "2/1/2021",
+                        "intervalEnd": "3/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval9",
+                        "intervalValue": "0%",
+                        "intervalStart": "3/1/2021",
+                        "intervalEnd": "4/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval10",
+                        "intervalValue": "0%",
+                        "intervalStart": "4/1/2021",
+                        "intervalEnd": "5/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval11",
+                        "intervalValue": "0%",
+                        "intervalStart": "5/1/2021",
+                        "intervalEnd": "6/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval12",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2021",
+                        "intervalEnd": "7/1/2021"
+                    }
+                ],
+                "timesheetData": [],
+                "selected": true,
+                "startDate": "1/26/2020",
+                "finishDate": "1/26/2020",
+                "autoGenerated": true
             },
             {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd3231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd3231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd7231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'd7231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'db231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'db231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'df231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'df231411-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1e458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'1e458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'22458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'22458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'26458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'26458117-6baf-ea11-80c9-00155d4a8803',ProjectId=guid'fbad6848-8e40-ea11-80bc-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "fbad6848-8e40-ea11-80bc-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 1"
-            },
-            {
-                "__metadata": {
-                    "id": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'769d4d84-5baa-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "uri": "http://monkey:8080/PWA/_api/ProjectData/Assignments(AssignmentId=guid'769d4d84-5baa-ea11-80c8-00155d4a8803',ProjectId=guid'3d7ebd62-5baa-ea11-80c8-00155d4a8803')",
-                    "type": "ReportingData.Assignment"
-                },
-                "ProjectId": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
-                "AssignmentType": 0,
-                "ProjectName": "Project 6"
+                "projUid": "3d7ebd62-5baa-ea11-80c8-00155d4a8803",
+                "projName": "Project 6",
+                "readOnly": false,
+                "error": null,
+                "readOnlyReason": null,
+                "intervals": [
+                    {
+                        "intervalName": "Interval0",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2020",
+                        "intervalEnd": "7/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval1",
+                        "intervalValue": "0%",
+                        "intervalStart": "7/1/2020",
+                        "intervalEnd": "8/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval2",
+                        "intervalValue": "0%",
+                        "intervalStart": "8/1/2020",
+                        "intervalEnd": "9/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval3",
+                        "intervalValue": "0%",
+                        "intervalStart": "9/1/2020",
+                        "intervalEnd": "10/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval4",
+                        "intervalValue": "0%",
+                        "intervalStart": "10/1/2020",
+                        "intervalEnd": "11/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval5",
+                        "intervalValue": "0%",
+                        "intervalStart": "11/1/2020",
+                        "intervalEnd": "12/1/2020"
+                    },
+                    {
+                        "intervalName": "Interval6",
+                        "intervalValue": "0%",
+                        "intervalStart": "12/1/2020",
+                        "intervalEnd": "1/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval7",
+                        "intervalValue": "0%",
+                        "intervalStart": "1/1/2021",
+                        "intervalEnd": "2/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval8",
+                        "intervalValue": "0%",
+                        "intervalStart": "2/1/2021",
+                        "intervalEnd": "3/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval9",
+                        "intervalValue": "0%",
+                        "intervalStart": "3/1/2021",
+                        "intervalEnd": "4/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval10",
+                        "intervalValue": "0%",
+                        "intervalStart": "4/1/2021",
+                        "intervalEnd": "5/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval11",
+                        "intervalValue": "0%",
+                        "intervalStart": "5/1/2021",
+                        "intervalEnd": "6/1/2021"
+                    },
+                    {
+                        "intervalName": "Interval12",
+                        "intervalValue": "0%",
+                        "intervalStart": "6/1/2021",
+                        "intervalEnd": "7/1/2021"
+                    }
+                ],
+                "timesheetData": [],
+                "selected": true,
+                "startDate": "6/1/2020",
+                "finishDate": "6/1/2020",
+                "autoGenerated": false
             }
-        ]
+        ],
+        "selected": true
     }
-}
+]
