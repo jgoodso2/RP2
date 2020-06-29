@@ -748,10 +748,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         if (this.mainForm.valid) {
 
 
-            let resourceplans = this.fb.array(this.resPlans.controls
-                .filter(item =>
-                    (item.value.selected == true || (item.value.projects.length > 0 && item.value.projects.filter(p => p.selected == true).length > 0)) // res Plan marked for delete or atleast one project in ResPlan marked for delete
-                )).controls
+            let resourceplans = this.fb.array(this.resPlans.controls)
+                .controls
                 .map(t => {
                     var _resPlan: IResPlan;
                     var _projects: [IProject];
@@ -771,7 +769,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             if (hideOnly == true) {
                 this._appSvc.loading(true);
                 this.getCurrentUserSub = this._resPlanUserStateSvc.getCurrentUserId().flatMap(resMgr => {
-                    return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans as IResPlan[]).map(r => {
+                    return this._resPlanUserStateSvc.HideResourcesOrProjects(resMgr, resourceplans).map(r => {
                         if (r.success == true) {
 
                             this.deleteResourcePlans(resourceplans)
