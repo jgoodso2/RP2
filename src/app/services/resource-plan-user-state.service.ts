@@ -339,8 +339,14 @@ export class ResourcePlanUserStateService {
     }
 
     exgetDateFormatString(date: Date): string {
-        var NowMoment = moment(date)
-        return NowMoment.format('l');
+        try {
+            var NowMoment = moment(date)
+            return NowMoment.format('l');
+        }
+        catch {
+            return moment().format('l');
+        }
+       
     }
 
 
@@ -357,6 +363,14 @@ export class ResourcePlanUserStateService {
     }
 
     transformToDate(date: any) {
+        debugger;
+        
+        let opDetermine =  moment(date).toDate();
+        console.log('is this value actually undefined??',opDetermine )
+        debugger;
+        if(date == undefined || date == null) {
+            return moment().toDate();
+        }
         return moment(date).toDate();
     }
 

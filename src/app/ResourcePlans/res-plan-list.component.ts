@@ -745,7 +745,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                         this.getResPlansFromProjectsSub = this._resPlanUserStateSvc.getResPlansFromProjects(resource.resUid, [resource],
                             Observable.of([new ResPlan(resource, modifiedSuccessfulProjects)]), fromDate, toDate, timescale, workunits
                             , showTimesheetData).subscribe(resPlans => {
-                             
+                                
                                 console.log(resPlans, 'circles') //i have resourceName and projects, but not projectOwner need to do operations here actually...wow!
                                     
                                     //get all resPlanProjects in a particular order (function needed)
@@ -1040,18 +1040,19 @@ if (sequences.length > projectDuration.length) {
        // return updatedResourcePlans;
 
        determineResPlanMaxDate(resourcePlans: IResPlan[]): Date {
-        
-        let allProjectsOnResourcePlans: any = [resourcePlans[0].projects[0]];
+        debugger;
+        let allProjectsOnResourcePlans: any[] = []; //resourcePlans[0].projects[0];
         let allPotentialToDates: any[] = [this.toDate];
         console.log('all podates',allPotentialToDates);
         let  resPlanMaxDate: Date;
         resourcePlans.forEach( (resourcePlan) => {
          resourcePlan.projects.forEach( (project) => {
-             if (project.finishDate !== null || project.finishDate !== undefined) {
-                 let finishDate = this._resPlanUserStateSvc.transformToDate(project.finishDate)
+             debugger;
+             if (project.finishDate !== null || project.finishDate !== undefined || project.finishDate) {
+                 let end = this._resPlanUserStateSvc.transformToDate(project.finishDate)
                  //if (finishDate > this.toDate) { 
                      console.log('why error out here',allPotentialToDates,allProjectsOnResourcePlans)
-                     allPotentialToDates.push(finishDate);
+                     allPotentialToDates.push(end);
                      allProjectsOnResourcePlans.push(project);
                 // }
              }
@@ -1062,7 +1063,9 @@ if (sequences.length > projectDuration.length) {
         console.log('you get in the mood sortedDates = ',sortedDates, sortedDates[0]);
          resPlanMaxDate = sortedDates[sortedDates.length - 1];
          this.maxIntervalProject = allProjectsOnResourcePlans[0];
-         let maxIntervalProjectIndex = allProjectsOnResourcePlans.findIndex((project) => this._resPlanUserStateSvc.exgetDateFormatString(this._resPlanUserStateSvc.transformToDate(project.finishDate)) == this._resPlanUserStateSvc.exgetDateFormatString(resPlanMaxDate));
+         debugger
+
+         let maxIntervalProjectIndex = allProjectsOnResourcePlans.findIndex((project) => this._resPlanUserStateSvc.exgetDateFormatString(this._resPlanUserStateSvc.transformToDate(project.finishDate )) == this._resPlanUserStateSvc.exgetDateFormatString(resPlanMaxDate));
          if (maxIntervalProjectIndex !== -1) {
              this.maxIntervalProject = allProjectsOnResourcePlans[maxIntervalProjectIndex];
          }
