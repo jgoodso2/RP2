@@ -19,6 +19,7 @@ import { SimpleModalComponent } from '../common/simple-modal.component'
 import { ModalCommunicator } from '../resourcePlans/modal-communicator.service';
 import { ProjectService } from '../services/project-service.service'
 import { ResourcePlanService } from '../services/resource-plan.service'
+import { ResourcePlansResolverService } from '../services/resource-plans-resolver.service';
 import { ResourcePlanUserStateService } from '../services/resource-plan-user-state.service'
 import { ResourcesModalCommunicatorService } from '../resourcePlans/resources-modal-communicator.service'
 import { AppUtilService } from '../common/app-util.service'
@@ -31,6 +32,7 @@ import { Subscription } from 'rxjs/Subscription'
 import { Subscriber } from 'rxjs/Subscriber'
 import { isMoment } from 'moment';
 import { element } from 'protractor';
+
 
 
 declare const $: any
@@ -76,6 +78,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     numberOfSelectedProjects: number;
     runItBack: number = 0;
     projectsSelecteForAddition: IProject[] = [];
+    isPMAllocationEnabled: Boolean = false;
 
 
 
@@ -131,6 +134,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         , private router: Router,
         private _resourcePlanSvc: ResourcePlanService
         , private _resPlanUserStateSvc: ResourcePlanUserStateService
+        , private _resourcePlansResolverService: ResourcePlansResolverService
         , private _projectService: ProjectService
         , private menuService: MenuService
         , private _exportExcelService: ExportExcelService
@@ -138,6 +142,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         , public _appSvc: AppStateService
         , private _appUtilSvc: AppUtilService
         , private _route: ActivatedRoute, private dialog: MatDialog) { }
+        
 
     ngOnInit(): void {
         this.mainForm = this.fb.group({
@@ -169,8 +174,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this.timescale = this._appSvc.queryParams.timescale
         this.workunits = this._appSvc.queryParams.workunits
         this.showTimesheetData = this._appSvc.queryParams.showTimesheetData;
-
         this.routeDataChangedSub = this._route.data.subscribe(values => {
+            console.log('family',values)
+            
             this.resPlanData = values.resPlans;
             //this.resPlans = values.resPlans;
             if (values.resPlans && values.resPlans.length > 0)
@@ -221,6 +227,10 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
         this._appUtilSvc.safeUnSubscribe(this.getResPlansFromProjectsSub)
         this._appUtilSvc.safeUnSubscribe(this.saveResPlansSub)
         this._appUtilSvc.safeUnSubscribe(this.delResPlansSub)
+        this._appUtilSvc.safeUnSubscribe(this.utilizePMAllocationSub)
+        
+
+        
     }
     safeUnSubscrbe(sub: Subscription) {
         if (sub) {
@@ -428,7 +438,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     buildInterval(interval: IInterval, _project, resPlans: IResPlan[]): FormGroup {
     
-        console.log('not sexy',interval, interval.intervalValue)
+        console.log('not object',interval, interval.intervalValue)
         return this.fb.group({
             intervalName: interval.intervalName,
             //intervalValue:  new PercentPipe(new IntervalPipe().transform(interval.intervalValue, this.workunits)  ).transform(interval.intervalValue)
@@ -521,7 +531,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 this.confirmDialogResult = result;
 
                 if (result == "yes") {
-
+                    
                     this._appSvc.mainFormDirty = false;
                     this.router.routeReuseStrategy.shouldReuseRoute = function () { return false };
                     this.router.isActive = function () { return false; }
@@ -546,13 +556,14 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     openPMAllocationDialog() {
         //form dirty:
         //curt
-        
+        debugger;
         //form not dirty:
         let dialogRef = this.openDialog({ title: "Are You Sure?", content: "This action will permanently add default PM Allocations to the selected project(s)." })
         this.matDlgSub = dialogRef.afterClosed().subscribe(result => {
             this.confirmDialogResult = result;
             if (result == "yes") {
-                const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+                debugger;
+                // const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
                 this.setPMAllocationCandidates().subscribe( (data) => {
                        console.log('what is data post set pm allocation candidates in subscribe', data, this.PMAllocationCandidates);
                        this.getProjectPMAllocations(this.PMAllocationCandidates)
@@ -562,7 +573,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                             console.log(this.projectsWithPMAllocationsList)
                          
                             this.pmAllocationProtocol().subscribe(
-                                (data) => {    wait(4000);this.ikeProtocol();}
+                                (data) => { this.ikeProtocol();}
                             );
                             debugger;
                             console.log('about to run ike protocol in this.openPMAllocationDialog for first time I invoke')
@@ -570,13 +581,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                             console.log('this is the end of the road before race me');
                             this.raceMe();
                     })//end ge projectpmallocation.subscribe()
-             } )//end setpmallocationcandidates.subscribe
-          
-
-               
-               
-           
-
+             })//end setpmallocationcandidates.subscrib
                  
             }
         });
@@ -1019,25 +1024,117 @@ if (sequences.length > projectDuration.length) {
             debugger;
             this._appSvc.loading(true);
             let readyForSave = this.ikeProtocolCheck();
-            this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits,readyStatus)
+            if (readyStatus == true) {
+                this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits,readyStatus)
                 .subscribe(
                     (results: Result[]) =>{ debugger; console.log('ready status is: + results',readyStatus, '+' ,  results   );
                     //if results does not equal [] then on save complete otherwise do nothing.
-                    this.onSaveComplete(results);} ,
+                    this.onSaveComplete(results);
+                    this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+                    this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+                   
+                    this.refreshStatus(readyStatus);
+                    if (results == []) {
+                        console.log('open sesame');
+                    }
+                   
+                    debugger;
+                    /* this.toggleProjectSelection(this.getSelectedProjects()) *///for each selected resplan (getseleceProjects() execute toggleProjectSelection())
+                    } ,
                     (error: any) => {
                         this.errorMessage = <any>error
                         this._appSvc.loading(false);
                     });
+            }
+            
         }
 
         ikeProtocolCheck(): Boolean {
             debugger;
-            if(this.pmAllocationCounter == this.numberOfSelectedProjects) {
+            if(this.pmAllocationCounter == this.numberOfSelectedProjects || this.isPMAllocationEnabled == true) {
+                this.isPMAllocationEnabled = true;
                 return true;
             }
             return false;
         }
-       // return updatedResourcePlans;
+       // return updatedResourcePlans
+
+       refreshStatus(readyStatus: Boolean): any {
+     /*    this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+        this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+        this.PMAllocationCandidates = []; */
+      
+        
+        this.mainForm = this.fb.group({
+            resPlans: this.fb.array([])
+        });
+        // this.formValueChangesSub = this.mainForm.valueChanges.subscribe(t => {
+        //     //app state service emit this.mainForm.dirty
+        //     this._appSvc.setFormDirty(this.mainForm.dirty);
+        // })
+        
+        this._appSvc.mainFormDirty = false;
+        this.valuesSavedSub = this._appSvc.save$.subscribe(() => this.savePlans(this.fromDate, this.toDate, this.timescale, this.workunits))
+        this.resourceAddedSub = this._appSvc.addResources$.subscribe(() => this.addResources())
+        this.resourceDeletedSub = this._appSvc.delete$.subscribe(() => this.openDeleteResPlanDialog())
+        this.utilizePMAllocationSub = this._appSvc.pmAllocation$.subscribe(() => this.openPMAllocationDialog()) 
+        this.resourceHiddenSub = this._appSvc.hide$.subscribe(() => this.deleteResPlans(this.fromDate, this.toDate, this.timescale, this.workunits, true))
+        this.resourceActualsShowHide = this._appSvc.showActuals$.subscribe(() => this.toggleTimesheetDisplay())
+        this.appExitSub = this._appSvc.exitToPerview$.subscribe(() => { console.log(''); this.exitToPerView(this._appSvc.mainFormDirty) })
+
+        this.exportPrintSub = this._appSvc.printToPDF$.subscribe(() => { this.printFunction() });
+        this.exportExcelSub = this._appSvc.exportToExcel$.subscribe(() => { this.excelExportFunction() });
+
+        this.appExitToBISub = this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
+
+
+
+        this.fromDate = this._appSvc.queryParams.fromDate
+        this.toDate = this._appSvc.queryParams.toDate
+        this.timescale = this._appSvc.queryParams.timescale
+        this.workunits = this._appSvc.queryParams.workunits
+        this.showTimesheetData = this._appSvc.queryParams.showTimesheetData;
+
+        this.routeDataChangedSub = this._route.data.subscribe(values => {
+            this.resPlanData = values.resPlans;
+            //this.resPlans = values.resPlans;
+            if (values.resPlans && values.resPlans.length > 0)
+                this.setIntervalLength((<IResPlan[]>values.resPlans).map(t => t.projects).reduce((a, b) => a.concat(b)))
+            this.refreshResPlans();
+          console.log(JSON.stringify(values.resPlans))
+        // }, (error) => console.log(error))
+        console.log("=========multi getting")
+       
+       
+        })
+       }
+
+       refreshResPlans(): any {
+        // let resourceplans = this.fb.array(this.resPlans.controls
+        //     ).controls
+        //     .map(t => {
+        //         var _resPlan: IResPlan;
+        //         var _projects: [IProject];
+        //         var projects = Object.assign([], _projects, this.fb.array(((t as FormGroup).controls['projects'] as FormArray).controls.filter(s => s.value.selected == true || s.value.selected == false)).value)
+        //         let resPlan = new ResPlan();
+        //         resPlan.resource = new Resource(t.value.resUid, t.value.resName);
+        //         resPlan.projects = projects;
+        //         resPlan["selected"] = (t as FormGroup).controls['selected'].value;
+        //         console.log(JSON.stringify(resPlan))
+        //         //resPlan["selected"] = _resPlan["selected"]
+        //         return resPlan;
+        //     });
+        //     return resourceplans;
+        this._resourcePlansResolverService.resolve(this._route.snapshot,this.router.routerState.snapshot).subscribe( (resPlansData) => {
+            this.buildResPlans(resPlansData);
+            this.mainForm.get('resPlans');
+            this.pmAllocationCounter = 0;
+            this.numberOfSelectedProjects = 0; 
+            
+            return resPlansData
+        })
+
+       }
 
        determineResPlanMaxDate(resourcePlans: IResPlan[]): Date {
         debugger;
@@ -1051,7 +1148,7 @@ if (sequences.length > projectDuration.length) {
              if (project.finishDate !== null || project.finishDate !== undefined || project.finishDate) {
                  let end = this._resPlanUserStateSvc.transformToDate(project.finishDate)
                  //if (finishDate > this.toDate) { 
-                     console.log('why error out here',allPotentialToDates,allProjectsOnResourcePlans)
+                     console.log('why error out here?',allPotentialToDates,allProjectsOnResourcePlans)
                      allPotentialToDates.push(end);
                      allProjectsOnResourcePlans.push(project);
                 // }
@@ -1340,7 +1437,7 @@ if (sequences.length > projectDuration.length) {
 
 
     getSelectedProjects(): IResPlan[] {
-        if (this.mainForm.valid) {
+        
 
 
             let resourceplans = this.fb.array(this.resPlans.controls
@@ -1364,7 +1461,7 @@ if (sequences.length > projectDuration.length) {
             console.log("blocked resPlans" + JSON.stringify(resourceplans));
             console.log('choosen ones? in getSelectedProjects', resourceplans); // this is us.resourceplans for each resource plan.projects (shuffle through projects and do stuff.)
             return resourceplans;
-    }
+    
 
 
 
