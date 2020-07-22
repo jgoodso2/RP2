@@ -77,8 +77,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     pmAllocationCounter: number = 0;
     numberOfSelectedProjects: number;
     runItBack: number = 0;
-    projectsSelecteForAddition: IProject[] = [];
+    projectsSelectedForAddition: IProject[] = [];
     isPMAllocationEnabled: Boolean = false;
+    validPMAllocationProjectExists: Boolean;
 
 
 
@@ -724,14 +725,16 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 .subscribe( (results) => {
                     console.log('this is what i have been missing', results)
                  
-                    this.projectsSelecteForAddition = this._modalSvc.selectedProjects;
+                    this.projectsSelectedForAddition = this._modalSvc.selectedProjects;
                     
                     this.updateErrors(results);
                     this._modalSvc.selectedProjects = [];
                     let superSuccessfulProjects: IProject[] = [];
                     let successfullProjectsObjects = results.filter(r => r.success == true)//.map(t => t.project)
                     let successfullProjects = results.filter(r => r.success == true).map(t => t.project)
-                    superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results).map(t => t.project));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
+                  
+                    superSuccessfulProjects = this._resPlanUserStateSvc.fillPMAllocationIntervals(this._resPlanUserStateSvc.usePMAllocationDefaults(results));//.map(t => t.project) //givesPM ALLOCATION TO LIBERALLY
+            
                     console.log(superSuccessfulProjects, "leggo my egg");
                     console.log('what are pm allocation here in successful projects?', successfullProjects)
                     let modifiedSuccessfulProjects = this._resPlanUserStateSvc.addResourceNameToProjects( superSuccessfulProjects, successfullProjectsObjects)
@@ -741,7 +744,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                     // console.log('what are againmoded successful projects',againModedsuccessfulProjects);
                     debugger;
                     //go through supersuccessful projects and change intervals if pm.Allocation is present in project
-                    this.projectsSelecteForAddition.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
+                    this.projectsSelectedForAddition.filter(p => results.findIndex(r => r.success == true && r.project.projUid.toUpperCase() == p.projUid.toUpperCase()) > -1)
                     console.log("===added projects" + JSON.stringify(successfullProjects))
                   //this.setPmAllocationProjects(modifiedSuccessfulProjects)
                    let goodProjects = this.setPmAllocationProjects(modifiedSuccessfulProjects)
@@ -758,7 +761,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                                    let gotProjects = this.getPmAllocationProjects();
                                    let engagePmAllocation = this.engagePMAllocation(this.getPmAllocationProjects(),resPlans[0].resource.resName)
                                     //need to filter engagePmAllocation for
-
+                                 
                                    let usableProjectsWithPMAllocations =  engagePmAllocation.filter( (element) => element.intervals.length > 0 )
 
                                     //for each project in resPlan Projects if corresponding project in pmAllocationProjects has resName = projectOwnerName and PM ALlocation does not equal "" 
@@ -855,7 +858,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
 
     insertPMAllocationIntervalValueForAddedProject(detailedProject: IProject, projectToAddPMAllocation: IProject) {
-        let referenceProject = this.projectsSelecteForAddition.find((project) => project.projUid == detailedProject.projUid);
+        let referenceProject = this.projectsSelectedForAddition.find((project) => project.projUid == detailedProject.projUid);
+        debugger;
         let copyOfIntervals: Interval[] = [...projectToAddPMAllocation.intervals]
         console.log('here is a copy of intervals...,detailedProject, projectoaddpmallocation',copyOfIntervals, detailedProject,projectToAddPMAllocation);
         let newIntervalsWithPmAllocation: Interval[] = []
@@ -872,7 +876,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     }
 
-    applyConditionalPMAllocationValue(detailedProject,interval, referenceProject): Interval {
+    applyConditionalPMAllocationValue(detailedProject, referenceProject, interval): Interval {
         debugger;
         console.log('interval,detailedproject,referenceproject', interval,detailedProject, referenceProject);
         let _intervalStart = new Date(interval.start)
@@ -1035,7 +1039,7 @@ if (sequences.length > projectDuration.length) {
                    
                     this.refreshStatus(readyStatus);
                     if (results == []) {
-                        console.log('open sesame');
+                        console.log('open sesame for non pm allocation projects', results), this.savableResPlans;
                     }
                    
                     debugger;
@@ -1130,10 +1134,18 @@ if (sequences.length > projectDuration.length) {
             this.mainForm.get('resPlans');
             this.pmAllocationCounter = 0;
             this.numberOfSelectedProjects = 0; 
-            
+            this.validPMAllocationProjectExists = false;
+            if(this.validPMAllocationProjectExists == false) {
+                this.informPMAllocationDoesNotApply();
+            }
             return resPlansData
         })
 
+       }
+
+       informPMAllocationDoesNotApply(): void {
+         let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
+         , content: "This action will permanently add default PM Allocations to the selected project(s)." })
        }
 
        determineResPlanMaxDate(resourcePlans: IResPlan[]): Date {
@@ -1192,6 +1204,7 @@ if (sequences.length > projectDuration.length) {
             console.log('resplan projects length is greater than 0');
             if(resPlan.projects.find(project => project.startDate && project.finishDate !== null) !== undefined) {
                 console.log('getting serious');
+                this.validPMAllocationProjectExists = true;
                 return true;
             }
         }

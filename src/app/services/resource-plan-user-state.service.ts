@@ -758,7 +758,6 @@ export class ResourcePlanUserStateService {
         debugger
         let defaultResults = filteredResults.map( (result) => {
             console.log('weird single result', result);
-            
              this.applyProjectManagerAllocation(result)
          }) 
 
@@ -784,9 +783,10 @@ export class ResourcePlanUserStateService {
        let projectsWithResourceNames: IProject[] = []
        projects.forEach((project, index) => {
            debugger
-         let usableAllocation = (successfulResult[index].pmAllocation === undefined || typeof successfulResult[index].pmAllocation  === 'undefined') ? "0" : successfulResult[index].pmAllocation;
-         project.resName = successfulResult[0].resourceName
+         let usableAllocation = (successfulResult[index].pmAllocation === undefined || typeof successfulResult[index].pmAllocation  === 'undefined'|| this.pmCheck(successfulResult[index]) == false) ? "0" : successfulResult[index].pmAllocation;
+         project.resName = successfulResult[index].resourceName
          project.pmAllocation = usableAllocation;
+         debugger
          projectsWithResourceNames.push(project);
        })
        debugger;
@@ -794,36 +794,42 @@ export class ResourcePlanUserStateService {
        return projectsWithResourceNames;
      }
 
-     fillPMAllocationIntervals(projects: IProject[]): IProject[] {
+     fillPMAllocationIntervals(results: any[]): IProject[] {
+         debugger;
+        let projects = results.map(t => t.project);
         let projectsWithIntervals: IProject[] = []
-        projects.forEach((project) => {
-            if (project.pmAllocation !== ""){ project.intervals.map((interval) => {
+        projects.forEach((project,index) => {
+            if (results[index].pmAllocation !== undefined || results[index].pmAllocation !== "0"){ project.intervals.map((interval) => {
                 interval.intervalValue = project.pmAllocation;
             } )}
             projectsWithIntervals.push(project);
         })
         console.log(projectsWithIntervals)
+        debugger;
         return projectsWithIntervals;
      }
 
      applyProjectManagerAllocation(result: Result): Result {
+         debugger
          console.log('passed in weird into applyProjectManagerAllocation', result);
          
-        if (this.pmCheck(result) === true) {
-            result.pmAllocation = result.project.pmAllocation;
+        if (this.pmCheck(result) == true) {
+            debugger;
+            result.project.pmAllocation =  result.pmAllocation;
             console.log('changed PMALLOCATION', result);
             
         }
-        
+        console.log('robbed');
+        debugger;
         return  result; //[result, this.pmCheck(result)];
     }
 
      pmCheck(result: Result): Boolean {
         console.log('passed in weird into PMCHECK', result);
-        if (result.project.owner === result.resourceName) { console.log('truthy value on weird owner');; return true;}
+        if (result.project.owner == result.resourceName || result.owner == result.resourceName) { console.log('truthy value on weird owner');debugger; return true;}
         else {
               console.log('nope muahaha');
-            
+              debugger
                return false;
         }
      
