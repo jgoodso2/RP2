@@ -936,6 +936,7 @@ export class ResourcePlanUserStateService {
 
     
     exsaveResPlans(resPlan: IResPlan[], fromDate: Date, toDate: Date, timeScale: Timescale, workScale: WorkUnits, readyToExecuteSave:Boolean): Observable<Result[]> {
+        debugger;
         console.log('array of ResPlans...in saveResPlans and startDate, greatSuccess', resPlan, typeof(fromDate));
         console.log('seriously wrong format??',this.exgetDateFormatString(fromDate));
         console.log('what is dat?', this.transformResPlanDatesToString(resPlan));

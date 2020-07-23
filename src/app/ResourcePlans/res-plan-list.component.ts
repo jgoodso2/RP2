@@ -1145,7 +1145,6 @@ if (sequences.length > projectDuration.length) {
             this.pmAllocationCounter = 0;
             this.numberOfSelectedProjects = 0; 
            
-           
             // this.validPMAllocationProjectExists = false;
             return resPlansData
         })
@@ -1382,7 +1381,7 @@ if (sequences.length > projectDuration.length) {
     }
 
     exbuildIntervals(projectToAddPMAllocation: IProject, referenceProject: any[]) {
-        console.log('inside buildINteravls()...returning intervals I thought...' ,this._resPlanUserStateSvc.exbuildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,Timescale.calendarMonths));
+        console.log('dear year...returning intervals I thought...' ,this._resPlanUserStateSvc.exbuildIntervals(projectToAddPMAllocation.startDate, projectToAddPMAllocation.finishDate,this.timescale));
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
         let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
