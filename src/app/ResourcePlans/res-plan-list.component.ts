@@ -32,6 +32,7 @@ import { Subscription } from 'rxjs/Subscription'
 import { Subscriber } from 'rxjs/Subscriber'
 import { isMoment } from 'moment';
 import { element } from 'protractor';
+import { ReadyState } from '@angular/http';
 
 
 
@@ -571,8 +572,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                        .subscribe( (data) => {
                             console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
                             this.projectsWithPMAllocationsList = data;
-                            console.log(this.projectsWithPMAllocationsList)
-                         
+                            console.log('just do it here: projectsWithPMAllocationsList', this.projectsWithPMAllocationsList)
+                            debugger
                             this.pmAllocationProtocol().subscribe(
                                 (data) => { this.ikeProtocol();}
                             );
@@ -591,6 +592,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
     raceMe(): void {
         console.log('async purgatory, this is a test to see if this runs before the completion of pm allocation protocol, which would explain a lot...mainly that I need to make pm allocation protocol a observable to make this work.');
         debugger;
+        this.informPMAllocationDoesNotApply();
     }
 
     addResPlan(): void {
@@ -928,7 +930,7 @@ if (sequences.length > projectDuration.length) {
             })
 
         })
-        console.log(this.PMAllocationCandidates);
+        console.log('just do it here', this.PMAllocationCandidates);
         debugger;
         return Observable.from(localCandidates);
      
@@ -968,6 +970,7 @@ if (sequences.length > projectDuration.length) {
 
                         if (this.startAndFinishDatesValid(project) == true && this.projectManagerResourceNameEqual(referenceProject[2],resPlan.resource.resName) == true && this.pmAllocationExistsInProject(referenceProject) == true && this.projectIsOngoing(project) ) {
                             console.log('valid start and finish dates and projectOwnerName is resourcename in form and pmAllocation has a value...', project);
+                            this.validPMAllocationProjectExists = true;
                             debugger;
                             
                             debugger
@@ -1050,6 +1053,10 @@ if (sequences.length > projectDuration.length) {
                         this._appSvc.loading(false);
                     });
             }
+            else {
+                this.pmAllocationProtocol();
+            }
+ 
             
         }
 
@@ -1068,7 +1075,7 @@ if (sequences.length > projectDuration.length) {
         this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
         this.PMAllocationCandidates = []; */
       
-        
+        if (readyStatus == true) {
         this.mainForm = this.fb.group({
             resPlans: this.fb.array([])
         });
@@ -1098,7 +1105,7 @@ if (sequences.length > projectDuration.length) {
         this.timescale = this._appSvc.queryParams.timescale
         this.workunits = this._appSvc.queryParams.workunits
         this.showTimesheetData = this._appSvc.queryParams.showTimesheetData;
-
+        //this.informPMAllocationDoesNotApply();
         this.routeDataChangedSub = this._route.data.subscribe(values => {
             this.resPlanData = values.resPlans;
             //this.resPlans = values.resPlans;
@@ -1111,6 +1118,7 @@ if (sequences.length > projectDuration.length) {
        
        
         })
+         }//ready status true
        }
 
        refreshResPlans(): any {
@@ -1129,23 +1137,48 @@ if (sequences.length > projectDuration.length) {
         //         return resPlan;
         //     });
         //     return resourceplans;
+        debugger;
         this._resourcePlansResolverService.resolve(this._route.snapshot,this.router.routerState.snapshot).subscribe( (resPlansData) => {
+       
             this.buildResPlans(resPlansData);
-            this.mainForm.get('resPlans');
+            //this.mainForm.get('resPlans');
             this.pmAllocationCounter = 0;
             this.numberOfSelectedProjects = 0; 
-            this.validPMAllocationProjectExists = false;
-            if(this.validPMAllocationProjectExists == false) {
-                this.informPMAllocationDoesNotApply();
-            }
+           
+           
+            // this.validPMAllocationProjectExists = false;
             return resPlansData
         })
-
+      
        }
 
        informPMAllocationDoesNotApply(): void {
-         let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
-         , content: "This action will permanently add default PM Allocations to the selected project(s)." })
+           debugger;
+            if ((this.ikeProtocolCheck() == true && this.validPMAllocationProjectExists == false) && this.savableResPlans.length == 0) {
+                debugger;
+                let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
+                , content: "This action will permanently add default PM Allocations to the selected project(s)." });
+
+                
+                console.log('ok it does kind of work...')
+             
+               
+            }   
+            debugger; 
+              
+            this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+            this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+            this.refreshStatus(this.ikeProtocolCheck());
+            debugger;
+            let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
+            , content: "This action will permanently add default PM Allocations to the selected project(s)." });
+
+            
+            console.log('ok it does kind of work...')
+       }
+
+       PMAllocationApplicableCheck() {
+           
        }
 
        determineResPlanMaxDate(resourcePlans: IResPlan[]): Date {
