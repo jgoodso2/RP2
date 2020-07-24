@@ -565,25 +565,35 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
             this.confirmDialogResult = result;
             if (result == "yes") {
                 debugger;
+                let arrayOfObservables: any[] = [];
+
                 // const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-                this.setPMAllocationCandidates().subscribe( (data) => {
-                       console.log('what is data post set pm allocation candidates in subscribe', data, this.PMAllocationCandidates);
-                       this.getProjectPMAllocations(this.PMAllocationCandidates)
-                       .subscribe( (data) => {
-                            console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
-                            this.projectsWithPMAllocationsList = data;
-                            console.log('just do it here: projectsWithPMAllocationsList', this.projectsWithPMAllocationsList)
-                            debugger
-                            this.pmAllocationProtocol().subscribe(
-                                (data) => { this.ikeProtocol();}
-                            );
-                            debugger;
-                            console.log('about to run ike protocol in this.openPMAllocationDialog for first time I invoke')
-                            // this.ikeProtocol();
-                            console.log('this is the end of the road before race me');
-                            this.raceMe();
-                    })//end ge projectpmallocation.subscribe()
-             })//end setpmallocationcandidates.subscrib
+               this.setPMAllocationCandidates().flatMap( () => this.getProjectPMAllocations().do(data => this.projectsWithPMAllocationsList = data)).flatMap((data) => this.pmAllocationProtocol(data))
+               .subscribe( () => this.ikeProtocol())
+               
+             
+            
+                   
+              
+                
+            //     ( (data) => {
+            //            console.log('what is data post set pm allocation candidates in subscribe', data, this.PMAllocationCandidates);
+            //            this.getProjectPMAllocations(this.PMAllocationCandidates)
+            //            .subscribe( (data) => {
+            //                 console.log('what is the data for getProjectPMAllocations...in subscribe  [project, pmAllocation,ProjectManager]', data);
+            //                 this.projectsWithPMAllocationsList = data;
+            //                 console.log('just do it here: projectsWithPMAllocationsList', this.projectsWithPMAllocationsList)
+            //                 debugger
+            //                 this.pmAllocationProtocol().subscribe(
+            //                     (data) => { this.ikeProtocol();}
+            //                 );
+            //                 debugger;
+            //                 console.log('about to run ike protocol in this.openPMAllocationDialog for first time I invoke')
+            //                 // this.ikeProtocol();
+            //                 console.log('this is the end of the road before race me');
+            //                 this.raceMe();
+            //         })//end ge projectpmallocation.subscribe()
+            //  })//end setpmallocationcandidates.subscrib
                  
             }
         });
@@ -936,18 +946,17 @@ if (sequences.length > projectDuration.length) {
      
 }
 
-    getProjectPMAllocations(projects): Observable<any> {
+    getProjectPMAllocations(): Observable<any> {
         debugger;
         let localCandidates = this.PMAllocationCandidates
        
-        return this._projectService.getProjectPMAllocations(projects);
+        return this._projectService.getProjectPMAllocations(this.PMAllocationCandidates);
     }
   
   
 
-     pmAllocationProtocol(): Observable <any[]> {
+     pmAllocationProtocol(data: any): Observable <any[]> {
          // list of projects = [project,pmAllocation,ProjectManager]
-       
          console.log('why hello pmALlocation protocol')
          this.pmAllocationCounter++
          this.numberOfSelectedProjects = this.PMAllocationCandidates.length;
@@ -958,7 +967,8 @@ if (sequences.length > projectDuration.length) {
         let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
         this.maxToDate = maxResPlanDate; 
         console.log('winner', this.maxToDate);
-        
+        debugger;
+       this.projectsWithPMAllocationsList = data;
         resourcePlans.forEach((resPlan,index) => {
             if (this.pmAllocationPrerequisiteCheck(resPlan) == true) {
                 resPlan.projects.forEach( (project,index) => {
@@ -1020,42 +1030,49 @@ if (sequences.length > projectDuration.length) {
                         this._appSvc.loading(false);
                     }); */
          debugger;
-         console.log('you a dog');   
+         console.log('you a dog', updatedResourcePlans);   
          console.log('[kat meow?]',this.savableResPlans); 
+         if (this.savableResPlans.length == 0) {this.informPMAllocationDoesNotApply();}
         return Observable.from(updatedResourcePlans);
        }
 
         ikeProtocol() {
-         
-            let readyStatus:Boolean = this.ikeProtocolCheck();
             debugger;
-            this._appSvc.loading(true);
-            let readyForSave = this.ikeProtocolCheck();
-            if (readyStatus == true) {
-                this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits,readyStatus)
-                .subscribe(
-                    (results: Result[]) =>{ debugger; console.log('ready status is: + results',readyStatus, '+' ,  results   );
-                    //if results does not equal [] then on save complete otherwise do nothing.
-                    this.onSaveComplete(results);
-                    this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
-                    this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
-                   
-                    this.refreshStatus(readyStatus);
-                    if (results == []) {
-                        console.log('open sesame for non pm allocation projects', results), this.savableResPlans;
-                    }
-                   
-                    debugger;
-                    /* this.toggleProjectSelection(this.getSelectedProjects()) *///for each selected resplan (getseleceProjects() execute toggleProjectSelection())
-                    } ,
-                    (error: any) => {
-                        this.errorMessage = <any>error
-                        this._appSvc.loading(false);
-                    });
+            if( this.savableResPlans.length == 0) {
+                this.informPMAllocationDoesNotApply();
             }
             else {
-                this.pmAllocationProtocol();
+                let readyStatus:Boolean = this.ikeProtocolCheck();
+                debugger;
+                this._appSvc.loading(true);
+                let readyForSave = this.ikeProtocolCheck();
+                //if (readyStatus == true) {
+                    this.saveResPlansSub = this._resPlanUserStateSvc.exsaveResPlans(this.savableResPlans, this.fromDate, this.maxToDate, this.timescale, this.workunits,readyStatus)
+                    .subscribe(
+                        (results: Result[]) =>{ debugger; console.log('ready status is: + results',readyStatus, '+' ,  results   );
+                        //if results does not equal [] then on save complete otherwise do nothing.
+                        this.onSaveComplete(results);
+                        this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+                        this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+                         this.refreshStatus(true); //take out afterwards
+                         //this.refreshStatus(readyStatus);
+                        // if (results == []) {
+                        //     console.log('open sesame for non pm allocation projects', results), this.savableResPlans;
+                        // }
+                       
+                        debugger;
+                        /* this.toggleProjectSelection(this.getSelectedProjects()) *///for each selected resplan (getseleceProjects() execute toggleProjectSelection())
+                        } ,
+                        (error: any) => {
+                            this.errorMessage = <any>error
+                            this._appSvc.loading(false);
+                        });
             }
+          
+            //}//end ready status
+            // else {
+            //     this.pmAllocationProtocol();
+            // }
  
             
         }
@@ -1075,7 +1092,7 @@ if (sequences.length > projectDuration.length) {
         this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
         this.PMAllocationCandidates = []; */
       
-        if (readyStatus == true) {
+        //if (readyStatus == true) {
         this.mainForm = this.fb.group({
             resPlans: this.fb.array([])
         });
@@ -1098,8 +1115,6 @@ if (sequences.length > projectDuration.length) {
 
         this.appExitToBISub = this._appSvc.exitToBI$.subscribe(() => this.exitToBI(this._appSvc.mainFormDirty))
 
-
-
         this.fromDate = this._appSvc.queryParams.fromDate
         this.toDate = this._appSvc.queryParams.toDate
         this.timescale = this._appSvc.queryParams.timescale
@@ -1118,7 +1133,7 @@ if (sequences.length > projectDuration.length) {
        
        
         })
-         }//ready status true
+        // }//ready status true
        }
 
        refreshResPlans(): any {
@@ -1153,7 +1168,7 @@ if (sequences.length > projectDuration.length) {
 
        informPMAllocationDoesNotApply(): void {
            debugger;
-            if ((this.ikeProtocolCheck() == true && this.validPMAllocationProjectExists == false) && this.savableResPlans.length == 0) {
+            //if ((this.ikeProtocolCheck() == true && this.validPMAllocationProjectExists == false) && this.savableResPlans.length == 0) {
                 debugger;
                 let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
                 , content: "This action will permanently add default PM Allocations to the selected project(s)." });
@@ -1162,18 +1177,18 @@ if (sequences.length > projectDuration.length) {
                 console.log('ok it does kind of work...')
              
                
-            }   
-            debugger; 
+           // }   
+            // debugger; 
               
-            this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
-            this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
-            this.refreshStatus(this.ikeProtocolCheck());
-            debugger;
-            let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
-            , content: "This action will permanently add default PM Allocations to the selected project(s)." });
+            // this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+            // this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
+            // this.refreshStatus(this.ikeProtocolCheck());
+            // debugger;
+            // let dialogRef = this.openDialog({ title: "There are no projects that PM Allocation can be applied to. (PM Allocations are applied if the resource manager and the project owner are the same individual) "
+            // , content: "This action will permanently add default PM Allocations to the selected project(s)." });
 
             
-            console.log('ok it does kind of work...')
+            // console.log('ok it does kind of work...')
        }
 
        PMAllocationApplicableCheck() {
@@ -1401,26 +1416,6 @@ if (sequences.length > projectDuration.length) {
        return projectFinishDate;
    }
 
-   filterOutStableProjects(resPlans: ResPlan[]): ResPlan[] {
-       debugger;
-       console.log('coffee filter: what are resplans?', resPlans, this.savableResPlans)
-       let filteredResPlans: ResPlan[] = [];
-       if (resPlans.length > 0) {
-        resPlans.forEach((resPlan) => {
-            resPlan.projects =  this.checkProjectsForUpdates(resPlan)
-            filteredResPlans.push(resPlan);
-       })
-       console.log('venus', filteredResPlans);
-       return filteredResPlans;
-       }
-       if(this.runItBack < 6) {
-        this.runItBack++;
-        this.pmAllocationProtocol();
-       }
-       
-       return [];
-      
-   }
 
    checkProjectsForUpdates(resPlan: ResPlan): IProject[] {
        debugger;
