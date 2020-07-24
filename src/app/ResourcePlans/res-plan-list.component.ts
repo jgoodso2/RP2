@@ -1400,7 +1400,7 @@ if (sequences.length > projectDuration.length) {
         let projectDurationIntervals: IInterval[] = [];
         let formattedStartDate = this.PmAllocationStartDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedStartDate(projectToAddPMAllocation.startDate);
         let formattedEndDate =  this.PmAllocationEndDate(projectToAddPMAllocation);//this._resPlanUserStateSvc.getModifiedEndDate(projectToAddPMAllocation.finishDate);
-        projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,Timescale.calendarMonths);
+        projectDurationIntervals = this._resPlanUserStateSvc.exbuildIntervals(formattedStartDate,formattedEndDate,this.timescale);
         console.log('looking for forrester intervals', projectDurationIntervals);
         return projectDurationIntervals;
      }
@@ -1432,10 +1432,10 @@ if (sequences.length > projectDuration.length) {
         console.log("the meaning of time: projectstartdate,typeof,projectstartdatetransofrmedtostring", project.startDate, typeof(project.startDate), this._resPlanUserStateSvc.getDateFormatString(project.startDate));
         if(projectStartDate < todayDate) {
             console.log('use today date because todays date is more current than project start date: start date, today dates', project.startDate, todayDate)
-            return this._resPlanUserStateSvc.getModifiedStartDate(todayDate);
+            return this._resPlanUserStateSvc.getModifiedStartDate(todayDate, this.timescale);
         }
         console.log('use project start date bc project has  not started as of etalready: startdate, today date', projectStartDate, todayDate);
-        return  this._resPlanUserStateSvc.getModifiedStartDate(projectStartDate);
+        return  this._resPlanUserStateSvc.getModifiedStartDate(projectStartDate, this.timescale);
     }
 
     PmAllocationEndDate(project: IProject) {
@@ -1447,7 +1447,7 @@ if (sequences.length > projectDuration.length) {
         //     return this._resPlanUserStateSvc.getModifiedEndDate(todayDate);
         // }
         console.log('use project end date bc project has  not ended as of etalready: enddate, today date', projectEndDate, todayDate);
-        return  this._resPlanUserStateSvc.getModifiedEndDate(projectEndDate);
+        return  this._resPlanUserStateSvc.getModifiedEndDate(projectEndDate, this.timescale);
     }
 
     getPMAllocationIntervalRange(projectToAddPMAllocation: IProject, projectData): any[] {

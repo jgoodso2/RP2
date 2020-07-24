@@ -354,11 +354,13 @@ export class ResourcePlanUserStateService {
         return moment().toDate();
     }
 
-    getModifiedStartDate(date: Date) {
+    getModifiedStartDate(date: Date, timescale:Timescale ) {
+       debugger;
        return moment(date).startOf('month').toDate();
     }
     
-    getModifiedEndDate(date: Date) {
+    getModifiedEndDate(date: Date, timescale: Timescale) {
+       debugger;
        return moment(date).endOf('month').toDate();
     }
 
