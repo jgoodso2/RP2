@@ -113,7 +113,7 @@ export class ResourcePlanUserStateService {
             });
 
             let projectsType0$ =  Observable.of(resource).flatMap(resource => {
-                let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
+                let filter = `$filter=ResourceName eq '${resource.resName.replace("'", "''")}' and AssignmentType eq 0 and AssignmentStartDate gt datetime'${moment().subtract(60, 'days').format('YYYY-MM-DD')}'`
                 let url = baseUrl + '?' + filter + '&' + select;
     
                 return this.http.get(url, options)
@@ -198,7 +198,7 @@ export class ResourcePlanUserStateService {
             ;
         //console.log('=======================hitting project server for assigments')
         return Observable.from(resources).flatMap(t => {
-            let filter = `$filter=TimesheetOwnerId eq guid'${t.resUid}' and PeriodStartDate gt datetime'${moment().subtract(30, 'days').format('YYYY-MM-DD')}'`
+            let filter = `$filter=TimesheetOwnerId eq guid'${t.resUid}' and PeriodStartDate gt datetime'${moment().subtract(60, 'days').format('YYYY-MM-DD')}'`
             let url = baseUrl + '?' + filter + '&' + select;
 
             // get unique project Uids from PS where the current resource has access to

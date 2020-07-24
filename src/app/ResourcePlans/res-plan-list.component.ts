@@ -204,7 +204,7 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     exitToPerView(mainFormIsDirty) {
 
-        this.checkForUnsavedChanges(mainFormIsDirty, "https://perview.app.parallon.com/PWA")
+        this.checkForUnsavedChanges(mainFormIsDirty, "https://perviewqa.app.parallon.com/PWA")
 
     }
 
@@ -226,12 +226,9 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
 
     exitToBI(mainFormIsDirty) {
 
-        this.checkForUnsavedChanges(mainFormIsDirty, "https://perview.app.parallon.com/PWA/ProjectBICenter/All%20Reports/Forms/Resource%20Mgmt%20Reports.aspx")
+        this.checkForUnsavedChanges(mainFormIsDirty, "https://perviewqa.app.parallon.com/PWA/ProjectBICenter/All%20Reports/Forms/Resource%20Mgmt%20Reports.aspx")
 
     }
-
-
-
 
     calculateTotals(fg: FormGroup): void {
 
