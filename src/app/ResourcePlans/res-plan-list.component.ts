@@ -568,8 +568,8 @@ export class ResPlanListComponent implements OnInit, OnDestroy {
                 let arrayOfObservables: any[] = [];
 
                 // const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
-               this.setPMAllocationCandidates().flatMap( () => this.getProjectPMAllocations().do(data => this.projectsWithPMAllocationsList = data)).flatMap((data) => this.pmAllocationProtocol(data))
-               .subscribe( () => this.ikeProtocol())
+               this.setPMAllocationCandidates().flatMap( () => this.getProjectPMAllocations().do(data => this.projectsWithPMAllocationsList = data)).flatMap((data) => this.updatePMAllocationsInResPlan(data))
+               .subscribe( () => this.savePMAllocation())
                
              
             
@@ -929,10 +929,10 @@ if (sequences.length > projectDuration.length) {
   
 
 */
-    setPMAllocationCandidates(): Observable<any[]> {
+    setPMAllocationCandidates(): Observable<IProject[]> { //any because date returned is not a date model type: [project, pmAllocation, projectOwnerName]
      
         let resourcePlans = this.getSelectedProjects();
-        let localCandidates: any[] = [];
+        let localCandidates: IProject[] = [];
         resourcePlans.forEach( (resourcePlan) => {
             resourcePlan.projects.forEach( (project) => {
                 this.PMAllocationCandidates.push(project);
@@ -946,7 +946,7 @@ if (sequences.length > projectDuration.length) {
      
 }
 
-    getProjectPMAllocations(): Observable<any> {
+    getProjectPMAllocations(): Observable<any> { //returns an observable of observables of  [project, pmAllocation, projectOwnerName] and therefore I used any
         debugger;
         let localCandidates = this.PMAllocationCandidates
        
@@ -955,14 +955,14 @@ if (sequences.length > projectDuration.length) {
   
   
 
-     pmAllocationProtocol(data: any): Observable <any[]> {
+     updatePMAllocationsInResPlan(data: any): Observable <ResPlan[]> {
          // list of projects = [project,pmAllocation,ProjectManager]
          console.log('why hello pmALlocation protocol')
          this.pmAllocationCounter++
          this.numberOfSelectedProjects = this.PMAllocationCandidates.length;
          //bryson
          debugger;
-        let updatedResourcePlans = [];
+        let updatedResourcePlans: ResPlan[] = [];
         let resourcePlans = this.getSelectedProjects();
         let maxResPlanDate = this.determineResPlanMaxDate(resourcePlans)
         this.maxToDate = maxResPlanDate; 
@@ -1032,11 +1032,12 @@ if (sequences.length > projectDuration.length) {
          debugger;
          console.log('you a dog', updatedResourcePlans);   
          console.log('[kat meow?]',this.savableResPlans); 
-         if (this.savableResPlans.length == 0) {this.informPMAllocationDoesNotApply();}
+         if (this.savableResPlans.length == 0) {this.informPMAllocationDoesNotApply(); this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
+            this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide()); }
         return Observable.from(updatedResourcePlans);
        }
 
-        ikeProtocol() {
+        savePMAllocation(): void {
             debugger;
             if( this.savableResPlans.length == 0) {
                 this.informPMAllocationDoesNotApply();
@@ -1087,7 +1088,7 @@ if (sequences.length > projectDuration.length) {
         }
        // return updatedResourcePlans
 
-       refreshStatus(readyStatus: Boolean): any {
+       refreshStatus(readyStatus: Boolean): void {
      /*    this._appSvc.resourceOrProjectsSelected(this.AnyResPlanSelectedForDeleteOrHide());
         this._appSvc.resourceSelected(this.AnyResPlanSelectedForDeleteOrHide());
         this.PMAllocationCandidates = []; */
@@ -1136,7 +1137,7 @@ if (sequences.length > projectDuration.length) {
         // }//ready status true
        }
 
-       refreshResPlans(): any {
+       refreshResPlans(): IResPlan[] {
         // let resourceplans = this.fb.array(this.resPlans.controls
         //     ).controls
         //     .map(t => {
@@ -1276,7 +1277,7 @@ if (sequences.length > projectDuration.length) {
         return false;
     }
 
-    pmAllocationExistsInProject(referenceProject: any){
+    pmAllocationExistsInProject(referenceProject: Boolean){
         console.log('referenceProjectbulldogs');
         let pmAllocation = referenceProject[1];
         if(pmAllocation !== null) {
