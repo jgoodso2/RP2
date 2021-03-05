@@ -127,68 +127,221 @@ excelObject = {
       }//end for block
     },
 
-    transformToCSV: function(resPlanData, filename) {
-       //build the first row (dates) - only 1 please
-   
-      let excelData: string = ',,';
-
-      for (var i = 0; i < resPlanData.length; i++ ) {
-        if (resPlanData[i].projects.length > 0) {
-          resPlanData[i].projects[0].intervals.forEach(interval=> {
-            excelData +=  moment(interval.start).format('MM/DD/YY') +' - ' + moment(interval.end).format('MM/DD/YY') + ',' 
-          })   
-          excelData += '\r\n' 
-          break
-        }
-        else {
-          
-          continue
-        }  
-        
-      }
-
-      resPlanData.forEach(resPlan => {
-        
-          let resourcename = resPlan.resource.resName;
-          let intervalNames : string[];
-          
-          if (resPlan.projects.length > 0) {
-              resPlan.projects.forEach(project=>{
-                excelData += resourcename +',';
-                excelData += project.projName + ','
-                project.intervals.forEach(interval => {
-                  excelData += interval.intervalValue.toString() + ','
-               })
-               excelData += '\r\n'
-          
-               if (project.timesheetData !== null) {
-                 excelData += 'Actuals,,'
-                 project.timesheetData.forEach((timesheetInterval) => {
-                   excelData += timesheetInterval.intervalValue.toString() + ','
-                 })
-                 excelData += '\r\n'
-                 
-               }//end if statement testing whether timesheet data is available
-              
-              });//end of single project instance
-          }
-          else {
-              excelData += resourcename + ','  + '\r\n'
-          }   
-      }); //end of data collection
-      console.log('excelData works:', excelData);
-      let csv = excelData;  
-      var blob = new Blob([csv], { type: "text/csv" });
+    transformToCSV: function(resPlanData, filename, workUnits) {
+      //build the first row (dates) - only 1 please
+     let timescaleStringAddition: string;
+     timescaleStringAddition = this.formatTimescaleString(workUnits); //This should actually be the workscalestring addition and you should change the symbol future dev. Sincerely, Ike
+     let excelData: string = ',,';
+     debugger
+     for (var i = 0; i < resPlanData.length; i++ ) {
+       if (resPlanData[i].projects.length > 0) {
+         resPlanData[i].projects[0].intervals.forEach(interval=> {
+           excelData +=  moment(interval.start).format('MM/DD/YY') +' - ' + moment(interval.end).format('MM/DD/YY') + ',' 
+         })   
+         excelData += '\r\n' 
+         break
+       }
+       else {
+         
+         continue
+       }  
+       
+     }
   
-      // Determine which approach to take for the download
-      if (navigator.msSaveOrOpenBlob) {
-      // Works for Internet Explorer and Microsoft Edge
-        navigator.msSaveOrOpenBlob(blob, this._filename + ".csv");
-      } else {      
-        this._downloadAnchor(URL.createObjectURL(blob), 'csv');      
-      }
-
+     resPlanData.forEach(resPlan => {
+       
+         let resourcename = resPlan.resource.resName;
+         let intervalNames : string[];
+         
+         if (resPlan.projects.length > 0) {
+            let resPlanintervalTotalRow =  this.getResplanIntervalTotalRows(resPlan);
+            debugger;
+             excelData += resourcename +',';
+             debugger;
+             excelData += 'TOTAL' +','
+             resPlanintervalTotalRow.forEach( interval => {
+               debugger;
+               
+               let testFormatB =  this.formatExcelValue(interval.toString(),workUnits) //remove when it works.
+               excelData += this.formatExcelValue(interval.toString(),workUnits,false) + timescaleStringAddition + ','
+             })
+             //start timesheet data
+             if (resPlan.projects[0].timesheetData !== null) { 
+              let resPlanIntervalTimesheetTotalRow =  this.getResplanIntervalTimesheetTotalRows(resPlan);
+              excelData +=  '\r\n'
+              excelData += resourcename +',';
+              excelData += 'Timesheet Totals' +','
+              resPlanIntervalTimesheetTotalRow.forEach( interval => {
+                debugger;
+              
+                let testFormatB =  this.formatExcelValue(interval.toString(),workUnits) //remove when it works.
+                excelData += this.formatExcelValue(interval.toString(),workUnits,true) + timescaleStringAddition + ','
+              })
+             }
+             //end timesheet total data
+  
+             excelData +=  '\r\n'
+             
+             resPlan.projects.forEach(project=>{
+              
+               excelData += resourcename +',';
+               excelData += project.projName + ','
+               project.intervals.forEach(interval => {
+                 excelData +=  this.formatExcelValue(interval.intervalValue.toString(),workUnits) + timescaleStringAddition + ','
+              })
+              excelData += '\r\n'
+         
+              if (project.timesheetData !== null) {
+                excelData += 'Actuals,,'
+                project.timesheetData.forEach((timesheetInterval) => {
+                  excelData += this.formatExcelValue(timesheetInterval.intervalValue.toString(), workUnits,true) + this.workscaleStringAdditionCheck( timesheetInterval.intervalValue.toString(),timescaleStringAddition) + ','
+                })
+                excelData += '\r\n'
+                
+              }//end if statement testing whether timesheet data is available
+             
+             });//end of single project instance
+         }
+         else {
+             excelData += resourcename + ','  + '\r\n'
+         }   
+     }); //end of data collection
+     console.log('excelData works:', excelData);
+     let csv = excelData;  
+     var blob = new Blob([csv], { type: "text/csv" });
+  
+     // Determine which approach to take for the download
+     if (navigator.msSaveOrOpenBlob) {
+     // Works for Internet Explorer and Microsoft Edge
+       navigator.msSaveOrOpenBlob(blob, this._filename + ".csv");
+     } else {      
+       this._downloadAnchor(URL.createObjectURL(blob), 'csv');      
+     }
+  
   },
+  
+     formatTimescaleString: function(workUnits) {
+       console.log('formatTimeScaleString', workUnits)
+       debugger;
+        if (workUnits == 1) { //hours
+          return 'hr'
+        }
+  
+        if (workUnits == 2) { //days
+          return 'd'
+        }
+  
+        if (workUnits == 3) { //FTE
+          return '%'
+        }
+  
+        
+        
+      },
+  
+      formatExcelValue(value:string, workunits, timesheet:Boolean)
+      {
+        debugger;
+          if(value && value.toUpperCase() != "NA"){
+          if(workunits == 1)
+          {
+            return parseFloat(value).toFixed(0);
+          }
+          else if(workunits == 2 ){
+              return (+parseFloat(value)).toFixed(1); //was 1 prior
+          }
+          else{
+              if(timesheet === true) {
+                return parseFloat(value).toFixed(0);
+              }
+              return (+(parseFloat(value)) * 100).toFixed(0)//parseFloat(value).toFixed(0);
+              // //do you need to multiply by 100? If so, use line below possibly
+              // return (+(parseFloat(value)) * 100).toFixed(0)
+          }
+      }
+      debugger;
+      return 0;//value;
+  
+      },
+  
+      workscaleStringAdditionCheck(value:string,timescaleStringAddition) {
+        debugger;
+          if(value && value.toUpperCase() == "NA"){
+            return ''
+          }
+      
+         return timescaleStringAddition;//value;
+      },
+  
+      getTimeScaleString: function() {
+        return this.excelObject.timescale;
+      },
+  
+      getResplanIntervalTotalRows: function(resplan) {
+        let intervalBuckets = this.createIntervalBuckets(resplan.projects[0].intervals);
+        debugger;
+        resplan.projects.forEach( (project) => {
+           project.intervals.forEach((interval,index) => {
+             debugger;
+            intervalBuckets[index][1].push(parseFloat(interval.intervalValue));
+           })
+        })
+       
+       const intervalSum = arr => arr.reduce((a,b) => a + b, 0);
+     
+       //let resPlanIntervalTotals = intervalBuckets.map( (bucket) => {intervalSum(bucket[1])} )
+       let resPlanIntervalTotals = intervalBuckets.map( (bucket) => { return this.sumIntervals(bucket[1])} )
+       debugger;
+       debugger;
+       return resPlanIntervalTotals;
+      },
+  
+      getResplanIntervalTimesheetTotalRows: function(resplan) {
+        let intervalBuckets = this.createIntervalBuckets(resplan.projects[0].intervals);
+        debugger;
+        resplan.projects.forEach( (project) => {
+           project.timesheetData.forEach((interval,index) => {
+             debugger;
+            intervalBuckets[index][1].push(parseFloat(this.NACheck(interval.intervalValue)));
+           })
+        })
+       
+       const intervalSum = arr => arr.reduce((a,b) => a + b, 0);
+     
+       //let resPlanIntervalTotals = intervalBuckets.map( (bucket) => {intervalSum(bucket[1])} )
+       let resPlanIntervalTotals = intervalBuckets.map( (bucket) => { return this.sumIntervals(bucket[1])} )
+       debugger;
+       debugger;
+       return resPlanIntervalTotals;
+      },
+  
+      NACheck(value) {
+        if(value == "NA") {
+          return "0"
+        }
+        else return value;
+      },
+  
+      sumIntervals: function(intervals) {
+        intervals[0] = 0;
+  
+        let newIntervals =   intervals.reduce((a,b) => a + b, 0);
+        debugger;
+        return newIntervals;
+      },
+  
+  
+      createIntervalBuckets: function(intervals) {
+        console.log('inside createIntervalBuckets....intervals =', intervals)
+        let arrayOfIntervalBuckets = []
+        debugger;
+        intervals.forEach((interval,index) => {
+          debugger;
+          arrayOfIntervalBuckets.push([index,[interval.intervalValue]])
+        })
+        return arrayOfIntervalBuckets;
+      },
+  
 
 
 
